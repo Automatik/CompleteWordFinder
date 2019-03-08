@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">CompleteWordFinder</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Complete Word Finder</string>
+    <string name="nav_header_subtitle">words &amp; anagrams</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="fragment_anagram_textinput_hint">Insert Word</string>
+    <string name="fragment_anagram_find_button_text">FIND</string>
+    <string name="nav_item_anagrams">Anagrams</string>
+    <string name="nav_item_begins_with">Begins With</string>
+    <string name="nav_item_words_contained">Words Contained</string>
+    <string name="nav_item_sub_anagrams">Sub Anagrams</string>
+    <string name="nav_item_wildcards">Wildcards</string>
+</resources>
