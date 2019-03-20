@@ -1,6 +1,8 @@
 package emilsoft.completewordfinder;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Objects;
 
 public class TrieNode implements Serializable {
 
@@ -29,4 +31,23 @@ public class TrieNode implements Serializable {
         //outDegree = 0;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TrieNode trieNode = (TrieNode) o;
+        return isWord == trieNode.isWord &&
+                character == trieNode.character &&
+                Arrays.equals(children, trieNode.children) &&
+                Objects.equals(parent, trieNode.parent) &&
+                Objects.equals(failure, trieNode.failure) &&
+                Objects.equals(output, trieNode.output);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(isWord, character, parent, failure, output);
+        result = 31 * result + Arrays.hashCode(children);
+        return result;
+    }
 }

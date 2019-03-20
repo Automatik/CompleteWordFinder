@@ -253,29 +253,4 @@ public class Trie implements Serializable {
         }
     }
 
-//    public void write(final UnsafeMemory buffer) {
-//        TrieNode temp = root.children[0];
-//        Log.v(MainActivity.TAG, "Original - Character: "+temp.character);
-//        TrieNode t = buffer.shallowCopy(temp);
-//        Log.v(MainActivity.TAG, "Returned - Character: "+t.character);
-////        buffer.putTrieNode(root);
-////        ArrayDeque<TrieNode> nodesQueue = new ArrayDeque<>();
-////        nodesQueue.offer(root);
-////        while(!nodesQueue.isEmpty()){
-////            TrieNode current = nodesQueue.poll();
-////            for(int i = 0; i < ALPHABET_SIZE; i++){
-////                TrieNode temp = current.children[i];
-////                if(temp != null){
-////                    nodesQueue.offer(temp);
-////                    buffer.putTrieNode(temp);
-////                }
-////            }
-////        }
-//    }
-
-//    public static Trie read(final UnsafeMemory buffer) {
-//        final TrieNode root = buffer.getTrieNode();
-//        return new Trie(root);
-//    }
-
 }

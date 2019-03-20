@@ -1,19 +1,19 @@
 package emilsoft.completewordfinder;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.InputFilter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputEditText;
 
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
 import java.util.Objects;
 
 import androidx.annotation.NonNull;
@@ -24,35 +24,28 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 import utils.KeyboardHelper;
-import utils.MyInputFilter;
 import utils.WordUtils;
-import viewmodel.BeginsWithViewModel;
+import viewmodel.SubAnagramsViewModel;
 import viewmodel.TrieViewModel;
 import viewmodel.TrieViewModelFactory;
 
-public class BeginsWithFragment extends Fragment {
+public class SubAnagramsFragment extends Fragment {
 
     private Button find;
     private TextInputEditText textinput;
     private RecyclerView wordslist;
-    private TextView textDescription, textNoWordsFound;
+    private TextView textDescription;
     private AnagramRecyclerViewAdapter adapter;
     private TrieViewModel trieViewModel;
-    private BeginsWithViewModel beginsWithViewModel;
-    private ProgressBar progressBarLoadingWords;
+    private SubAnagramsViewModel subAnagramsViewModel;
 
     private static final String TEXT_INSERTED_STATE = "textInserted";
-    private static final String TEXT_NO_WORDS_FOUND_STATE = "textNoWordsFound";
-    private static final String TEXT_PROGRESSBAR_LOADING_WORDS_STATE = "textNoWordsFound";
-    private boolean isTextNoWordsFoundVisible = false, isProgressBarLoadingWordsVisible = false;
 
-    public BeginsWithFragment() {}
-
-    public static BeginsWithFragment newInstance() {
+    public static SubAnagramsFragment newInstance() {
 
         Bundle args = new Bundle();
 
-        BeginsWithFragment fragment = new BeginsWithFragment();
+        SubAnagramsFragment fragment = new SubAnagramsFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -60,7 +53,7 @@ public class BeginsWithFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        beginsWithViewModel = ViewModelProviders.of(this).get(BeginsWithViewModel.class);
+        subAnagramsViewModel = ViewModelProviders.of(this).get(SubAnagramsViewModel.class);
         trieViewModel = ViewModelProviders.of(getActivity(),
                 new TrieViewModelFactory(getActivity().getApplication(), MainActivity.DICTIONARY)).get(TrieViewModel.class);
     }
@@ -73,12 +66,10 @@ public class BeginsWithFragment extends Fragment {
         find = (Button) view.findViewById(R.id.find_button);
         wordslist = (RecyclerView) view.findViewById(R.id.words_list);
         textDescription = (TextView) view.findViewById(R.id.text_description);
-        textNoWordsFound = (TextView) view.findViewById(R.id.text_no_words_found);
-        progressBarLoadingWords = (ProgressBar) view.findViewById(R.id.progressBarLoadingWords);
         find.setOnClickListener(onClickListener);
         textinput.setOnFocusChangeListener(onFocusChangeListener);
         textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters()));
-        textDescription.setText(R.string.text_description_begins_with);
+        textDescription.setText(R.string.text_description_sub_anagrams);
         return view;
     }
 
@@ -88,21 +79,9 @@ public class BeginsWithFragment extends Fragment {
         if(savedInstanceState != null) {
             String textInserted = savedInstanceState.getString(TEXT_INSERTED_STATE);
             textinput.setText(textInserted);
-            if(beginsWithViewModel.wordsFound != null && adapter == null) {
-                adapter = new AnagramRecyclerViewAdapter(beginsWithViewModel.wordsFound);
+            if(subAnagramsViewModel.wordsFound != null && adapter == null) {
+                adapter = new AnagramRecyclerViewAdapter(subAnagramsViewModel.wordsFound);
                 wordslist.setAdapter(adapter);
-            }
-            isTextNoWordsFoundVisible = savedInstanceState.getBoolean(TEXT_NO_WORDS_FOUND_STATE);
-            if(isTextNoWordsFoundVisible)
-                textNoWordsFound.setVisibility(View.VISIBLE);
-            else
-                textNoWordsFound.setVisibility(View.INVISIBLE);
-            isProgressBarLoadingWordsVisible = savedInstanceState.getBoolean(TEXT_PROGRESSBAR_LOADING_WORDS_STATE);
-            if(isProgressBarLoadingWordsVisible && !isTextNoWordsFoundVisible)
-                progressBarLoadingWords.setVisibility(View.VISIBLE);
-            else {
-                isProgressBarLoadingWordsVisible = false;
-                progressBarLoadingWords.setVisibility(View.INVISIBLE);
             }
         }
     }
@@ -117,8 +96,6 @@ public class BeginsWithFragment extends Fragment {
         super.onSaveInstanceState(outState);
         if(textinput != null && textinput.getText() != null)
             outState.putString(TEXT_INSERTED_STATE,textinput.getText().toString());
-        outState.putBoolean(TEXT_NO_WORDS_FOUND_STATE, isTextNoWordsFoundVisible);
-        outState.putBoolean(TEXT_PROGRESSBAR_LOADING_WORDS_STATE, isProgressBarLoadingWordsVisible);
     }
 
     private View.OnClickListener onClickListener = new View.OnClickListener() {
@@ -129,20 +106,15 @@ public class BeginsWithFragment extends Fragment {
                 String textInserted = textinput.getText().toString().toLowerCase();
                 Log.v(MainActivity.TAG,"Text Inserted: "+textInserted);
 
-                isProgressBarLoadingWordsVisible = true;
-                progressBarLoadingWords.setVisibility(View.VISIBLE);
-                isTextNoWordsFoundVisible = false;
-                textNoWordsFound.setVisibility(View.INVISIBLE);
-
                 trieViewModel.getTrie().observe(getActivity(), new Observer<Trie>() {
                     @Override
                     public void onChanged(Trie trie) {
-                        beginsWithViewModel.wordsFound = trie.startsWith(textInserted);
-                        //No need to sort and remove duplicates
-                        WordUtils.wordsToUpperCase(beginsWithViewModel.wordsFound);
-                        Log.v(MainActivity.TAG, "Words[0]:"+beginsWithViewModel.wordsFound.get(0));
-                        Log.v(MainActivity.TAG, "Words["+Integer.toString(beginsWithViewModel.wordsFound.size()-1)+"]:"+beginsWithViewModel.wordsFound.get(beginsWithViewModel.wordsFound.size()-1));
-                        adapter = new AnagramRecyclerViewAdapter(beginsWithViewModel.wordsFound);
+                        subAnagramsViewModel.wordsFound = (ArrayList<String>) trie.permute(textInserted.toCharArray());
+                        subAnagramsViewModel.wordsFound = (ArrayList<String>) WordUtils.sortAndRemoveDuplicates(subAnagramsViewModel.wordsFound);
+                        WordUtils.wordsToUpperCase(subAnagramsViewModel.wordsFound);
+                        Log.v(MainActivity.TAG, "Words[0]:"+subAnagramsViewModel.wordsFound.get(0));
+                        Log.v(MainActivity.TAG, "Words["+Integer.toString(subAnagramsViewModel.wordsFound.size()-1)+"]:"+subAnagramsViewModel.wordsFound.get(subAnagramsViewModel.wordsFound.size()-1));
+                        adapter = new AnagramRecyclerViewAdapter(subAnagramsViewModel.wordsFound);
                         wordslist.setAdapter(adapter);
                     }
                 });
@@ -164,5 +136,4 @@ public class BeginsWithFragment extends Fragment {
             }
         }
     };
-
 }

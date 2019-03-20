@@ -1,5 +1,7 @@
 package emilsoft.completewordfinder;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -12,11 +14,13 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProviders;
+import utils.KeyboardHelper;
 import viewmodel.TrieViewModel;
 import viewmodel.TrieViewModelFactory;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -44,7 +48,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                KeyboardHelper.hideKeyboard(MainActivity.this);
+            }
+
+        };
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
@@ -53,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //Only create fragment if activity is started for the first time
         if (savedInstanceState == null) {
+            setTitle(getResources().getString(R.string.nav_item_anagrams));
             Fragment fragment = AnagramFragment.newInstance();
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
@@ -103,15 +115,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
         Fragment fragment;
         if (id == R.id.nav_anagrams) {
+            setTitle(getResources().getString(R.string.nav_item_anagrams));
             fragment = AnagramFragment.newInstance();
         } else if (id == R.id.nav_begins_with) {
+            setTitle(getResources().getString(R.string.nav_item_begins_with));
             fragment = BeginsWithFragment.newInstance();
         } else if (id == R.id.nav_words_contained) {
-            fragment = WordsInPatternFragment.newInstance(); //replace
+            setTitle(getResources().getString(R.string.nav_item_words_contained));
+            fragment = WordsInPatternFragment.newInstance();
         } else if (id == R.id.nav_sub_anagrams) {
-            fragment = BeginsWithFragment.newInstance(); //replace
+            setTitle(getResources().getString(R.string.nav_item_sub_anagrams));
+            fragment = SubAnagramsFragment.newInstance();
         } else if (id == R.id.nav_wildcards) {
-            fragment = BeginsWithFragment.newInstance(); //replace
+            setTitle(getResources().getString(R.string.nav_item_wildcards));
+            fragment = WildcardsFragment.newInstance();
         } else {
             fragment = AnagramFragment.newInstance();
         }

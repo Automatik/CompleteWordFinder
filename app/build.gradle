@@ -33,11 +33,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
     //For ViewMode,LiveData
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
-    //For Unsafe
-    implementation 'com.headius:unsafe-mock:8.92.1'
     //For Kryo
     implementation 'com.esotericsoftware:kryo:5.0.0-RC2'
-    //For FSTSerialization
-    implementation 'de.ruedigermoeller:fst:2.57'
 
 }

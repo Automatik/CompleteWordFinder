@@ -7,9 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 import androidx.annotation.NonNull;
@@ -19,6 +21,8 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
+import utils.KeyboardHelper;
+import utils.WordUtils;
 import viewmodel.TrieViewModel;
 import viewmodel.TrieViewModelFactory;
 import viewmodel.WordsInPatternViewModel;
@@ -28,6 +32,7 @@ public class WordsInPatternFragment extends Fragment {
     private Button find;
     private TextInputEditText textinput;
     private RecyclerView wordslist;
+    private TextView textDescription;
     private AnagramRecyclerViewAdapter adapter;
     private TrieViewModel trieViewModel;
     private WordsInPatternViewModel wordsInPatternViewModel;
@@ -58,8 +63,11 @@ public class WordsInPatternFragment extends Fragment {
         textinput = (TextInputEditText) view.findViewById(R.id.textinput);
         find = (Button) view.findViewById(R.id.find_button);
         wordslist = (RecyclerView) view.findViewById(R.id.words_list);
+        textDescription = (TextView) view.findViewById(R.id.text_description);
         find.setOnClickListener(onClickListener);
         textinput.setOnFocusChangeListener(onFocusChangeListener);
+        textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters()));
+        textDescription.setText(R.string.text_description_words_contained);
         return view;
     }
 
@@ -92,14 +100,16 @@ public class WordsInPatternFragment extends Fragment {
         @Override
         public void onClick(View v) {
             try {
-                String textInserted = textinput.getText().toString();
+                KeyboardHelper.hideKeyboard(getActivity());
+                String textInserted = textinput.getText().toString().toLowerCase();
                 Log.v(MainActivity.TAG,"Text Inserted: "+textInserted);
-                //new FindWordsStartWith().execute(textInserted);
 
                 trieViewModel.getTrie().observe(getActivity(), new Observer<Trie>() {
                     @Override
                     public void onChanged(Trie trie) {
-                        wordsInPatternViewModel.wordsFound = trie.startsWith(textInserted);
+                        wordsInPatternViewModel.wordsFound = (ArrayList<String>) trie.match(textInserted);
+                        wordsInPatternViewModel.wordsFound = (ArrayList<String>) WordUtils.sortAndRemoveDuplicates(wordsInPatternViewModel.wordsFound);
+                        WordUtils.wordsToUpperCase(wordsInPatternViewModel.wordsFound);
                         Log.v(MainActivity.TAG, "Words[0]:"+wordsInPatternViewModel.wordsFound.get(0));
                         Log.v(MainActivity.TAG, "Words["+Integer.toString(wordsInPatternViewModel.wordsFound.size()-1)+"]:"+wordsInPatternViewModel.wordsFound.get(wordsInPatternViewModel.wordsFound.size()-1));
                         adapter = new AnagramRecyclerViewAdapter(wordsInPatternViewModel.wordsFound);

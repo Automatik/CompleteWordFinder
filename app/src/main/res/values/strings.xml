@@ -13,4 +13,10 @@
     <string name="nav_item_words_contained">Words Contained</string>
     <string name="nav_item_sub_anagrams">Sub Anagrams</string>
     <string name="nav_item_wildcards">Wildcards</string>
+    <string name="text_description_anagrams">Find words from the given word\'s anagrams</string>
+    <string name="text_description_begins_with">Find words that start with given letters</string>
+    <string name="text_description_words_contained">Find words contained in given word</string>
+    <string name="text_description_sub_anagrams">Find words from combination of letters</string>
+    <string name="text_description_wildcars">Find words using the wildcard "?"</string>
+    <string name="text_no_words_found">No Words Found</string>
 </resources>

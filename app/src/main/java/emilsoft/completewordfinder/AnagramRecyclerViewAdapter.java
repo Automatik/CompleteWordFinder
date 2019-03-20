@@ -2,6 +2,8 @@ package emilsoft.completewordfinder;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +15,19 @@ import java.util.List;
 public class AnagramRecyclerViewAdapter extends RecyclerView.Adapter<AnagramRecyclerViewAdapter.ViewHolder> {
 
     private ArrayList<String> mWords;
+    private int defaultBackgroundColor, alternativeBackgroundColor, whiteColor, blackColor;
+    private int primary, primaryDark;
 
     public AnagramRecyclerViewAdapter(ArrayList<String> words) {
         if (words == null)
             mWords = new ArrayList<>(0);
         else mWords = words;
+        defaultBackgroundColor = Color.parseColor("#FAFAFA");
+        alternativeBackgroundColor = Color.parseColor("#AAAAAA");
+        whiteColor = Color.parseColor("#FFFFFF");
+        blackColor = Color.parseColor("#000000");
+        primary = Color.parseColor("#008577");
+        primaryDark = Color.parseColor("#00574B");
     }
 
     @NonNull
@@ -32,6 +42,14 @@ public class AnagramRecyclerViewAdapter extends RecyclerView.Adapter<AnagramRecy
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.mWord = mWords.get(position);
         holder.mText.setText(holder.mWord);
+        if(position % 2 == 0) {
+            holder.mText.setBackgroundColor(defaultBackgroundColor);
+            holder.mText.setTextColor(blackColor);
+        }
+        else {
+            holder.mText.setBackgroundColor(primary);
+            holder.mText.setTextColor(whiteColor);
+        }
     }
 
     @Override
