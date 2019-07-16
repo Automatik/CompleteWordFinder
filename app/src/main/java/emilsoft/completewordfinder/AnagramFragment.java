@@ -40,7 +40,8 @@ public class AnagramFragment extends Fragment {
     private AnagramRecyclerViewAdapter adapter;
     private AnagramViewModel anagramViewModel;
     private ProgressBar progressBarLoadingWords;
-    private FindAnagrams task;
+    private FindAnagrams findAnagramsTask;
+    private ReadDictionary readDictionaryTask;
 
     //TODO Extends for alphabets with more letters (e.g Swedish)
     private static final int[] PRIMES = new int[] { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31,
@@ -131,8 +132,10 @@ public class AnagramFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        if(task != null)
-            task.setListener(null);
+        if(findAnagramsTask != null)
+            findAnagramsTask.setListener(null);
+        if(readDictionaryTask != null)
+            readDictionaryTask.setListener(null);
         super.onDestroy();
     }
 
@@ -156,39 +159,61 @@ public class AnagramFragment extends Fragment {
                 else
                     adapter.notifyItemRangeRemoved(0, size);
 
-                task = new FindAnagrams(getContext(), MainActivity.DICTIONARY);
-                task.setListener(new FindAnagrams.FindAnagramsTaskListener() {
-                    @Override
-                    public void onFindAnagramsTaskNewWordFound(String newWord) {
-                        if(isProgressBarLoadingWordsVisible) {
-                            isProgressBarLoadingWordsVisible = false;
-                            progressBarLoadingWords.setVisibility(View.INVISIBLE);
-                        }
-                        if(!anagramViewModel.wordsFound.contains(newWord)) {
-                            anagramViewModel.wordsFound.add(newWord);
-                            adapter.notifyItemInserted(anagramViewModel.wordsFound.size() - 1);
-                        }
-                    }
+                if(anagramViewModel.dictionary.isEmpty())
+                    readDictionaryFirst(textInserted);
+                else
+                    findAnagrams(textInserted);
 
-                    @Override
-                    public void onFindAnagramsTaskFinished() {
-                        if(anagramViewModel.wordsFound.isEmpty()) {
-                            isProgressBarLoadingWordsVisible = false;
-                            progressBarLoadingWords.setVisibility(View.INVISIBLE);
-                            isTextNoWordsFoundVisible = true;
-                            textNoWordsFound.setVisibility(View.VISIBLE);
-                        } else {
-                            isTextNoWordsFoundVisible = false;
-                            textNoWordsFound.setVisibility(View.INVISIBLE);
-                        }
-                    }
-                });
-                task.execute(textInserted);
             } catch (NullPointerException ex) {
                 Log.v(MainActivity.TAG, "text inserted is null");
             }
         }
     };
+
+    private void readDictionaryFirst(String textInserted) {
+        readDictionaryTask = new ReadDictionary(getContext(), MainActivity.DICTIONARY);
+        readDictionaryTask.setListener(new ReadDictionary.ReadDictionaryTaskListener() {
+
+            @Override
+            public void onWordReadFinished(ArrayList<String> dictionary) {
+                anagramViewModel.dictionary = dictionary;
+                findAnagrams(textInserted);
+            }
+        });
+        readDictionaryTask.execute();
+    }
+
+    private void findAnagrams(String textInserted) {
+        //findAnagramsTask = new FindAnagrams(getContext(), MainActivity.DICTIONARY, anagramViewModel.dictionary);
+        findAnagramsTask = new FindAnagrams(anagramViewModel.dictionary);
+        findAnagramsTask.setListener(new FindAnagrams.FindAnagramsTaskListener() {
+            @Override
+            public void onFindAnagramsTaskNewWordFound(String newWord) {
+                if (isProgressBarLoadingWordsVisible) {
+                    isProgressBarLoadingWordsVisible = false;
+                    progressBarLoadingWords.setVisibility(View.INVISIBLE);
+                }
+                if (!anagramViewModel.wordsFound.contains(newWord)) {
+                    anagramViewModel.wordsFound.add(newWord);
+                    adapter.notifyItemInserted(anagramViewModel.wordsFound.size() - 1);
+                }
+            }
+
+            @Override
+            public void onFindAnagramsTaskFinished() {
+                if (anagramViewModel.wordsFound.isEmpty()) {
+                    isProgressBarLoadingWordsVisible = false;
+                    progressBarLoadingWords.setVisibility(View.INVISIBLE);
+                    isTextNoWordsFoundVisible = true;
+                    textNoWordsFound.setVisibility(View.VISIBLE);
+                } else {
+                    isTextNoWordsFoundVisible = false;
+                    textNoWordsFound.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+        findAnagramsTask.execute(textInserted);
+    }
 
     private View.OnFocusChangeListener onFocusChangeListener = new View.OnFocusChangeListener() {
         @Override
@@ -222,46 +247,31 @@ public class AnagramFragment extends Fragment {
     }
 
     private static class FindAnagrams extends AsyncTask<String, String, Void> {
-
-        private WeakReference<Context> context;
-        private String filename;
+        
         private ArrayList<String> words;
         private FindAnagramsTaskListener listener;
 
-        public FindAnagrams(Context context, String filename) {
-            this.context = new WeakReference<>(context);
-            this.filename = filename;
-            words = new ArrayList<>();
+        public FindAnagrams(ArrayList<String> words) {
+            this.words = words;
         }
 
         @Override
         protected Void doInBackground(String... strings) {
             String word = strings[0];
             long pw = calculateProduct(word.toUpperCase().toCharArray()); //Product of the word to match
-            try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(context.get().getAssets().open(filename)));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    char[] letters = line.toUpperCase().toCharArray();
-                    long product = calculateProduct(letters);
-                    if (product == pw) {
-                        //words.add(line);
-                        //int lastInsertedPosition = words.size() - 1;
-                        publishProgress(line);
-                    }
-                }
-                reader.close();
-                return null;
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                Log.v(MainActivity.TAG, "exception in asynctask FindAnagrams");
-                return null;
+            for(String w : words) {
+                w = w.toUpperCase();
+                char[] letters = w.toCharArray();
+                long product = calculateProduct(letters);
+                if(product == pw)
+                    publishProgress(w);
             }
+            return null;
         }
 
         @Override
         protected void onProgressUpdate(String... values) {
-            String newWord = values[0].toUpperCase();
+            String newWord = values[0];
             if(listener != null)
                 listener.onFindAnagramsTaskNewWordFound(newWord);
         }
@@ -282,6 +292,56 @@ public class AnagramFragment extends Fragment {
             void onFindAnagramsTaskNewWordFound(String newWord);
 
             void onFindAnagramsTaskFinished();
+
+        }
+    }
+
+    private static class ReadDictionary extends AsyncTask<Void, Void, Void> {
+
+        private WeakReference<Context> context;
+        private String filename;
+        private ReadDictionaryTaskListener listener;
+        private ArrayList<String> words;
+
+        public ReadDictionary(Context context, String filename) {
+            this.context = new WeakReference<>(context);
+            this.filename = filename;
+            words = new ArrayList<>();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                Log.v(MainActivity.TAG, "Starting reading dictionary");
+                BufferedReader reader = new BufferedReader(new InputStreamReader(context.get().getAssets().open(filename)));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                        words.add(line); //Should add .toLowerCase()?
+                }
+                reader.close();
+                Log.v(MainActivity.TAG, "Finished reading dictionary");
+                return null;
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                Log.v(MainActivity.TAG, "AnagramFragment/ReadDictionary: error reading dictionary");
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if(listener != null)
+                listener.onWordReadFinished(words);
+        }
+
+        public void setListener(ReadDictionaryTaskListener listener) {
+            this.listener = listener;
+        }
+
+        public interface ReadDictionaryTaskListener {
+
+            void onWordReadFinished(ArrayList<String> dictionary);
 
         }
     }

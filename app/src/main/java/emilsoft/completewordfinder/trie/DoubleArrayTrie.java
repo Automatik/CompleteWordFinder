@@ -61,7 +61,7 @@ public class DoubleArrayTrie implements Serializable {
      * letter of the alphabet. So the value of endmarkerOffset is set
      * equal to alphabetSize + 1.
      */
-    private static int endmarkerOffset;
+    private int endmarkerOffset;
 
     private IntegerList base;
 
