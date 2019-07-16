@@ -1,4 +1,4 @@
-package viewmodel;
+package emilsoft.completewordfinder.viewmodel;
 
 import android.app.Application;
 import androidx.lifecycle.AndroidViewModel;
@@ -6,6 +6,9 @@ import androidx.lifecycle.LiveData;
 import emilsoft.completewordfinder.MainActivity;
 import emilsoft.completewordfinder.Trie;
 import emilsoft.completewordfinder.TrieNode;
+import emilsoft.completewordfinder.trie.DoubleArrayTrie;
+import emilsoft.completewordfinder.trie.IntegerArrayList;
+import emilsoft.completewordfinder.trie.IntegerList;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -14,13 +17,20 @@ import android.util.Log;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.ByteBufferInput;
 import com.esotericsoftware.kryo.io.ByteBufferOutput;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.util.HashMapReferenceResolver;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 
 public class TrieViewModel extends AndroidViewModel {
 
@@ -36,11 +46,11 @@ public class TrieViewModel extends AndroidViewModel {
         else Log.v(MainActivity.TAG, "Is mTrie null? False");
     }
 
-    public LiveData<Trie> getTrie() {
+    public LiveData<DoubleArrayTrie> getTrie() {
         return mTrie;
     }
 
-    public class TrieLiveData extends LiveData<Trie> {
+    public class TrieLiveData extends LiveData<DoubleArrayTrie> {
 
         private final Context context;
 
@@ -50,20 +60,21 @@ public class TrieViewModel extends AndroidViewModel {
             Log.v(MainActivity.TAG, "TrieLiveData() called");
         }
 
-        private class CreateTrie extends AsyncTask<String, Void, Trie> {
+        private class CreateTrie extends AsyncTask<String, Void, DoubleArrayTrie> {
 
             @Override
-            protected Trie doInBackground(String... strings) {
+            protected DoubleArrayTrie doInBackground(String... strings) {
                 String filename = strings[0];
-                Trie trie = new Trie();
+                DoubleArrayTrie trie = new DoubleArrayTrie(); //TODO do we need to specific alphabet size?
                 long start, stop;
 
                 Kryo kryo = new Kryo();
-                kryo.register(Trie.class, 12);
-                kryo.register(TrieNode.class, 13);
-                kryo.register(TrieNode[].class, 14);
-                HashMapReferenceResolver referenceResolver = new HashMapReferenceResolver();
-                kryo.setReferenceResolver(referenceResolver);
+                kryo.register(DoubleArrayTrie.class, 12);
+                kryo.register(IntegerList.class, 13);
+                kryo.register(IntegerArrayList.class, 14);
+                kryo.register(ArrayList.class, 15);
+//                HashMapReferenceResolver referenceResolver = new HashMapReferenceResolver();
+//                kryo.setReferenceResolver(referenceResolver);
 
                 try {
                     // If trie already exists, read it
@@ -73,27 +84,30 @@ public class TrieViewModel extends AndroidViewModel {
 //                        BufferedInputStream bis = new BufferedInputStream(fis);
 //                        ObjectInputStream ois = new ObjectInputStream(bis);
 //                        Log.v(MainActivity.TAG, "Reading trie from file");
-//                        trie = (Trie) ois.readObject();
+//                        start = System.nanoTime();
+//                        trie = (DoubleArrayTrie) ois.readObject();
+//                        stop = System.nanoTime();
+//                        Log.v(MainActivity.TAG,"Java reading time: "+(((stop-start)/(double)1000000))+" ms");
 //                        Log.v(MainActivity.TAG, "Finished reading trie from file");
 //                        ois.close();
 //                        fis.close();
-//
-//                        Log.v(MainActivity.TAG, "Building trie's suffix links");
-//                        trie.buildSuffixLinks();
-//                        Log.v(MainActivity.TAG, "Finished building the trie");
+
+//                        FileInputStream fis = context.openFileInput(MainActivity.TRIE_FILENAME);
+//                        ByteBufferInput input = new ByteBufferInput(fis);
+//                        start = System.nanoTime();
+//                        trie = kryo.readObject(input, DoubleArrayTrie.class);
+//                        stop = System.nanoTime();
+//                        Log.v(MainActivity.TAG,"Kryo reading time: "+(((stop-start)/(double)1000000))+" ms");
+//                        input.close();
 
                         FileInputStream fis = context.openFileInput(MainActivity.TRIE_FILENAME);
-                        ByteBufferInput input = new ByteBufferInput(fis);
+                        BufferedInputStream bis = new BufferedInputStream(fis);
+                        Input input = new Input(bis);
                         start = System.nanoTime();
-                        TrieNode root = kryo.readObject(input, TrieNode.class);
-                        trie = new Trie(root);
+                        trie = kryo.readObject(input, DoubleArrayTrie.class);
                         stop = System.nanoTime();
                         Log.v(MainActivity.TAG,"Kryo reading time: "+(((stop-start)/(double)1000000))+" ms");
                         input.close();
-
-                        Log.v(MainActivity.TAG, "Building trie's suffix links");
-                        trie.buildSuffixLinks();
-                        Log.v(MainActivity.TAG, "Finished building the trie");
 
                     } else {
                         //Read dictionary file
@@ -118,24 +132,31 @@ public class TrieViewModel extends AndroidViewModel {
 //                        FileOutputStream fos = context.openFileOutput(MainActivity.TRIE_FILENAME, Context.MODE_PRIVATE);
 //                        BufferedOutputStream bos = new BufferedOutputStream(fos);
 //                        ObjectOutputStream oos = new ObjectOutputStream(bos);
+//                        start = System.nanoTime();
 //                        oos.writeObject(trie);
+//                        stop = System.nanoTime();
+//                        Log.v(MainActivity.TAG,"Java writing time: "+(((stop-start)/(double)1000000))+" ms");
 //                        oos.close();
 //                        fos.close();
 
 
 
+//                        FileOutputStream fos = context.openFileOutput(MainActivity.TRIE_FILENAME, Context.MODE_PRIVATE);
+//                        ByteBufferOutput output = new ByteBufferOutput(fos);
+//                        start = System.nanoTime();
+//                        kryo.writeObject(output, trie);
+//                        stop = System.nanoTime();
+//                        Log.v(MainActivity.TAG,"Kryo writing time: "+(((stop-start)/(double)1000000))+" ms");
+//                        output.close();
+
                         FileOutputStream fos = context.openFileOutput(MainActivity.TRIE_FILENAME, Context.MODE_PRIVATE);
-                        ByteBufferOutput output = new ByteBufferOutput(fos);
+                        BufferedOutputStream bos = new BufferedOutputStream(fos);
+                        Output output = new Output(bos);
                         start = System.nanoTime();
-                        kryo.writeObject(output, trie.getRoot());
+                        kryo.writeObject(output, trie);
                         stop = System.nanoTime();
                         Log.v(MainActivity.TAG,"Kryo writing time: "+(((stop-start)/(double)1000000))+" ms");
                         output.close();
-
-                        //After writing the trie, builds the suffix links
-                        Log.v(MainActivity.TAG, "Building trie's suffix links");
-                        trie.buildSuffixLinks();
-                        Log.v(MainActivity.TAG, "Finished building the trie");
 
                         Log.v(MainActivity.TAG, "Finished writing trie to file");
                     }
@@ -148,7 +169,7 @@ public class TrieViewModel extends AndroidViewModel {
             }
 
             @Override
-            protected void onPostExecute(Trie trie) {
+            protected void onPostExecute(DoubleArrayTrie trie) {
                 setValue(trie);
                 Log.v(MainActivity.TAG, "setValue(trie) called in onPostExecute of CreateTrie");
             }

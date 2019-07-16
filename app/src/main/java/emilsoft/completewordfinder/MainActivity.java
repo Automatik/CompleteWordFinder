@@ -1,7 +1,5 @@
 package emilsoft.completewordfinder;
 
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -14,9 +12,9 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProviders;
-import utils.KeyboardHelper;
-import viewmodel.TrieViewModel;
-import viewmodel.TrieViewModelFactory;
+import emilsoft.completewordfinder.utils.KeyboardHelper;
+import emilsoft.completewordfinder.viewmodel.TrieViewModel;
+import emilsoft.completewordfinder.viewmodel.TrieViewModelFactory;
 
 import android.view.Menu;
 import android.view.MenuItem;

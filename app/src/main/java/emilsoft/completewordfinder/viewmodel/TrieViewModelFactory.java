@@ -1,4 +1,4 @@
-package viewmodel;
+package emilsoft.completewordfinder.viewmodel;
 
 import android.app.Application;
 

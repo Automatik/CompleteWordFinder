@@ -1,4 +1,4 @@
-package viewmodel;
+package emilsoft.completewordfinder.viewmodel;
 
 import java.util.ArrayList;
 
@@ -11,5 +11,6 @@ public class WildcardsViewModel extends ViewModel {
 
     public WildcardsViewModel() {
         super();
+        wordsFound = new ArrayList<>();
     }
 }

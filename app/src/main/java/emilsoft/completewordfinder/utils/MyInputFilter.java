@@ -1,4 +1,4 @@
-package utils;
+package emilsoft.completewordfinder.utils;
 
 import android.text.InputFilter;
 import android.text.SpannableString;

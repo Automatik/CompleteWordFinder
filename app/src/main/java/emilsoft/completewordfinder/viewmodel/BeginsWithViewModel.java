@@ -1,4 +1,4 @@
-package viewmodel;
+package emilsoft.completewordfinder.viewmodel;
 
 import java.util.ArrayList;
 
@@ -8,8 +8,11 @@ public class BeginsWithViewModel extends ViewModel {
 
     //Words found from FindAnagrams
     public ArrayList<String> wordsFound;
+    public int[] headersIndex;
 
     public BeginsWithViewModel() {
         super();
+        wordsFound = new ArrayList<>();
+        headersIndex = new int[0];
     }
 }

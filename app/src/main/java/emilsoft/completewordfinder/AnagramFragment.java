@@ -11,9 +11,9 @@ import com.google.android.material.textfield.TextInputEditText;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
-import utils.KeyboardHelper;
-import utils.WordUtils;
-import viewmodel.AnagramViewModel;
+import emilsoft.completewordfinder.utils.KeyboardHelper;
+import emilsoft.completewordfinder.utils.WordUtils;
+import emilsoft.completewordfinder.viewmodel.AnagramViewModel;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +26,7 @@ import android.widget.TextView;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -39,6 +40,7 @@ public class AnagramFragment extends Fragment {
     private AnagramRecyclerViewAdapter adapter;
     private AnagramViewModel anagramViewModel;
     private ProgressBar progressBarLoadingWords;
+    private FindAnagrams task;
 
     //TODO Extends for alphabets with more letters (e.g Swedish)
     private static final int[] PRIMES = new int[] { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31,
@@ -127,6 +129,13 @@ public class AnagramFragment extends Fragment {
         outState.putBoolean(TEXT_PROGRESSBAR_LOADING_WORDS_STATE, isProgressBarLoadingWordsVisible);
     }
 
+    @Override
+    public void onDestroy() {
+        if(task != null)
+            task.setListener(null);
+        super.onDestroy();
+    }
+
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -137,7 +146,44 @@ public class AnagramFragment extends Fragment {
                 progressBarLoadingWords.setVisibility(View.VISIBLE);
                 isTextNoWordsFoundVisible = false;
                 textNoWordsFound.setVisibility(View.INVISIBLE);
-                new FindAnagrams(getContext(), MainActivity.DICTIONARY).execute(textInserted);
+
+                int size = anagramViewModel.wordsFound.size();
+                anagramViewModel.wordsFound.clear();
+                if(adapter == null) {
+                    adapter = new AnagramRecyclerViewAdapter(anagramViewModel.wordsFound);
+                    wordslist.setAdapter(adapter);
+                }
+                else
+                    adapter.notifyItemRangeRemoved(0, size);
+
+                task = new FindAnagrams(getContext(), MainActivity.DICTIONARY);
+                task.setListener(new FindAnagrams.FindAnagramsTaskListener() {
+                    @Override
+                    public void onFindAnagramsTaskNewWordFound(String newWord) {
+                        if(isProgressBarLoadingWordsVisible) {
+                            isProgressBarLoadingWordsVisible = false;
+                            progressBarLoadingWords.setVisibility(View.INVISIBLE);
+                        }
+                        if(!anagramViewModel.wordsFound.contains(newWord)) {
+                            anagramViewModel.wordsFound.add(newWord);
+                            adapter.notifyItemInserted(anagramViewModel.wordsFound.size() - 1);
+                        }
+                    }
+
+                    @Override
+                    public void onFindAnagramsTaskFinished() {
+                        if(anagramViewModel.wordsFound.isEmpty()) {
+                            isProgressBarLoadingWordsVisible = false;
+                            progressBarLoadingWords.setVisibility(View.INVISIBLE);
+                            isTextNoWordsFoundVisible = true;
+                            textNoWordsFound.setVisibility(View.VISIBLE);
+                        } else {
+                            isTextNoWordsFoundVisible = false;
+                            textNoWordsFound.setVisibility(View.INVISIBLE);
+                        }
+                    }
+                });
+                task.execute(textInserted);
             } catch (NullPointerException ex) {
                 Log.v(MainActivity.TAG, "text inserted is null");
             }
@@ -175,24 +221,17 @@ public class AnagramFragment extends Fragment {
         return (int) (dp * scale + 0.5f);
     }
 
-    private class FindAnagrams extends AsyncTask<String, String, Void> {
+    private static class FindAnagrams extends AsyncTask<String, String, Void> {
 
-        private Context context;
+        private WeakReference<Context> context;
         private String filename;
         private ArrayList<String> words;
+        private FindAnagramsTaskListener listener;
 
         public FindAnagrams(Context context, String filename) {
-            this.context = context;
+            this.context = new WeakReference<>(context);
             this.filename = filename;
             words = new ArrayList<>();
-        }
-
-        @Override
-        protected void onPreExecute() {
-            if (wordslist != null) {
-                adapter = new AnagramRecyclerViewAdapter(words);
-                wordslist.setAdapter(adapter);
-            }
         }
 
         @Override
@@ -200,7 +239,7 @@ public class AnagramFragment extends Fragment {
             String word = strings[0];
             long pw = calculateProduct(word.toUpperCase().toCharArray()); //Product of the word to match
             try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open(filename)));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(context.get().getAssets().open(filename)));
                 String line;
                 while ((line = reader.readLine()) != null) {
                     char[] letters = line.toUpperCase().toCharArray();
@@ -208,10 +247,6 @@ public class AnagramFragment extends Fragment {
                     if (product == pw) {
                         //words.add(line);
                         //int lastInsertedPosition = words.size() - 1;
-                        if(isProgressBarLoadingWordsVisible) {
-                            isProgressBarLoadingWordsVisible = false;
-                            progressBarLoadingWords.setVisibility(View.INVISIBLE);
-                        }
                         publishProgress(line);
                     }
                 }
@@ -227,23 +262,27 @@ public class AnagramFragment extends Fragment {
         @Override
         protected void onProgressUpdate(String... values) {
             String newWord = values[0].toUpperCase();
-            words.add(newWord);
-            adapter.notifyItemInserted(words.size()-1);
+            if(listener != null)
+                listener.onFindAnagramsTaskNewWordFound(newWord);
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            anagramViewModel.wordsFound = words;
-            if(anagramViewModel.wordsFound.isEmpty()) {
-                isProgressBarLoadingWordsVisible = false;
-                progressBarLoadingWords.setVisibility(View.INVISIBLE);
-                isTextNoWordsFoundVisible = true;
-                textNoWordsFound.setVisibility(View.VISIBLE);
-            } else {
-                isTextNoWordsFoundVisible = false;
-                textNoWordsFound.setVisibility(View.INVISIBLE);
-            }
+            if(listener != null)
+                listener.onFindAnagramsTaskFinished();
+        }
+
+        public void setListener(FindAnagramsTaskListener listener) {
+            this.listener = listener;
+        }
+
+        public interface FindAnagramsTaskListener {
+
+            void onFindAnagramsTaskNewWordFound(String newWord);
+
+            void onFindAnagramsTaskFinished();
+
         }
     }
 

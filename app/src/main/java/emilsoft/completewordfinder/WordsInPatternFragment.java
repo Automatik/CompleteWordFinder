@@ -1,12 +1,14 @@
 package emilsoft.completewordfinder;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputEditText;
@@ -21,23 +23,30 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
-import utils.KeyboardHelper;
-import utils.WordUtils;
-import viewmodel.TrieViewModel;
-import viewmodel.TrieViewModelFactory;
-import viewmodel.WordsInPatternViewModel;
+
+import emilsoft.completewordfinder.trie.DoubleArrayTrie;
+import emilsoft.completewordfinder.utils.KeyboardHelper;
+import emilsoft.completewordfinder.utils.WordUtils;
+import emilsoft.completewordfinder.viewmodel.TrieViewModel;
+import emilsoft.completewordfinder.viewmodel.TrieViewModelFactory;
+import emilsoft.completewordfinder.viewmodel.WordsInPatternViewModel;
 
 public class WordsInPatternFragment extends Fragment {
 
     private Button find;
     private TextInputEditText textinput;
     private RecyclerView wordslist;
-    private TextView textDescription;
-    private AnagramRecyclerViewAdapter adapter;
+    private TextView textDescription, textNoWordsFound;
+    private HeaderRecyclerViewAdapter adapter;
     private TrieViewModel trieViewModel;
     private WordsInPatternViewModel wordsInPatternViewModel;
+    private ProgressBar progressBarLoadingWords;
+    private FindWordsInPattern task;
 
     private static final String TEXT_INSERTED_STATE = "textInserted";
+    private static final String TEXT_NO_WORDS_FOUND_STATE = "textNoWordsFound";
+    private static final String TEXT_PROGRESSBAR_LOADING_WORDS_STATE = "textNoWordsFound";
+    private boolean isTextNoWordsFoundVisible = false, isProgressBarLoadingWordsVisible = false;
 
     public static WordsInPatternFragment newInstance() {
 
@@ -64,6 +73,8 @@ public class WordsInPatternFragment extends Fragment {
         find = (Button) view.findViewById(R.id.find_button);
         wordslist = (RecyclerView) view.findViewById(R.id.words_list);
         textDescription = (TextView) view.findViewById(R.id.text_description);
+        textNoWordsFound = (TextView) view.findViewById(R.id.text_no_words_found);
+        progressBarLoadingWords = (ProgressBar) view.findViewById(R.id.progressBarLoadingWords);
         find.setOnClickListener(onClickListener);
         textinput.setOnFocusChangeListener(onFocusChangeListener);
         textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters()));
@@ -78,8 +89,20 @@ public class WordsInPatternFragment extends Fragment {
             String textInserted = savedInstanceState.getString(TEXT_INSERTED_STATE);
             textinput.setText(textInserted);
             if(wordsInPatternViewModel.wordsFound != null && adapter == null) {
-                adapter = new AnagramRecyclerViewAdapter(wordsInPatternViewModel.wordsFound);
+                adapter = new HeaderRecyclerViewAdapter(wordsInPatternViewModel.wordsFound, wordsInPatternViewModel.headersIndex);
                 wordslist.setAdapter(adapter);
+            }
+            isTextNoWordsFoundVisible = savedInstanceState.getBoolean(TEXT_NO_WORDS_FOUND_STATE);
+            if(isTextNoWordsFoundVisible)
+                textNoWordsFound.setVisibility(View.VISIBLE);
+            else
+                textNoWordsFound.setVisibility(View.INVISIBLE);
+            isProgressBarLoadingWordsVisible = savedInstanceState.getBoolean(TEXT_PROGRESSBAR_LOADING_WORDS_STATE);
+            if(isProgressBarLoadingWordsVisible && !isTextNoWordsFoundVisible)
+                progressBarLoadingWords.setVisibility(View.VISIBLE);
+            else {
+                isProgressBarLoadingWordsVisible = false;
+                progressBarLoadingWords.setVisibility(View.INVISIBLE);
             }
         }
     }
@@ -94,6 +117,15 @@ public class WordsInPatternFragment extends Fragment {
         super.onSaveInstanceState(outState);
         if(textinput != null && textinput.getText() != null)
             outState.putString(TEXT_INSERTED_STATE,textinput.getText().toString());
+        outState.putBoolean(TEXT_NO_WORDS_FOUND_STATE, isTextNoWordsFoundVisible);
+        outState.putBoolean(TEXT_PROGRESSBAR_LOADING_WORDS_STATE, isProgressBarLoadingWordsVisible);
+    }
+
+    @Override
+    public void onDestroy() {
+        if(task != null)
+            task.setListener(null);
+        super.onDestroy();
     }
 
     private View.OnClickListener onClickListener = new View.OnClickListener() {
@@ -104,16 +136,40 @@ public class WordsInPatternFragment extends Fragment {
                 String textInserted = textinput.getText().toString().toLowerCase();
                 Log.v(MainActivity.TAG,"Text Inserted: "+textInserted);
 
-                trieViewModel.getTrie().observe(getActivity(), new Observer<Trie>() {
+                isProgressBarLoadingWordsVisible = true;
+                progressBarLoadingWords.setVisibility(View.VISIBLE);
+                isTextNoWordsFoundVisible = false;
+                textNoWordsFound.setVisibility(View.INVISIBLE);
+
+                trieViewModel.getTrie().observe(getActivity(), new Observer<DoubleArrayTrie>() {
                     @Override
-                    public void onChanged(Trie trie) {
-                        wordsInPatternViewModel.wordsFound = (ArrayList<String>) trie.match(textInserted);
-                        wordsInPatternViewModel.wordsFound = (ArrayList<String>) WordUtils.sortAndRemoveDuplicates(wordsInPatternViewModel.wordsFound);
-                        WordUtils.wordsToUpperCase(wordsInPatternViewModel.wordsFound);
-                        Log.v(MainActivity.TAG, "Words[0]:"+wordsInPatternViewModel.wordsFound.get(0));
-                        Log.v(MainActivity.TAG, "Words["+Integer.toString(wordsInPatternViewModel.wordsFound.size()-1)+"]:"+wordsInPatternViewModel.wordsFound.get(wordsInPatternViewModel.wordsFound.size()-1));
-                        adapter = new AnagramRecyclerViewAdapter(wordsInPatternViewModel.wordsFound);
-                        wordslist.setAdapter(adapter);
+                    public void onChanged(DoubleArrayTrie trie) {
+                        task = new FindWordsInPattern(trie);
+                        task.setListener((wordsFound, headersIndex) -> {
+
+                            if(isProgressBarLoadingWordsVisible) {
+                                isProgressBarLoadingWordsVisible = false;
+                                progressBarLoadingWords.setVisibility(View.INVISIBLE);
+                            }
+                            if(wordsFound.isEmpty()) {
+                                isTextNoWordsFoundVisible = true;
+                                textNoWordsFound.setVisibility(View.VISIBLE);
+                            }
+                            //headersIndex.length is the number of headers to insert in the recyclerview
+                            int size = wordsInPatternViewModel.wordsFound.size() + wordsInPatternViewModel.headersIndex.length;
+                            wordsInPatternViewModel.wordsFound.clear();
+                            if(adapter == null) {
+                                adapter = new HeaderRecyclerViewAdapter(wordsInPatternViewModel.wordsFound, wordsInPatternViewModel.headersIndex);
+                                wordslist.setAdapter(adapter);
+                            }
+                            else
+                                adapter.notifyItemRangeRemoved(0, size);
+                            wordsInPatternViewModel.wordsFound.addAll(wordsFound);
+                            wordsInPatternViewModel.headersIndex = headersIndex;
+                            adapter.setHeadersIndex(headersIndex);
+                            adapter.notifyItemRangeInserted(0, wordsFound.size() + headersIndex.length);
+                        });
+                        task.execute(textInserted);
                     }
                 });
             } catch (NullPointerException ex) {
@@ -134,5 +190,46 @@ public class WordsInPatternFragment extends Fragment {
             }
         }
     };
+
+    private static class FindWordsInPattern extends AsyncTask<String, Void, Void> {
+
+        private DoubleArrayTrie trie;
+        private ArrayList<String> words;
+        private int[] headersIndex;
+        private FindWordsInPatternTaskListener listener;
+
+        public FindWordsInPattern(DoubleArrayTrie trie) {
+            this.trie = trie;
+        }
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            String textInserted = strings[0];
+            words = (ArrayList<String>) trie.match(textInserted);
+            if(!words.isEmpty()) {
+                //WordUtils.sortAndRemoveDuplicates(words);
+                headersIndex = WordUtils.sortByWordLength(words);
+                WordUtils.wordsToUpperCase(words);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if(listener != null)
+                listener.onFindWordsInPatternTaskFinished(words, headersIndex);
+        }
+
+        public void setListener(FindWordsInPatternTaskListener listener) {
+            this.listener = listener;
+        }
+
+        public interface FindWordsInPatternTaskListener {
+
+            void onFindWordsInPatternTaskFinished(ArrayList<String> wordsFound, int[] headersIndex);
+
+        }
+    }
 
 }

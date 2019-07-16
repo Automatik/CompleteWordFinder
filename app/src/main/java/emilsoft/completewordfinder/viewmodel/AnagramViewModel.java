@@ -1,15 +1,16 @@
-package viewmodel;
+package emilsoft.completewordfinder.viewmodel;
 
 import java.util.ArrayList;
 
 import androidx.lifecycle.ViewModel;
 
-public class SubAnagramsViewModel extends ViewModel {
+public class AnagramViewModel extends ViewModel {
 
     //Words found from FindAnagrams
     public ArrayList<String> wordsFound;
 
-    public SubAnagramsViewModel() {
+    public AnagramViewModel() {
         super();
+        wordsFound = new ArrayList<>();
     }
 }

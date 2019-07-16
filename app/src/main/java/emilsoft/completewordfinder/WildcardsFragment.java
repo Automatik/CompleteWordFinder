@@ -1,12 +1,14 @@
 package emilsoft.completewordfinder;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputEditText;
@@ -21,23 +23,30 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
-import utils.KeyboardHelper;
-import utils.WordUtils;
-import viewmodel.TrieViewModel;
-import viewmodel.TrieViewModelFactory;
-import viewmodel.WildcardsViewModel;
+
+import emilsoft.completewordfinder.trie.DoubleArrayTrie;
+import emilsoft.completewordfinder.utils.KeyboardHelper;
+import emilsoft.completewordfinder.utils.WordUtils;
+import emilsoft.completewordfinder.viewmodel.TrieViewModel;
+import emilsoft.completewordfinder.viewmodel.TrieViewModelFactory;
+import emilsoft.completewordfinder.viewmodel.WildcardsViewModel;
 
 public class WildcardsFragment extends Fragment {
 
     private Button find;
     private TextInputEditText textinput;
     private RecyclerView wordslist;
-    private TextView textDescription;
+    private TextView textDescription, textNoWordsFound;
     private AnagramRecyclerViewAdapter adapter;
     private TrieViewModel trieViewModel;
     private WildcardsViewModel wildcardsViewModel;
+    private ProgressBar progressBarLoadingWords;
+    private FindWildcards task;
 
     private static final String TEXT_INSERTED_STATE = "textInserted";
+    private static final String TEXT_NO_WORDS_FOUND_STATE = "textNoWordsFound";
+    private static final String TEXT_PROGRESSBAR_LOADING_WORDS_STATE = "textNoWordsFound";
+    private boolean isTextNoWordsFoundVisible = false, isProgressBarLoadingWordsVisible = false;
 
     public static WildcardsFragment newInstance() {
 
@@ -65,6 +74,8 @@ public class WildcardsFragment extends Fragment {
         find = (Button) view.findViewById(R.id.find_button);
         wordslist = (RecyclerView) view.findViewById(R.id.words_list);
         textDescription = (TextView) view.findViewById(R.id.text_description);
+        textNoWordsFound = (TextView) view.findViewById(R.id.text_no_words_found);
+        progressBarLoadingWords = (ProgressBar) view.findViewById(R.id.progressBarLoadingWords);
         find.setOnClickListener(onClickListener);
         textinput.setOnFocusChangeListener(onFocusChangeListener);
         textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), true));
@@ -82,6 +93,18 @@ public class WildcardsFragment extends Fragment {
                 adapter = new AnagramRecyclerViewAdapter(wildcardsViewModel.wordsFound);
                 wordslist.setAdapter(adapter);
             }
+            isTextNoWordsFoundVisible = savedInstanceState.getBoolean(TEXT_NO_WORDS_FOUND_STATE);
+            if(isTextNoWordsFoundVisible)
+                textNoWordsFound.setVisibility(View.VISIBLE);
+            else
+                textNoWordsFound.setVisibility(View.INVISIBLE);
+            isProgressBarLoadingWordsVisible = savedInstanceState.getBoolean(TEXT_PROGRESSBAR_LOADING_WORDS_STATE);
+            if(isProgressBarLoadingWordsVisible && !isTextNoWordsFoundVisible)
+                progressBarLoadingWords.setVisibility(View.VISIBLE);
+            else {
+                isProgressBarLoadingWordsVisible = false;
+                progressBarLoadingWords.setVisibility(View.INVISIBLE);
+            }
         }
     }
 
@@ -95,6 +118,15 @@ public class WildcardsFragment extends Fragment {
         super.onSaveInstanceState(outState);
         if(textinput != null && textinput.getText() != null)
             outState.putString(TEXT_INSERTED_STATE,textinput.getText().toString());
+        outState.putBoolean(TEXT_NO_WORDS_FOUND_STATE, isTextNoWordsFoundVisible);
+        outState.putBoolean(TEXT_PROGRESSBAR_LOADING_WORDS_STATE, isProgressBarLoadingWordsVisible);
+    }
+
+    @Override
+    public void onDestroy() {
+        if(task != null)
+            task.setListener(null);
+        super.onDestroy();
     }
 
     private View.OnClickListener onClickListener = new View.OnClickListener() {
@@ -105,16 +137,38 @@ public class WildcardsFragment extends Fragment {
                 String textInserted = textinput.getText().toString().toLowerCase();
                 Log.v(MainActivity.TAG,"Text Inserted: "+textInserted);
 
-                trieViewModel.getTrie().observe(getActivity(), new Observer<Trie>() {
+                isProgressBarLoadingWordsVisible = true;
+                progressBarLoadingWords.setVisibility(View.VISIBLE);
+                isTextNoWordsFoundVisible = false;
+                textNoWordsFound.setVisibility(View.INVISIBLE);
+
+                trieViewModel.getTrie().observe(getActivity(), new Observer<DoubleArrayTrie>() {
                     @Override
-                    public void onChanged(Trie trie) {
-                        wildcardsViewModel.wordsFound = (ArrayList<String>) trie.query(textInserted);
-                        wildcardsViewModel.wordsFound = (ArrayList<String>) WordUtils.sortAndRemoveDuplicates(wildcardsViewModel.wordsFound);
-                        WordUtils.wordsToUpperCase(wildcardsViewModel.wordsFound);
-                        Log.v(MainActivity.TAG, "Words[0]:"+wildcardsViewModel.wordsFound.get(0));
-                        Log.v(MainActivity.TAG, "Words["+Integer.toString(wildcardsViewModel.wordsFound.size()-1)+"]:"+wildcardsViewModel.wordsFound.get(wildcardsViewModel.wordsFound.size()-1));
-                        adapter = new AnagramRecyclerViewAdapter(wildcardsViewModel.wordsFound);
-                        wordslist.setAdapter(adapter);
+                    public void onChanged(DoubleArrayTrie trie) {
+                        task = new FindWildcards(trie);
+                        task.setListener(wordsFound -> {
+
+                            if(isProgressBarLoadingWordsVisible) {
+                                isProgressBarLoadingWordsVisible = false;
+                                progressBarLoadingWords.setVisibility(View.INVISIBLE);
+                            }
+                            if(wordsFound.isEmpty()) {
+                                isTextNoWordsFoundVisible = true;
+                                textNoWordsFound.setVisibility(View.VISIBLE);
+                            }
+
+                            int size = wildcardsViewModel.wordsFound.size();
+                            wildcardsViewModel.wordsFound.clear();
+                            if(adapter == null) {
+                                adapter = new AnagramRecyclerViewAdapter(wildcardsViewModel.wordsFound);
+                                wordslist.setAdapter(adapter);
+                            }
+                            else
+                                adapter.notifyItemRangeRemoved(0, size);
+                            wildcardsViewModel.wordsFound.addAll(wordsFound);
+                            adapter.notifyItemRangeInserted(0, wordsFound.size());
+                        });
+                        task.execute(textInserted);
                     }
                 });
             } catch (NullPointerException ex) {
@@ -135,4 +189,43 @@ public class WildcardsFragment extends Fragment {
             }
         }
     };
+
+    private static class FindWildcards extends AsyncTask<String, Void, Void> {
+
+        private DoubleArrayTrie trie;
+        private ArrayList<String> words;
+        private FindWildcardsTaskListener listener;
+
+        public FindWildcards(DoubleArrayTrie trie) {
+            this.trie = trie;
+        }
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            String textInserted = strings[0];
+            words = (ArrayList<String>) trie.query(textInserted);
+            if(!words.isEmpty()) {
+                WordUtils.sortAndRemoveDuplicates(words);
+                WordUtils.wordsToUpperCase(words);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if(listener != null)
+                listener.onFindWildcardsTaskFinished(words);
+        }
+
+        public void setListener(FindWildcardsTaskListener listener) {
+            this.listener = listener;
+        }
+
+        public interface FindWildcardsTaskListener {
+
+            void onFindWildcardsTaskFinished(ArrayList<String> wordsFound);
+
+        }
+    }
 }

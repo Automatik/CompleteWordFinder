@@ -50,17 +50,9 @@ public class Trie implements Serializable {
         return current != null && current.isWord;
     }
 
-    /*public boolean startsWith(String prefix){
-        TrieNode current = getTrieNode(prefix);
-        return (current == null);
-    }*/
-
     public ArrayList<String> startsWith(String prefix){
         TrieNode current = getTrieNode(prefix);
-        //ArrayList<String> words = new ArrayList<>();
-        //DFS(current, prefix, words);
-        return (ArrayList<String>) DFS(current, prefix);
-        //return words;
+        return (current == null) ? new ArrayList<>() : (ArrayList<String>) DFS(current, prefix);
     }
 
     public TrieNode getTrieNode(String s) {
@@ -151,7 +143,7 @@ public class Trie implements Serializable {
     private void permute(Queue<Character> letters, String current, List<String> words) {
         if(!current.equals("")){
             TrieNode node = getTrieNode(current);
-            if(node != null && node.isWord) //TODO And if word length > 1
+            if(node != null && node.isWord)
                 words.add(current);
         }
         if(!letters.isEmpty()){

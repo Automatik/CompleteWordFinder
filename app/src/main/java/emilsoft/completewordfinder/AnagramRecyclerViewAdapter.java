@@ -16,18 +16,15 @@ public class AnagramRecyclerViewAdapter extends RecyclerView.Adapter<AnagramRecy
 
     private ArrayList<String> mWords;
     private int defaultBackgroundColor, alternativeBackgroundColor, whiteColor, blackColor;
-    private int primary, primaryDark;
 
     public AnagramRecyclerViewAdapter(ArrayList<String> words) {
         if (words == null)
             mWords = new ArrayList<>(0);
         else mWords = words;
         defaultBackgroundColor = Color.parseColor("#FAFAFA");
-        alternativeBackgroundColor = Color.parseColor("#AAAAAA");
+        alternativeBackgroundColor = Color.parseColor("#008577");
         whiteColor = Color.parseColor("#FFFFFF");
         blackColor = Color.parseColor("#000000");
-        primary = Color.parseColor("#008577");
-        primaryDark = Color.parseColor("#00574B");
     }
 
     @NonNull
@@ -47,7 +44,7 @@ public class AnagramRecyclerViewAdapter extends RecyclerView.Adapter<AnagramRecy
             holder.mText.setTextColor(blackColor);
         }
         else {
-            holder.mText.setBackgroundColor(primary);
+            holder.mText.setBackgroundColor(alternativeBackgroundColor);
             holder.mText.setTextColor(whiteColor);
         }
     }

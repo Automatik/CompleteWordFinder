@@ -1,4 +1,4 @@
-package utils;
+package emilsoft.completewordfinder.utils;
 
 import android.app.Activity;
 import android.content.Context;
