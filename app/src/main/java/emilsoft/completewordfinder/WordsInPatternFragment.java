@@ -1,6 +1,7 @@
 package emilsoft.completewordfinder;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,8 +11,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -25,6 +28,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
 import emilsoft.completewordfinder.trie.DoubleArrayTrie;
+import emilsoft.completewordfinder.utils.Dictionary;
 import emilsoft.completewordfinder.utils.KeyboardHelper;
 import emilsoft.completewordfinder.utils.WordUtils;
 import emilsoft.completewordfinder.viewmodel.TrieViewModel;
@@ -35,6 +39,7 @@ public class WordsInPatternFragment extends Fragment {
 
     private Button find;
     private TextInputEditText textinput;
+    private TextInputLayout textInputLayout;
     private RecyclerView wordslist;
     private TextView textDescription, textNoWordsFound;
     private HeaderRecyclerViewAdapter adapter;
@@ -47,11 +52,15 @@ public class WordsInPatternFragment extends Fragment {
     private static final String TEXT_NO_WORDS_FOUND_STATE = "textNoWordsFound";
     private static final String TEXT_PROGRESSBAR_LOADING_WORDS_STATE = "textNoWordsFound";
     private boolean isTextNoWordsFoundVisible = false, isProgressBarLoadingWordsVisible = false;
+    private String dictionaryFilename;
+    private int dictionaryAlphabetSize, maxWordLength;
 
-    public static WordsInPatternFragment newInstance() {
+    public static WordsInPatternFragment newInstance(Dictionary dictionary) {
 
         Bundle args = new Bundle();
-
+        args.putString(MainActivity.DICTIONARY_FILENAME, dictionary.getFilename());
+        args.putInt(MainActivity.DICTIONARY_ALPHABET_SIZE, dictionary.getAlphabetSize());
+        args.putInt(MainActivity.DICTIONARY_MAX_WORD, dictionary.getMaxWordLength());
         WordsInPatternFragment fragment = new WordsInPatternFragment();
         fragment.setArguments(args);
         return fragment;
@@ -61,8 +70,19 @@ public class WordsInPatternFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         wordsInPatternViewModel = ViewModelProviders.of(this).get(WordsInPatternViewModel.class);
+        if(getArguments() != null) {
+            dictionaryFilename = getArguments().getString(MainActivity.DICTIONARY_FILENAME);
+            dictionaryAlphabetSize = getArguments().getInt(MainActivity.DICTIONARY_ALPHABET_SIZE);
+            maxWordLength = getArguments().getInt(MainActivity.DICTIONARY_MAX_WORD);
+        }
+        //this is only an extra check
+        if(maxWordLength == MainActivity.MAX_WORD_LENGTH_DEFAULT_VALUE) {
+            SharedPreferences sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+            maxWordLength = sharedPreferences.getInt(getString(R.string.sharedpref_current_dictionary_max_word_length), MainActivity.MAX_WORD_LENGTH_DEFAULT_VALUE);
+        }
+        Dictionary dictionary = new Dictionary(dictionaryFilename, dictionaryAlphabetSize, maxWordLength);
         trieViewModel = ViewModelProviders.of(getActivity(),
-                new TrieViewModelFactory(getActivity().getApplication(), MainActivity.DICTIONARY)).get(TrieViewModel.class);
+                new TrieViewModelFactory(getActivity().getApplication(), dictionary, null)).get(TrieViewModel.class);
     }
 
     @Nullable
@@ -70,6 +90,7 @@ public class WordsInPatternFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_anagram, container, false);
         textinput = (TextInputEditText) view.findViewById(R.id.textinput);
+        textInputLayout = (TextInputLayout) view.findViewById(R.id.textinput_layout);
         find = (Button) view.findViewById(R.id.find_button);
         wordslist = (RecyclerView) view.findViewById(R.id.words_list);
         textDescription = (TextView) view.findViewById(R.id.text_description);
@@ -77,8 +98,13 @@ public class WordsInPatternFragment extends Fragment {
         progressBarLoadingWords = (ProgressBar) view.findViewById(R.id.progressBarLoadingWords);
         find.setOnClickListener(onClickListener);
         textinput.setOnFocusChangeListener(onFocusChangeListener);
-        textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters()));
+        //textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters()));
+        textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), maxWordLength));
         textDescription.setText(R.string.text_description_words_contained);
+        if(maxWordLength != 0) {
+            textInputLayout.setCounterEnabled(true);
+            textInputLayout.setCounterMaxLength(maxWordLength);
+        }
         return view;
     }
 
@@ -135,6 +161,11 @@ public class WordsInPatternFragment extends Fragment {
                 KeyboardHelper.hideKeyboard(getActivity());
                 String textInserted = textinput.getText().toString().toLowerCase();
                 Log.v(MainActivity.TAG,"Text Inserted: "+textInserted);
+
+                if(textInserted.length() > maxWordLength) {
+                    Toast.makeText(getContext(), getString(R.string.toast_max_digits_exceeded), Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 isProgressBarLoadingWordsVisible = true;
                 progressBarLoadingWords.setVisibility(View.VISIBLE);
@@ -205,12 +236,16 @@ public class WordsInPatternFragment extends Fragment {
         @Override
         protected Void doInBackground(String... strings) {
             String textInserted = strings[0];
+            Log.v(MainActivity.TAG,"Beginning match");
+            long start = System.nanoTime();
             words = (ArrayList<String>) trie.match(textInserted);
             if(!words.isEmpty()) {
                 //WordUtils.sortAndRemoveDuplicates(words);
                 headersIndex = WordUtils.sortByWordLength(words);
                 WordUtils.wordsToUpperCase(words);
             }
+            long stop = System.nanoTime();
+            Log.v(MainActivity.TAG,"WordsInPattern time: "+(((stop-start)/(double)1000000))+" ms");
             return null;
         }
 

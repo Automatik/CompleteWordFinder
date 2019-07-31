@@ -3,118 +3,88 @@ package emilsoft.completewordfinder.viewmodel;
 import android.app.Application;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.preference.PreferenceManager;
+
 import emilsoft.completewordfinder.MainActivity;
 import emilsoft.completewordfinder.trie.DoubleArrayTrie;
+import emilsoft.completewordfinder.utils.Dictionaries;
+import emilsoft.completewordfinder.utils.Dictionary;
 
-import android.content.Context;
-import android.os.AsyncTask;
+import android.content.SharedPreferences;
 import android.util.Log;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
-public class TrieViewModel extends AndroidViewModel {
+public class TrieViewModel extends AndroidViewModel implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private final TrieLiveData mTrie;
+    private final SharedPreferences sharedPreferences;
+    //private MaxWordLengthListener listener;
+    private List<MaxWordLengthListener> listeners;
 
-    public TrieViewModel(Application application, String filename) {
+    //public TrieViewModel(Application application, Dictionary dictionary, MaxWordLengthListener listener) {
+    public TrieViewModel(Application application, Dictionary dictionary) {
         super(application);
         Log.v(MainActivity.TAG, "TrieViewModel() called");
-        mTrie = new TrieLiveData(application, filename);
-        boolean b = mTrie.getValue() == null;
-        if (b)
-            Log.v(MainActivity.TAG, "Is mTrie null? True");
-        else Log.v(MainActivity.TAG, "Is mTrie null? False");
+        //this.listener = listener;
+        listeners = new ArrayList<>();
+        //listeners.add(listener);
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(application);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+
+        //mTrie = new TrieLiveData(application, dictionary, listener);
+        mTrie = new TrieLiveData(application, dictionary, internalMaxWordLengthListener);
     }
 
     public LiveData<DoubleArrayTrie> getTrie() {
         return mTrie;
     }
 
-    public class TrieLiveData extends LiveData<DoubleArrayTrie> {
+    public void addMaxWordLengthListener(MaxWordLengthListener listener) {
+        listeners.add(listener);
+        //should also implement removeListener() ?
+    }
 
-        private final Context context;
+    private InternalMaxWordLengthListener internalMaxWordLengthListener = (maxWordLength -> {
+         for(MaxWordLengthListener listener : listeners)
+             listener.onGetMaxWordLength(maxWordLength);
+    });
 
-        public TrieLiveData(Context context, String filename) {
-            this.context = context;
-            new CreateTrie().execute(filename);
-            Log.v(MainActivity.TAG, "TrieLiveData() called");
-        }
+    @Override
+    protected void onCleared() {
+        Log.v(MainActivity.TAG, "TrieViewModel/onCleared call");
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
+    }
 
-        private class CreateTrie extends AsyncTask<String, Void, DoubleArrayTrie> {
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        Log.v(MainActivity.TAG, "TrieViewModel/onSharedPreferenceChanged called");
+        if(key.equals("dictionary")) {
+            Application app = getApplication();
+//            String currentDict = app.getString(R.string.sharedpref_current_dictionary);
+//            String dictionaryFile = sharedPreferences.getString(currentDict, null);
 
-            @Override
-            protected DoubleArrayTrie doInBackground(String... strings) {
-                String filename = strings[0];
-                DoubleArrayTrie trie = new DoubleArrayTrie(); //TODO do we need to specific alphabet size?
-
-                try {
-                    // If trie already exists, read it
-                    if (fileExists(context, MainActivity.TRIE_FILENAME)) {
-
-                        FileInputStream fis = context.openFileInput(MainActivity.TRIE_FILENAME);
-                        BufferedInputStream bis = new BufferedInputStream(fis);
-                        ObjectInputStream ois = new ObjectInputStream(bis);
-                        Log.v(MainActivity.TAG, "Reading trie from file");
-                        trie = (DoubleArrayTrie) ois.readObject();
-                        Log.v(MainActivity.TAG, "Finished reading trie from file");
-                        ois.close();
-                        fis.close();
-
-                    } else {
-                        //Read dictionary file
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open(filename))); //context or getApplication() ?
-                        String line;
-                        Log.v(MainActivity.TAG, "Beginning trie insertions");
-                        long start = System.nanoTime();
-                        while ((line = reader.readLine()) != null) {
-                            trie.insert(line); //Should add .toLowerCase()?
-                        }
-                        long stop = System.nanoTime();
-                        Log.v(MainActivity.TAG,"Trie insertion time: "+(((stop-start)/(double)1000000))+" ms");
-                        reader.close();
-
-                        //Write trie to file. So we skip to build it every time
-                        FileOutputStream fos = context.openFileOutput(MainActivity.TRIE_FILENAME, Context.MODE_PRIVATE);
-                        BufferedOutputStream bos = new BufferedOutputStream(fos);
-                        ObjectOutputStream oos = new ObjectOutputStream(bos);
-                        oos.writeObject(trie);
-                        oos.close();
-                        fos.close();
-
-                        Log.v(MainActivity.TAG, "Finished writing trie to file");
-                    }
-                    return trie;
-                } catch (Exception ex) {
-                        ex.printStackTrace();
-                        Log.v(MainActivity.TAG, "exception while reading/writing trie file");
-                        return null;
-                }
-            }
-
-            @Override
-            protected void onPostExecute(DoubleArrayTrie trie) {
-                setValue(trie);
-                Log.v(MainActivity.TAG, "setValue(trie) called in onPostExecute of CreateTrie");
+            String dictionaryName = sharedPreferences.getString(key, null);
+            if(dictionaryName != null) {
+                Dictionary dictionary = Dictionaries.get(dictionaryName);
+                //Dictionary dictionary = new Dictionary(dictionaryFile, alphabetSize);
+                mTrie.createTrie(app, dictionary, true);
             }
         }
+    }
+
+    public interface MaxWordLengthListener {
+
+        void onGetMaxWordLength(int maxWordLength);
 
     }
 
-    public boolean fileExists(Context context, String filename) {
-        File file = context.getFileStreamPath(filename);
-        Log.v(MainActivity.TAG, "File Length = "+file.length());
-        if(file == null || !file.exists()) {
-            return false;
-        }
-        return true;
+    protected interface InternalMaxWordLengthListener {
+
+        void onGetMaxWordLength(int maxWordLength);
+
     }
 
 }

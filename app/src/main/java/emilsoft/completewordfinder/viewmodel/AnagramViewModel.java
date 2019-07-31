@@ -12,9 +12,12 @@ public class AnagramViewModel extends ViewModel {
     //Words found from FindAnagrams
     public ArrayList<String> wordsFound;
 
+    public int maxWordLength;
+
     public AnagramViewModel() {
         super();
         wordsFound = new ArrayList<>();
         dictionary = new ArrayList<>();
+        maxWordLength = 0;
     }
 }

@@ -5,16 +5,9 @@ import android.text.InputFilter;
 import android.util.SparseArray;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
-import java.util.function.UnaryOperator;
-import java.util.stream.IntStream;
-
-import androidx.core.content.res.TypedArrayUtils;
 
 public final class WordUtils {
 
@@ -106,11 +99,24 @@ public final class WordUtils {
         return addMyInputFilters(inputFilters, false);
     }
 
+    public static InputFilter[] addMyInputFilters(InputFilter[] inputFilters, int maxWordLength) {
+        return addMyInputFilters(inputFilters, false, maxWordLength);
+    }
+
     public static InputFilter[] addMyInputFilters(InputFilter[] inputFilters, boolean allowWildcard) {
         InputFilter[] newInputFilters = new InputFilter[inputFilters.length + 2];
         System.arraycopy(inputFilters, 0, newInputFilters, 0, inputFilters.length);
-        newInputFilters[inputFilters.length] = new MyInputFilter(allowWildcard);
+        newInputFilters[inputFilters.length] = new DigitsInputFilter(allowWildcard);
         newInputFilters[inputFilters.length + 1] = new InputFilter.AllCaps();
+        return newInputFilters;
+    }
+
+    public static InputFilter[] addMyInputFilters(InputFilter[] inputFilters, boolean allowWildcard, int maxWordLength) {
+        InputFilter[] newInputFilters = new InputFilter[inputFilters.length + 3];
+        System.arraycopy(inputFilters, 0, newInputFilters, 0, inputFilters.length);
+        newInputFilters[inputFilters.length] = new DigitsInputFilter(allowWildcard);
+        newInputFilters[inputFilters.length + 1] = new InputFilter.AllCaps();
+        newInputFilters[inputFilters.length + 2] = new InputFilter.LengthFilter(maxWordLength);
         return newInputFilters;
     }
 

@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <SwitchPreference
-        android:defaultValue="false"
-        android:key="notifications"
-        android:title="Switch preference" />
+    <androidx.preference.ListPreference
+        android:key="dictionary"
+        android:title="Dictionary"
+        android:summary="Current selected: "
+        android:entries="@array/dictionariesAlias"
+        android:entryValues="@array/dictionaries"/>
 
-    <Preference
-        android:key="feedback"
-        android:title="Send feedback"
-        android:summary="Report technical issues or suggest new features"/>
-</PreferenceScreen>
+</androidx.preference.PreferenceScreen>

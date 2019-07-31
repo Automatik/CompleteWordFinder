@@ -10,8 +10,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -25,6 +27,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
 import emilsoft.completewordfinder.trie.DoubleArrayTrie;
+import emilsoft.completewordfinder.utils.Dictionary;
 import emilsoft.completewordfinder.utils.KeyboardHelper;
 import emilsoft.completewordfinder.utils.WordUtils;
 import emilsoft.completewordfinder.viewmodel.SubAnagramsViewModel;
@@ -35,6 +38,7 @@ public class SubAnagramsFragment extends Fragment {
 
     private Button find;
     private TextInputEditText textinput;
+    private TextInputLayout textInputLayout;
     private RecyclerView wordslist;
     private TextView textDescription, textNoWordsFound;
     private HeaderRecyclerViewAdapter adapter;
@@ -46,12 +50,17 @@ public class SubAnagramsFragment extends Fragment {
     private static final String TEXT_INSERTED_STATE = "textInserted";
     private static final String TEXT_NO_WORDS_FOUND_STATE = "textNoWordsFound";
     private static final String TEXT_PROGRESSBAR_LOADING_WORDS_STATE = "textNoWordsFound";
+    private static final int MAX_WORD_LENGTH = 15; //due to computation reason
     private boolean isTextNoWordsFoundVisible = false, isProgressBarLoadingWordsVisible = false;
+    private String dictionaryFilename;
+    private int dictionaryAlphabetSize;
 
-    public static SubAnagramsFragment newInstance() {
+    public static SubAnagramsFragment newInstance(Dictionary dictionary) {
 
         Bundle args = new Bundle();
-
+        args.putString(MainActivity.DICTIONARY_FILENAME, dictionary.getFilename());
+        args.putInt(MainActivity.DICTIONARY_ALPHABET_SIZE, dictionary.getAlphabetSize());
+        args.putInt(MainActivity.DICTIONARY_MAX_WORD, dictionary.getMaxWordLength());
         SubAnagramsFragment fragment = new SubAnagramsFragment();
         fragment.setArguments(args);
         return fragment;
@@ -61,8 +70,13 @@ public class SubAnagramsFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         subAnagramsViewModel = ViewModelProviders.of(this).get(SubAnagramsViewModel.class);
+        if(getArguments() != null) {
+            dictionaryFilename = getArguments().getString(MainActivity.DICTIONARY_FILENAME);
+            dictionaryAlphabetSize = getArguments().getInt(MainActivity.DICTIONARY_ALPHABET_SIZE);
+        }
+        Dictionary dictionary = new Dictionary(dictionaryFilename, dictionaryAlphabetSize);
         trieViewModel = ViewModelProviders.of(getActivity(),
-                new TrieViewModelFactory(getActivity().getApplication(), MainActivity.DICTIONARY)).get(TrieViewModel.class);
+                new TrieViewModelFactory(getActivity().getApplication(), dictionary, null)).get(TrieViewModel.class);
     }
 
     @Nullable
@@ -70,6 +84,7 @@ public class SubAnagramsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_anagram, container, false);
         textinput = (TextInputEditText) view.findViewById(R.id.textinput);
+        textInputLayout = (TextInputLayout) view.findViewById(R.id.textinput_layout);
         find = (Button) view.findViewById(R.id.find_button);
         wordslist = (RecyclerView) view.findViewById(R.id.words_list);
         textDescription = (TextView) view.findViewById(R.id.text_description);
@@ -77,8 +92,11 @@ public class SubAnagramsFragment extends Fragment {
         progressBarLoadingWords = (ProgressBar) view.findViewById(R.id.progressBarLoadingWords);
         find.setOnClickListener(onClickListener);
         textinput.setOnFocusChangeListener(onFocusChangeListener);
-        textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters()));
+        //textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters()));
+        textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), MAX_WORD_LENGTH));
         textDescription.setText(R.string.text_description_sub_anagrams);
+        textInputLayout.setCounterEnabled(true);
+        textInputLayout.setCounterMaxLength(MAX_WORD_LENGTH);
         return view;
     }
 
@@ -135,6 +153,11 @@ public class SubAnagramsFragment extends Fragment {
                 KeyboardHelper.hideKeyboard(getActivity());
                 String textInserted = textinput.getText().toString().toLowerCase();
                 Log.v(MainActivity.TAG,"Text Inserted: "+textInserted);
+
+                if(textInserted.length() > MAX_WORD_LENGTH) {
+                    Toast.makeText(getContext(), getString(R.string.toast_max_digits_exceeded), Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 isProgressBarLoadingWordsVisible = true;
                 progressBarLoadingWords.setVisibility(View.VISIBLE);
@@ -208,12 +231,16 @@ public class SubAnagramsFragment extends Fragment {
         @Override
         protected Void doInBackground(String... strings) {
             String textInserted = strings[0];
+            Log.v(MainActivity.TAG,"Beginning permute");
+            long start = System.nanoTime();
             words = (ArrayList<String>) trie.permute(textInserted.toCharArray());
             if(!words.isEmpty()) {
                 headersIndex = WordUtils.sortByWordLength(words);
                 //WordUtils.sortAndRemoveDuplicates(words);
                 WordUtils.wordsToUpperCase(words);
             }
+            long stop = System.nanoTime();
+            Log.v(MainActivity.TAG,"SubAnagrams time: "+(((stop-start)/(double)1000000))+" ms");
             return null;
         }
 

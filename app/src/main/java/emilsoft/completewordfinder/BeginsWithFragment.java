@@ -1,8 +1,10 @@
 package emilsoft.completewordfinder;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,8 +12,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -22,9 +26,11 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import emilsoft.completewordfinder.trie.DoubleArrayTrie;
+import emilsoft.completewordfinder.utils.Dictionary;
 import emilsoft.completewordfinder.utils.KeyboardHelper;
 import emilsoft.completewordfinder.utils.WordUtils;
 import emilsoft.completewordfinder.viewmodel.BeginsWithViewModel;
@@ -35,6 +41,7 @@ public class BeginsWithFragment extends Fragment {
 
     private Button find;
     private TextInputEditText textinput;
+    private TextInputLayout textInputLayout;
     private RecyclerView wordslist;
     private TextView textDescription, textNoWordsFound;
     private HeaderRecyclerViewAdapter adapter;
@@ -42,18 +49,24 @@ public class BeginsWithFragment extends Fragment {
     private BeginsWithViewModel beginsWithViewModel;
     private ProgressBar progressBarLoadingWords;
     private FindBeginsWith task;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.OnSharedPreferenceChangeListener onSharedPreferenceChangeListener;
 
     private static final String TEXT_INSERTED_STATE = "textInserted";
     private static final String TEXT_NO_WORDS_FOUND_STATE = "textNoWordsFound";
     private static final String TEXT_PROGRESSBAR_LOADING_WORDS_STATE = "textNoWordsFound";
     private boolean isTextNoWordsFoundVisible = false, isProgressBarLoadingWordsVisible = false;
+    private String dictionaryFilename;
+    private int dictionaryAlphabetSize, maxWordLength;
 
     public BeginsWithFragment() {}
 
-    public static BeginsWithFragment newInstance() {
+    public static BeginsWithFragment newInstance(Dictionary dictionary) {
 
         Bundle args = new Bundle();
-
+        args.putString(MainActivity.DICTIONARY_FILENAME, dictionary.getFilename());
+        args.putInt(MainActivity.DICTIONARY_ALPHABET_SIZE, dictionary.getAlphabetSize());
+        args.putInt(MainActivity.DICTIONARY_MAX_WORD, dictionary.getMaxWordLength());
         BeginsWithFragment fragment = new BeginsWithFragment();
         fragment.setArguments(args);
         return fragment;
@@ -63,8 +76,21 @@ public class BeginsWithFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         beginsWithViewModel = ViewModelProviders.of(this).get(BeginsWithViewModel.class);
+        if(getArguments() != null) {
+            dictionaryFilename = getArguments().getString(MainActivity.DICTIONARY_FILENAME);
+            dictionaryAlphabetSize = getArguments().getInt(MainActivity.DICTIONARY_ALPHABET_SIZE);
+            maxWordLength = getArguments().getInt(MainActivity.DICTIONARY_MAX_WORD);
+        }
+        //this is only an extra check. Conflict when changing dictionary in settings
+//        if(maxWordLength == MainActivity.MAX_WORD_LENGTH_DEFAULT_VALUE) {
+//            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+//            //SharedPreferences sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+//            maxWordLength = sharedPreferences.getInt(getString(R.string.sharedpref_current_dictionary_max_word_length), MainActivity.MAX_WORD_LENGTH_DEFAULT_VALUE);
+//        }
+        Dictionary dictionary = new Dictionary(dictionaryFilename, dictionaryAlphabetSize, maxWordLength);
         trieViewModel = ViewModelProviders.of(getActivity(),
-                new TrieViewModelFactory(getActivity().getApplication(), MainActivity.DICTIONARY)).get(TrieViewModel.class);
+                new TrieViewModelFactory(getActivity().getApplication(), dictionary, maxWordLengthListener)).get(TrieViewModel.class);
+        trieViewModel.addMaxWordLengthListener(maxWordLengthListener);
     }
 
     @Nullable
@@ -72,6 +98,7 @@ public class BeginsWithFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_anagram, container, false);
         textinput = (TextInputEditText) view.findViewById(R.id.textinput);
+        textInputLayout = (TextInputLayout) view.findViewById(R.id.textinput_layout);
         find = (Button) view.findViewById(R.id.find_button);
         wordslist = (RecyclerView) view.findViewById(R.id.words_list);
         textDescription = (TextView) view.findViewById(R.id.text_description);
@@ -79,8 +106,13 @@ public class BeginsWithFragment extends Fragment {
         progressBarLoadingWords = (ProgressBar) view.findViewById(R.id.progressBarLoadingWords);
         find.setOnClickListener(onClickListener);
         textinput.setOnFocusChangeListener(onFocusChangeListener);
-        textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters()));
+        //textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters()));
+        textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), maxWordLength));
         textDescription.setText(R.string.text_description_begins_with);
+        if(maxWordLength != 0) {
+            textInputLayout.setCounterEnabled(true);
+            textInputLayout.setCounterMaxLength(maxWordLength);
+        }
         return view;
     }
 
@@ -107,6 +139,16 @@ public class BeginsWithFragment extends Fragment {
                 progressBarLoadingWords.setVisibility(View.INVISIBLE);
             }
         }
+
+        onSharedPreferenceChangeListener = ((sharedPreferences, key) -> {
+            if(key.equals("dictionary")) {
+                textInputLayout.setCounterEnabled(false);
+                textinput.setFilters(WordUtils.addMyInputFilters(new InputFilter[]{}));
+            }
+        });
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        sharedPreferences.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
     }
 
     @Override
@@ -127,6 +169,8 @@ public class BeginsWithFragment extends Fragment {
     public void onDestroy() {
         if(task != null)
             task.setListener(null);
+        if(sharedPreferences != null)
+            sharedPreferences.unregisterOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
         super.onDestroy();
     }
 
@@ -137,6 +181,11 @@ public class BeginsWithFragment extends Fragment {
                 KeyboardHelper.hideKeyboard(getActivity());
                 String textInserted = textinput.getText().toString().toLowerCase();
                 Log.v(MainActivity.TAG,"Text Inserted: "+textInserted);
+
+                if(textInserted.length() > maxWordLength) {
+                    Toast.makeText(getContext(), getString(R.string.toast_max_digits_exceeded), Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 isProgressBarLoadingWordsVisible = true;
                 progressBarLoadingWords.setVisibility(View.VISIBLE);
@@ -179,6 +228,16 @@ public class BeginsWithFragment extends Fragment {
             }
         }
     };
+
+    private TrieViewModel.MaxWordLengthListener maxWordLengthListener = (maxWordLength -> {
+        Log.v(MainActivity.TAG, "BeginsWithFragment/ maxWordLengthListener called");
+        this.maxWordLength = maxWordLength;
+        if(maxWordLength != 0) {
+            textInputLayout.setCounterEnabled(true);
+            textInputLayout.setCounterMaxLength(maxWordLength);
+            textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), maxWordLength));
+        }
+    });
 
     private View.OnFocusChangeListener onFocusChangeListener = new View.OnFocusChangeListener() {
         @Override
