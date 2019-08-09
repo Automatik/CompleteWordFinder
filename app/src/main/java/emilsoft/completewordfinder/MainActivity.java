@@ -153,10 +153,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             fragment = BeginsWithFragment.newInstance(dict, isWordOrderAscending);
         } else if (id == R.id.nav_words_contained) {
             setTitle(getResources().getString(R.string.nav_item_words_contained));
-            fragment = WordsInPatternFragment.newInstance(dict);
+            fragment = WordsInPatternFragment.newInstance(dict, isWordOrderAscending);
         } else if (id == R.id.nav_sub_anagrams) {
             setTitle(getResources().getString(R.string.nav_item_sub_anagrams));
-            fragment = SubAnagramsFragment.newInstance(dict);
+            fragment = SubAnagramsFragment.newInstance(dict, isWordOrderAscending);
         } else if (id == R.id.nav_wildcards) {
             setTitle(getResources().getString(R.string.nav_item_wildcards));
             fragment = WildcardsFragment.newInstance(dict);
