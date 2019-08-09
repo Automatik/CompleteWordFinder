@@ -58,7 +58,6 @@ public class AnagramFragment extends Fragment {
             37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103,
             107, 109, 113 };
 
-    public static final int findButtonShiftDownDP = 12;
     private static final String TEXT_INSERTED_STATE = "textInserted";
     private static final String TEXT_NO_WORDS_FOUND_STATE = "textNoWordsFound";
     private static final String TEXT_PROGRESSBAR_LOADING_WORDS_STATE = "textNoWordsFound";
@@ -106,7 +105,6 @@ public class AnagramFragment extends Fragment {
         textNoWordsFound = (TextView) view.findViewById(R.id.text_no_words_found);
         progressBarLoadingWords = (ProgressBar) view.findViewById(R.id.progressBarLoadingWords);
         find.setOnClickListener(onClickListener);
-        textinput.setOnFocusChangeListener(onFocusChangeListener);
         textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters()));
         textDescription.setText(R.string.text_description_anagrams);
         return view;
@@ -283,19 +281,6 @@ public class AnagramFragment extends Fragment {
         findAnagramsTask.execute(textInserted);
     }
 
-    private View.OnFocusChangeListener onFocusChangeListener = new View.OnFocusChangeListener() {
-        @Override
-        public void onFocusChange(View v, boolean hasFocus) {
-            if (hasFocus) {
-                ConstraintLayout.LayoutParams parameter = (ConstraintLayout.LayoutParams) find.getLayoutParams();
-                int pixel_topMargin = convertDPtoPX(Objects.requireNonNull(getActivity()), findButtonShiftDownDP);
-                parameter.setMargins(parameter.leftMargin, pixel_topMargin, parameter.rightMargin, parameter.bottomMargin);
-                find.setLayoutParams(parameter);
-                find.requestLayout();
-            }
-        }
-    };
-
     private static long calculateProduct(char[] letters) {
         long result = 1L;
         for(char c: letters){
@@ -305,13 +290,6 @@ public class AnagramFragment extends Fragment {
             result *= PRIMES[pos];
         }
         return result;
-    }
-
-    public static int convertDPtoPX(Context context, int dp) {
-        // Get the screen's density scale
-        final float scale = context.getResources().getDisplayMetrics().density;
-        // Convert the dps to pixels, based on density scale
-        return (int) (dp * scale + 0.5f);
     }
 
     private static class FindAnagrams extends AsyncTask<String, String, Void> {

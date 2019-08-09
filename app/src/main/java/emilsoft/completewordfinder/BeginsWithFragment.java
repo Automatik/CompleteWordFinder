@@ -106,7 +106,6 @@ public class BeginsWithFragment extends Fragment {
         textNoWordsFound = (TextView) view.findViewById(R.id.text_no_words_found);
         progressBarLoadingWords = (ProgressBar) view.findViewById(R.id.progressBarLoadingWords);
         find.setOnClickListener(onClickListener);
-        textinput.setOnFocusChangeListener(onFocusChangeListener);
         //textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters()));
         //textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), maxWordLength));
         textDescription.setText(R.string.text_description_begins_with);
@@ -241,19 +240,6 @@ public class BeginsWithFragment extends Fragment {
             textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), maxWordLength));
         }
     });
-
-    private View.OnFocusChangeListener onFocusChangeListener = new View.OnFocusChangeListener() {
-        @Override
-        public void onFocusChange(View v, boolean hasFocus) {
-            if (hasFocus) {
-                ConstraintLayout.LayoutParams parameter = (ConstraintLayout.LayoutParams) find.getLayoutParams();
-                int pixel_topMargin = AnagramFragment.convertDPtoPX(Objects.requireNonNull(getActivity()), AnagramFragment.findButtonShiftDownDP);
-                parameter.setMargins(parameter.leftMargin, pixel_topMargin, parameter.rightMargin, parameter.bottomMargin);
-                find.setLayoutParams(parameter);
-                find.requestLayout();
-            }
-        }
-    };
 
     private static class FindBeginsWith extends AsyncTask<String, Void, Void> {
 

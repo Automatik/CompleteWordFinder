@@ -91,7 +91,6 @@ public class SubAnagramsFragment extends Fragment {
         textNoWordsFound = (TextView) view.findViewById(R.id.text_no_words_found);
         progressBarLoadingWords = (ProgressBar) view.findViewById(R.id.progressBarLoadingWords);
         find.setOnClickListener(onClickListener);
-        textinput.setOnFocusChangeListener(onFocusChangeListener);
         //textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters()));
         textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), MAX_WORD_LENGTH));
         textDescription.setText(R.string.text_description_sub_anagrams);
@@ -200,19 +199,6 @@ public class SubAnagramsFragment extends Fragment {
                 });
             } catch (NullPointerException ex) {
                 Log.v(MainActivity.TAG, "text inserted is null");
-            }
-        }
-    };
-
-    private View.OnFocusChangeListener onFocusChangeListener = new View.OnFocusChangeListener() {
-        @Override
-        public void onFocusChange(View v, boolean hasFocus) {
-            if (hasFocus) {
-                ConstraintLayout.LayoutParams parameter = (ConstraintLayout.LayoutParams) find.getLayoutParams();
-                int pixel_topMargin = AnagramFragment.convertDPtoPX(Objects.requireNonNull(getActivity()), AnagramFragment.findButtonShiftDownDP);
-                parameter.setMargins(parameter.leftMargin, pixel_topMargin, parameter.rightMargin, parameter.bottomMargin);
-                find.setLayoutParams(parameter);
-                find.requestLayout();
             }
         }
     };
