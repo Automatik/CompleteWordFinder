@@ -4,10 +4,19 @@
 
     <androidx.preference.ListPreference
         android:key="@string/sharedpref_current_dictionary"
-        android:title="Dictionary"
-        android:summary="Current selected: "
+        android:title="@string/sharedpref_current_dictionary_title"
+        android:summary="@string/sharedpref_default_dictionary"
         android:defaultValue="@string/sharedpref_default_dictionary"
         android:entries="@array/dictionariesAlias"
         android:entryValues="@array/dictionaries"/>
+
+    <androidx.preference.ListPreference
+        android:key="@string/sharedpref_word_order"
+        android:title="@string/sharedpref_word_order_title"
+        android:summary="@string/sharedpref_word_order_default"
+        android:defaultValue="@string/sharedpref_word_order_default"
+        android:entries="@array/wordOrdersAlias"
+        android:entryValues="@array/wordOrders"
+        />
 
 </androidx.preference.PreferenceScreen>

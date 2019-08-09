@@ -86,8 +86,9 @@ public class AnagramFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         anagramViewModel = ViewModelProviders.of(this).get(AnagramViewModel.class);
-        if(getArguments() != null)
+        if(getArguments() != null) {
             dictionaryFilename = getArguments().getString(DICTIONARY_FILENAME);
+        }
         //TODO if getArguments = null, use default dictionary name?
         readDictionary(dictionaryFilename);
     }

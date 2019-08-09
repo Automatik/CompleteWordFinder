@@ -54,13 +54,19 @@ public class SubAnagramsFragment extends Fragment {
     private boolean isTextNoWordsFoundVisible = false, isProgressBarLoadingWordsVisible = false;
     private String dictionaryFilename;
     private int dictionaryAlphabetSize;
+    private boolean isWordOrderAscending;
 
-    public static SubAnagramsFragment newInstance(Dictionary dictionary) {
+    public SubAnagramsFragment() {
+        isWordOrderAscending = MainActivity.WORD_ORDER_DEFAULT;
+    }
+
+    public static SubAnagramsFragment newInstance(Dictionary dictionary, boolean isWordOrderAscending) {
 
         Bundle args = new Bundle();
         args.putString(MainActivity.DICTIONARY_FILENAME, dictionary.getFilename());
         args.putInt(MainActivity.DICTIONARY_ALPHABET_SIZE, dictionary.getAlphabetSize());
         args.putInt(MainActivity.DICTIONARY_MAX_WORD, dictionary.getMaxWordLength());
+        args.putBoolean(MainActivity.IS_WORD_ORDER_ASCENDING, isWordOrderAscending);
         SubAnagramsFragment fragment = new SubAnagramsFragment();
         fragment.setArguments(args);
         return fragment;
@@ -73,6 +79,7 @@ public class SubAnagramsFragment extends Fragment {
         if(getArguments() != null) {
             dictionaryFilename = getArguments().getString(MainActivity.DICTIONARY_FILENAME);
             dictionaryAlphabetSize = getArguments().getInt(MainActivity.DICTIONARY_ALPHABET_SIZE);
+            isWordOrderAscending = getArguments().getBoolean(MainActivity.IS_WORD_ORDER_ASCENDING);
         }
         Dictionary dictionary = new Dictionary(dictionaryFilename, dictionaryAlphabetSize);
         trieViewModel = ViewModelProviders.of(getActivity(),
@@ -166,7 +173,7 @@ public class SubAnagramsFragment extends Fragment {
                 trieViewModel.getTrie().observe(getActivity(), new Observer<DoubleArrayTrie>() {
                     @Override
                     public void onChanged(DoubleArrayTrie trie) {
-                        task = new FindSubAnagrams(trie);
+                        task = new FindSubAnagrams(trie, isWordOrderAscending);
                         task.setListener((wordsFound, headersIndex) -> {
 
                             if(isProgressBarLoadingWordsVisible) {
@@ -209,9 +216,11 @@ public class SubAnagramsFragment extends Fragment {
         private ArrayList<String> words;
         private int[] headersIndex;
         private FindSubAnagramsTaskListener listener;
+        private boolean isWordOrderAscending;
 
-        public FindSubAnagrams(DoubleArrayTrie trie) {
+        public FindSubAnagrams(DoubleArrayTrie trie, boolean isWordOrderAscending) {
             this.trie = trie;
+            this.isWordOrderAscending = isWordOrderAscending;
         }
 
         @Override
@@ -221,7 +230,7 @@ public class SubAnagramsFragment extends Fragment {
             long start = System.nanoTime();
             words = (ArrayList<String>) trie.permute(textInserted.toCharArray());
             if(!words.isEmpty()) {
-                headersIndex = WordUtils.sortByWordLength(words);
+                headersIndex = WordUtils.sortByWordLength(words, isWordOrderAscending);
                 //WordUtils.sortAndRemoveDuplicates(words);
                 WordUtils.wordsToUpperCase(words);
             }

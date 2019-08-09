@@ -58,13 +58,19 @@ public class WordsInPatternFragment extends Fragment {
     private boolean isTextNoWordsFoundVisible = false, isProgressBarLoadingWordsVisible = false;
     private String dictionaryFilename;
     private int dictionaryAlphabetSize, maxWordLength;
+    private boolean isWordOrderAscending;
 
-    public static WordsInPatternFragment newInstance(Dictionary dictionary) {
+    public WordsInPatternFragment() {
+        isWordOrderAscending = MainActivity.WORD_ORDER_DEFAULT;
+    }
+
+    public static WordsInPatternFragment newInstance(Dictionary dictionary, boolean isWordOrderAscending) {
 
         Bundle args = new Bundle();
         args.putString(MainActivity.DICTIONARY_FILENAME, dictionary.getFilename());
         args.putInt(MainActivity.DICTIONARY_ALPHABET_SIZE, dictionary.getAlphabetSize());
         args.putInt(MainActivity.DICTIONARY_MAX_WORD, dictionary.getMaxWordLength());
+        args.putBoolean(MainActivity.IS_WORD_ORDER_ASCENDING, isWordOrderAscending);
         WordsInPatternFragment fragment = new WordsInPatternFragment();
         fragment.setArguments(args);
         return fragment;
@@ -78,12 +84,8 @@ public class WordsInPatternFragment extends Fragment {
             dictionaryFilename = getArguments().getString(MainActivity.DICTIONARY_FILENAME);
             dictionaryAlphabetSize = getArguments().getInt(MainActivity.DICTIONARY_ALPHABET_SIZE);
             maxWordLength = getArguments().getInt(MainActivity.DICTIONARY_MAX_WORD);
+            isWordOrderAscending = getArguments().getBoolean(MainActivity.IS_WORD_ORDER_ASCENDING);
         }
-        //this is only an extra check
-//        if(maxWordLength == MainActivity.MAX_WORD_LENGTH_DEFAULT_VALUE) {
-//            SharedPreferences sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
-//            maxWordLength = sharedPreferences.getInt(getString(R.string.sharedpref_current_dictionary_max_word_length), MainActivity.MAX_WORD_LENGTH_DEFAULT_VALUE);
-//        }
         Dictionary dictionary = new Dictionary(dictionaryFilename, dictionaryAlphabetSize, maxWordLength);
         trieViewModel = ViewModelProviders.of(getActivity(),
                 new TrieViewModelFactory(getActivity().getApplication(), dictionary)).get(TrieViewModel.class);
@@ -193,7 +195,7 @@ public class WordsInPatternFragment extends Fragment {
                 trieViewModel.getTrie().observe(getActivity(), new Observer<DoubleArrayTrie>() {
                     @Override
                     public void onChanged(DoubleArrayTrie trie) {
-                        task = new FindWordsInPattern(trie);
+                        task = new FindWordsInPattern(trie, isWordOrderAscending);
                         task.setListener((wordsFound, headersIndex) -> {
 
                             if(isProgressBarLoadingWordsVisible) {
@@ -243,9 +245,11 @@ public class WordsInPatternFragment extends Fragment {
         private ArrayList<String> words;
         private int[] headersIndex;
         private FindWordsInPatternTaskListener listener;
+        private boolean isWordOrderAscending;
 
-        public FindWordsInPattern(DoubleArrayTrie trie) {
+        public FindWordsInPattern(DoubleArrayTrie trie, boolean isWordOrderAscending) {
             this.trie = trie;
+            this.isWordOrderAscending = isWordOrderAscending;
         }
 
         @Override
@@ -256,7 +260,7 @@ public class WordsInPatternFragment extends Fragment {
             words = (ArrayList<String>) trie.match(textInserted);
             if(!words.isEmpty()) {
                 //WordUtils.sortAndRemoveDuplicates(words);
-                headersIndex = WordUtils.sortByWordLength(words);
+                headersIndex = WordUtils.sortByWordLength(words, isWordOrderAscending);
                 WordUtils.wordsToUpperCase(words);
             }
             long stop = System.nanoTime();

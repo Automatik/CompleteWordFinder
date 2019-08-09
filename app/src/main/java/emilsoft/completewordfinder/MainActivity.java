@@ -37,9 +37,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static final String DICTIONARY_FILENAME = "dictionaryFilename";
     public static final String DICTIONARY_ALPHABET_SIZE = "dictionaryAlphabetSize";
     public static final String DICTIONARY_MAX_WORD = "dictionaryMaxWord";
+    public static final String IS_WORD_ORDER_ASCENDING = "isWordOrderAscending";
+
+    public static final boolean WORD_ORDER_DEFAULT = false; //descending
 
     private Dictionary dict; //Dictionary in use
     private SharedPreferences sharedPreferences;
+    private boolean isWordOrderAscending = WORD_ORDER_DEFAULT;
 
     private TrieViewModel mModel;
 
@@ -83,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //String dictName = sharedPreferences.getString(getString(R.string.sharedpref_current_dictionary), getString(R.string.sharedpref_default_dictionary));
         dict = readDictionary();
 
+        //Read Word Order in use
+        isWordOrderAscending = readWordOrder();
 
         //Only create fragment if activity is started for the first time
         if (savedInstanceState == null) {
@@ -144,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             fragment = AnagramFragment.newInstance(dict);
         } else if (id == R.id.nav_begins_with) {
             setTitle(getResources().getString(R.string.nav_item_begins_with));
-            fragment = BeginsWithFragment.newInstance(dict);
+            fragment = BeginsWithFragment.newInstance(dict, isWordOrderAscending);
         } else if (id == R.id.nav_words_contained) {
             setTitle(getResources().getString(R.string.nav_item_words_contained));
             fragment = WordsInPatternFragment.newInstance(dict);
@@ -185,6 +191,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return dict;
     }
 
+    private boolean readWordOrder() {
+        String wordOrder = sharedPreferences.getString(getString(R.string.sharedpref_word_order), null);
+        boolean isWordOrderAscending;
+        if(wordOrder != null) {
+            switch (wordOrder) {
+                //values from R.array.wordOrders
+                case "ascending": isWordOrderAscending = true; break;
+                case "descending": isWordOrderAscending = false; break;
+                default: isWordOrderAscending = WORD_ORDER_DEFAULT;
+            }
+        } else
+            isWordOrderAscending = WORD_ORDER_DEFAULT;
+        Log.v(TAG, "MainAcitivity/readWordOrder isWordOrderAscending: "+isWordOrderAscending);
+        return isWordOrderAscending;
+    }
+
     @Override
     public void onGetMaxWordLength(int maxWordLength) {
         //SharedPreferences sharedPreferences = getPreferences(Context.MODE_PRIVATE);
@@ -204,6 +226,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 dict = Dictionaries.get(dictName);
             //Set to zero the maxWordLength, because it doesn't correspond to the new dictionary
             onGetMaxWordLength(MAX_WORD_LENGTH_DEFAULT_VALUE); //possibly dangerous
+        }
+        if(key.equals(getString(R.string.sharedpref_word_order))) {
+            isWordOrderAscending = readWordOrder();
         }
     }
 }

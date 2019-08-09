@@ -6,29 +6,30 @@ import android.os.Bundle;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
-import java.util.Objects;
-
 public class SettingsFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceChangeListener {
-
-    private static final String DICTIONARY_SUMMARY_TEXT = "Current selected: ";
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.settings_ui, rootKey);
 
         Preference dictionaryPref = findPreference(getString(R.string.sharedpref_current_dictionary));
-//        updateDictionarySummary(dictionaryPref,
-//                dictionaryPref.getSharedPreferences().getString(getString(R.string.sharedpref_current_dictionary),
-//                        null));
+        Preference wordOrderPref = findPreference(getString(R.string.sharedpref_word_order));
+
         updateDictionarySummary(dictionaryPref,
                 dictionaryPref.getSharedPreferences().getString(getString(R.string.sharedpref_current_dictionary), null));
         dictionaryPref.setOnPreferenceChangeListener(this);
+
+        updateWordOrderSummary(wordOrderPref,
+                wordOrderPref.getSharedPreferences().getString(getString(R.string.sharedpref_word_order), null));
+        wordOrderPref.setOnPreferenceChangeListener(this);
     }
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         if(preference.getKey().equals(getString(R.string.sharedpref_current_dictionary)))
             updateDictionarySummary(preference, newValue.toString());
+        if(preference.getKey().equals(getString(R.string.sharedpref_word_order)))
+            updateWordOrderSummary(preference, newValue.toString());
         return true;
     }
 
@@ -38,13 +39,27 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         if(value == null) {
             //No dictionary set, use the default dictionary
             //preference.setSummary(DICTIONARY_SUMMARY_TEXT+getString(R.string.sharedpref_default_dictionary));
-            preference.setSummary(DICTIONARY_SUMMARY_TEXT+values[0]); //English
+            preference.setSummary(values[0]); //English
         } else {
             //preference.setSummary(DICTIONARY_SUMMARY_TEXT+value);
             int i = 0;
             while(i < entries.length && !entries[i].equals(value))
                 i++;
-            preference.setSummary(DICTIONARY_SUMMARY_TEXT+values[i]);
+            preference.setSummary(values[i]);
+        }
+    }
+
+    private void updateWordOrderSummary(Preference preference, String value) {
+        String[] entries = getResources().getStringArray(R.array.wordOrders);
+        String[] values = getResources().getStringArray(R.array.wordOrdersAlias);
+        if(value == null) {
+            //No word order set
+            preference.setSummary(values[1]); //Descending
+        } else {
+            int i = 0;
+            while(i < entries.length && !entries[i].equals(value))
+                i++;
+            preference.setSummary(values[i]);
         }
     }
 }

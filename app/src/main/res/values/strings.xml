@@ -21,7 +21,11 @@
     <string name="text_no_words_found">No Words Found</string>
     <string name="sharedpref_current_dictionary">current_dictionary</string>
     <string name="sharedpref_default_dictionary">english_dictionary</string>
+    <string name="sharedpref_current_dictionary_title">Dictionary</string>
     <string name="sharedpref_current_dictionary_max_word_length">max_word_length</string>
+    <string name="sharedpref_word_order">word_order</string>
+    <string name="sharedpref_word_order_default">descending</string>
+    <string name="sharedpref_word_order_title">Word Order</string>
     <string-array name="dictionaries">
         <item>english_dictionary</item>
         <item>italian_dictionary</item>
@@ -29,6 +33,14 @@
     <string-array name="dictionariesAlias">
         <item>English</item>
         <item>Italian</item>
+    </string-array>
+    <string-array name="wordOrders">
+        <item>ascending</item>
+        <item>descending</item>
+    </string-array>
+    <string-array name="wordOrdersAlias">
+        <item>Ascending</item>
+        <item>Descending</item>
     </string-array>
     <string name="english_dictionary">words_english.txt</string>
     <string name="italian_dictionary">280000_parole_italiane.txt</string>
