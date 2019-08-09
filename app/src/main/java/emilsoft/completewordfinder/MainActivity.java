@@ -79,12 +79,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
-        //TODO write the current dictionary in use in the settings
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        //editor.putString(getString(R.string.sharedpref_current_dictionary), getString(R.string.italian_dictionary));
-//        editor.putString(getString(R.string.sharedpref_current_dictionary), "italian");
-//        editor.apply();
-
         //Read Dictionary in use
         //String dictName = sharedPreferences.getString(getString(R.string.sharedpref_current_dictionary), getString(R.string.sharedpref_default_dictionary));
         dict = readDictionary();
@@ -100,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //TrieViewModel model = ViewModelProviders.of(this).get(TrieViewModel.class);
         mModel = ViewModelProviders.of(this,
-                new TrieViewModelFactory(this.getApplication(), dict, this)).get(TrieViewModel.class);
+                new TrieViewModelFactory(this.getApplication(), dict)).get(TrieViewModel.class);
         mModel.addMaxWordLengthListener(this);
     }
 
@@ -180,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private Dictionary readDictionary() {
-        String dictName = sharedPreferences.getString("dictionary", Dictionaries.ENGLISH);
+        String dictName = sharedPreferences.getString(getString(R.string.sharedpref_current_dictionary), Dictionaries.ENGLISH);
         int maxWordLength = sharedPreferences.getInt(getString(R.string.sharedpref_current_dictionary_max_word_length), MAX_WORD_LENGTH_DEFAULT_VALUE);
         Log.v(TAG, "MainActivity/readDictionary dictName: "+dictName+" maxWordLength: "+maxWordLength);
         Dictionary dict = Dictionaries.get(dictName);
@@ -204,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Log.v(TAG, "MainActivity/ onSharedPreferenceChanged called");
-        if(key.equals("dictionary")) {
+        if(key.equals(getString(R.string.sharedpref_current_dictionary))) {
             String dictName = sharedPreferences.getString(key, null);
             if(dictName != null)
                 dict = Dictionaries.get(dictName);

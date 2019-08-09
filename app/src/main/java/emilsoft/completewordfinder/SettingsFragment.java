@@ -16,18 +16,18 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.settings_ui, rootKey);
 
-        Preference dictionaryPref = findPreference("dictionary");
+        Preference dictionaryPref = findPreference(getString(R.string.sharedpref_current_dictionary));
 //        updateDictionarySummary(dictionaryPref,
 //                dictionaryPref.getSharedPreferences().getString(getString(R.string.sharedpref_current_dictionary),
 //                        null));
         updateDictionarySummary(dictionaryPref,
-                dictionaryPref.getSharedPreferences().getString("dictionary", null));
+                dictionaryPref.getSharedPreferences().getString(getString(R.string.sharedpref_current_dictionary), null));
         dictionaryPref.setOnPreferenceChangeListener(this);
     }
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
-        if(preference.getKey().equals("dictionary"))
+        if(preference.getKey().equals(getString(R.string.sharedpref_current_dictionary)))
             updateDictionarySummary(preference, newValue.toString());
         return true;
     }

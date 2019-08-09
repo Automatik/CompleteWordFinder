@@ -64,6 +64,7 @@ public class AnagramFragment extends Fragment {
     private static final String TEXT_PROGRESSBAR_LOADING_WORDS_STATE = "textNoWordsFound";
     private static final String IS_DICTIONARY_READ_STATE = "isDictionaryRead";
     private static final String DICTIONARY_FILENAME = "dictionaryFilename";
+
     private String textInserted, dictionaryFilename;
     private boolean isTextNoWordsFoundVisible = false, isProgressBarLoadingWordsVisible = false;
     private boolean isDictionaryRead, findAnagramPending;
@@ -149,7 +150,7 @@ public class AnagramFragment extends Fragment {
         }
 
         onSharedPreferenceChangeListener = ((sharedPreferences, key) -> {
-            if(key.equals("dictionary")) {
+            if(key.equals(getString(R.string.sharedpref_current_dictionary))) {
                 //read dictionary is already done when recreating this fragment
                 //disable counter before the new dictionary is read
                 textInputLayout.setCounterEnabled(false);

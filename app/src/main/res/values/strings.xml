@@ -20,7 +20,7 @@
     <string name="text_description_wildcars">Find words using the wildcard "?"</string>
     <string name="text_no_words_found">No Words Found</string>
     <string name="sharedpref_current_dictionary">current_dictionary</string>
-    <string name="sharedpref_default_dictionary">english</string>
+    <string name="sharedpref_default_dictionary">english_dictionary</string>
     <string name="sharedpref_current_dictionary_max_word_length">max_word_length</string>
     <string-array name="dictionaries">
         <item>english_dictionary</item>

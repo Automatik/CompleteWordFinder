@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData;
 import androidx.preference.PreferenceManager;
 
 import emilsoft.completewordfinder.MainActivity;
+import emilsoft.completewordfinder.R;
 import emilsoft.completewordfinder.trie.DoubleArrayTrie;
 import emilsoft.completewordfinder.utils.Dictionaries;
 import emilsoft.completewordfinder.utils.Dictionary;
@@ -21,7 +22,7 @@ public class TrieViewModel extends AndroidViewModel implements SharedPreferences
     private final TrieLiveData mTrie;
     private final SharedPreferences sharedPreferences;
     //private MaxWordLengthListener listener;
-    private List<MaxWordLengthListener> listeners;
+    private static List<MaxWordLengthListener> listeners;
 
     //public TrieViewModel(Application application, Dictionary dictionary, MaxWordLengthListener listener) {
     public TrieViewModel(Application application, Dictionary dictionary) {
@@ -29,12 +30,15 @@ public class TrieViewModel extends AndroidViewModel implements SharedPreferences
         Log.v(MainActivity.TAG, "TrieViewModel() called");
         //this.listener = listener;
         listeners = new ArrayList<>();
-        //listeners.add(listener);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(application);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
         //mTrie = new TrieLiveData(application, dictionary, listener);
+        InternalMaxWordLengthListener internalMaxWordLengthListener = (maxWordLength -> {
+            for (MaxWordLengthListener listener : listeners)
+                listener.onGetMaxWordLength(maxWordLength);
+        });
         mTrie = new TrieLiveData(application, dictionary, internalMaxWordLengthListener);
     }
 
@@ -43,26 +47,24 @@ public class TrieViewModel extends AndroidViewModel implements SharedPreferences
     }
 
     public void addMaxWordLengthListener(MaxWordLengthListener listener) {
+        Log.v(MainActivity.TAG, "Listeners "+listeners.toString()+": "+listeners.size()+" adding "+listener.toString());
         listeners.add(listener);
         //should also implement removeListener() ?
     }
 
-    private InternalMaxWordLengthListener internalMaxWordLengthListener = (maxWordLength -> {
-         for(MaxWordLengthListener listener : listeners)
-             listener.onGetMaxWordLength(maxWordLength);
-    });
-
     @Override
     protected void onCleared() {
         Log.v(MainActivity.TAG, "TrieViewModel/onCleared call");
+        Log.v(MainActivity.TAG, "Listeners clearing "+listeners.toString());
+        listeners.clear();
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Log.v(MainActivity.TAG, "TrieViewModel/onSharedPreferenceChanged called");
-        if(key.equals("dictionary")) {
-            Application app = getApplication();
+        Application app = getApplication();
+        if(key.equals(app.getString(R.string.sharedpref_current_dictionary))) {
 //            String currentDict = app.getString(R.string.sharedpref_current_dictionary);
 //            String dictionaryFile = sharedPreferences.getString(currentDict, null);
 

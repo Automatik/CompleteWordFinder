@@ -3,9 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <androidx.preference.ListPreference
-        android:key="dictionary"
+        android:key="@string/sharedpref_current_dictionary"
         android:title="Dictionary"
         android:summary="Current selected: "
+        android:defaultValue="@string/sharedpref_default_dictionary"
         android:entries="@array/dictionariesAlias"
         android:entryValues="@array/dictionaries"/>
 

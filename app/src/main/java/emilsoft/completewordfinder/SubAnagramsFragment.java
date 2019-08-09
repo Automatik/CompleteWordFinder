@@ -76,7 +76,7 @@ public class SubAnagramsFragment extends Fragment {
         }
         Dictionary dictionary = new Dictionary(dictionaryFilename, dictionaryAlphabetSize);
         trieViewModel = ViewModelProviders.of(getActivity(),
-                new TrieViewModelFactory(getActivity().getApplication(), dictionary, null)).get(TrieViewModel.class);
+                new TrieViewModelFactory(getActivity().getApplication(), dictionary)).get(TrieViewModel.class);
     }
 
     @Nullable

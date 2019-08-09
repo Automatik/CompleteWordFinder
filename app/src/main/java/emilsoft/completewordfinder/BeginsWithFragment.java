@@ -55,6 +55,7 @@ public class BeginsWithFragment extends Fragment {
     private static final String TEXT_INSERTED_STATE = "textInserted";
     private static final String TEXT_NO_WORDS_FOUND_STATE = "textNoWordsFound";
     private static final String TEXT_PROGRESSBAR_LOADING_WORDS_STATE = "textNoWordsFound";
+
     private boolean isTextNoWordsFoundVisible = false, isProgressBarLoadingWordsVisible = false;
     private String dictionaryFilename;
     private int dictionaryAlphabetSize, maxWordLength;
@@ -89,7 +90,7 @@ public class BeginsWithFragment extends Fragment {
 //        }
         Dictionary dictionary = new Dictionary(dictionaryFilename, dictionaryAlphabetSize, maxWordLength);
         trieViewModel = ViewModelProviders.of(getActivity(),
-                new TrieViewModelFactory(getActivity().getApplication(), dictionary, maxWordLengthListener)).get(TrieViewModel.class);
+                new TrieViewModelFactory(getActivity().getApplication(), dictionary)).get(TrieViewModel.class);
         trieViewModel.addMaxWordLengthListener(maxWordLengthListener);
     }
 
@@ -107,12 +108,14 @@ public class BeginsWithFragment extends Fragment {
         find.setOnClickListener(onClickListener);
         textinput.setOnFocusChangeListener(onFocusChangeListener);
         //textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters()));
-        textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), maxWordLength));
+        //textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), maxWordLength));
         textDescription.setText(R.string.text_description_begins_with);
         if(maxWordLength != 0) {
             textInputLayout.setCounterEnabled(true);
             textInputLayout.setCounterMaxLength(maxWordLength);
-        }
+            textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), maxWordLength));
+        } else
+            textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters()));
         return view;
     }
 
@@ -141,7 +144,7 @@ public class BeginsWithFragment extends Fragment {
         }
 
         onSharedPreferenceChangeListener = ((sharedPreferences, key) -> {
-            if(key.equals("dictionary")) {
+            if(key.equals(getString(R.string.sharedpref_current_dictionary))) {
                 textInputLayout.setCounterEnabled(false);
                 textinput.setFilters(WordUtils.addMyInputFilters(new InputFilter[]{}));
             }

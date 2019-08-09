@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -37,12 +36,13 @@ public class TrieLiveData extends LiveData<DoubleArrayTrie> {
             listener.onGetMaxWordLength(maxWordLength);
     }
 
+    private CreateTrie.CreateTrieTaskListener createTrieTaskListener = (trie, maxWordLength) -> {
+        setValue(trie);
+        if(maxWordLength != 0)
+            setMaxWordLength(maxWordLength);
+    };
+
     public void createTrie(Context context, Dictionary dictionary, boolean isDictionaryLanguageChanged) {
-        CreateTrie.CreateTrieTaskListener createTrieTaskListener = (trie, maxWordLength) -> {
-            setValue(trie);
-            if(maxWordLength != 0)
-                setMaxWordLength(maxWordLength);
-        };
         CreateTrie task = new CreateTrie(context, dictionary, createTrieTaskListener);
         task.execute(isDictionaryLanguageChanged);
     }

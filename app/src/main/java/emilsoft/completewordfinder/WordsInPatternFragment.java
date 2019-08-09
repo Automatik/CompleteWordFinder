@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +26,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import emilsoft.completewordfinder.trie.DoubleArrayTrie;
@@ -47,6 +49,8 @@ public class WordsInPatternFragment extends Fragment {
     private WordsInPatternViewModel wordsInPatternViewModel;
     private ProgressBar progressBarLoadingWords;
     private FindWordsInPattern task;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.OnSharedPreferenceChangeListener onSharedPreferenceChangeListener;
 
     private static final String TEXT_INSERTED_STATE = "textInserted";
     private static final String TEXT_NO_WORDS_FOUND_STATE = "textNoWordsFound";
@@ -76,13 +80,14 @@ public class WordsInPatternFragment extends Fragment {
             maxWordLength = getArguments().getInt(MainActivity.DICTIONARY_MAX_WORD);
         }
         //this is only an extra check
-        if(maxWordLength == MainActivity.MAX_WORD_LENGTH_DEFAULT_VALUE) {
-            SharedPreferences sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
-            maxWordLength = sharedPreferences.getInt(getString(R.string.sharedpref_current_dictionary_max_word_length), MainActivity.MAX_WORD_LENGTH_DEFAULT_VALUE);
-        }
+//        if(maxWordLength == MainActivity.MAX_WORD_LENGTH_DEFAULT_VALUE) {
+//            SharedPreferences sharedPreferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+//            maxWordLength = sharedPreferences.getInt(getString(R.string.sharedpref_current_dictionary_max_word_length), MainActivity.MAX_WORD_LENGTH_DEFAULT_VALUE);
+//        }
         Dictionary dictionary = new Dictionary(dictionaryFilename, dictionaryAlphabetSize, maxWordLength);
         trieViewModel = ViewModelProviders.of(getActivity(),
-                new TrieViewModelFactory(getActivity().getApplication(), dictionary, null)).get(TrieViewModel.class);
+                new TrieViewModelFactory(getActivity().getApplication(), dictionary)).get(TrieViewModel.class);
+        trieViewModel.addMaxWordLengthListener(maxWordLengthListener);
     }
 
     @Nullable
@@ -99,12 +104,14 @@ public class WordsInPatternFragment extends Fragment {
         find.setOnClickListener(onClickListener);
         textinput.setOnFocusChangeListener(onFocusChangeListener);
         //textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters()));
-        textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), maxWordLength));
+        //textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), maxWordLength));
         textDescription.setText(R.string.text_description_words_contained);
         if(maxWordLength != 0) {
             textInputLayout.setCounterEnabled(true);
             textInputLayout.setCounterMaxLength(maxWordLength);
-        }
+            textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), maxWordLength));
+        } else
+            textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters()));
         return view;
     }
 
@@ -131,6 +138,16 @@ public class WordsInPatternFragment extends Fragment {
                 progressBarLoadingWords.setVisibility(View.INVISIBLE);
             }
         }
+
+        onSharedPreferenceChangeListener = ((sharedPreferences, key) -> {
+           if(key.equals(getString(R.string.sharedpref_current_dictionary))) {
+               textInputLayout.setCounterEnabled(false);
+               textinput.setFilters(WordUtils.addMyInputFilters(new InputFilter[]{}));
+           }
+        });
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        sharedPreferences.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
     }
 
     @Override
@@ -151,6 +168,8 @@ public class WordsInPatternFragment extends Fragment {
     public void onDestroy() {
         if(task != null)
             task.setListener(null);
+        if(sharedPreferences != null)
+            sharedPreferences.unregisterOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
         super.onDestroy();
     }
 
@@ -208,6 +227,16 @@ public class WordsInPatternFragment extends Fragment {
             }
         }
     };
+
+    private TrieViewModel.MaxWordLengthListener maxWordLengthListener = (maxWordLength -> {
+        Log.v(MainActivity.TAG, "WordsInPatternFragment/ maxWordLengthListener called");
+        this.maxWordLength = maxWordLength;
+        if(maxWordLength != 0) {
+            textInputLayout.setCounterEnabled(true);
+            textInputLayout.setCounterMaxLength(maxWordLength);
+            textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), maxWordLength));
+        }
+    });
 
     private View.OnFocusChangeListener onFocusChangeListener = new View.OnFocusChangeListener() {
         @Override
