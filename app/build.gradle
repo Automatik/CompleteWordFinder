@@ -26,7 +26,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.google.android.material:material:1.1.0-alpha08'
+    implementation 'com.google.android.material:material:1.1.0-alpha09'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta2'
     implementation 'androidx.legacy:legacy-preference-v14:1.0.0'
     implementation 'androidx.preference:preference:1.1.0-rc01'
@@ -35,6 +35,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     //For ViewMode,LiveData
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
-    //For Kryo
+    //For RecyclerView Fast Scroll Styling https://github.com/timusus/RecyclerView-FastScroll
+    implementation 'com.simplecityapps:recyclerview-fastscroll:2.0.0'
 
 }

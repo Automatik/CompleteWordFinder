@@ -12,7 +12,10 @@ import java.util.ArrayList;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class HeaderRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
+
+public class HeaderRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+    implements FastScrollRecyclerView.SectionedAdapter {
 
     private ArrayList<String> mWords;
     private int[] mHeadersIndex;
@@ -101,10 +104,19 @@ public class HeaderRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
         return viewType;
     }
 
+    @NonNull
+    @Override
+    public String getSectionName(int position) {
+        int header = binarySearch(mHeadersIndex, position);
+        int numLetters = mWords.get(mHeadersIndex[header]).length();
+        return Integer.toString(numLetters);
+    }
+
     public void setHeadersIndex(int[] headersIndex) {
         mHeadersIndex = headersIndex;
     }
 
+    //return at which header does the item in position belong
     private static int binarySearch(int[] indexArray, int position) {
         int low = 0;
         int high = indexArray.length - 1;

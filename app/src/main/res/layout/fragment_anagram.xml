@@ -60,7 +60,7 @@
         app:layout_constraintTop_toBottomOf="@id/text_description" />
 
 
-    <androidx.recyclerview.widget.RecyclerView
+    <!-- <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/words_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -73,9 +73,34 @@
         app:layout_constraintStart_toStartOf="@id/textinput_layout"
         app:layout_constraintTop_toBottomOf="@id/textinput_layout"
         tools:listitem="@layout/fragment_anagram_list_item">
+    </androidx.recyclerview.widget.RecyclerView> -->
 
-    </androidx.recyclerview.widget.RecyclerView>
-    <!--android:layout_below="@id/insertion_layout" -->
+    <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+        android:id="@+id/words_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="8dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/find_button"
+        app:layout_constraintStart_toStartOf="@id/textinput_layout"
+        app:layout_constraintTop_toBottomOf="@id/textinput_layout"
+        tools:listitem="@layout/fragment_anagram_list_item"
+        app:fastScrollThumbEnabled="true"
+        app:fastScrollPopupBgColor="@color/colorAccent"
+        app:fastScrollPopupTextColor="@color/white"
+        app:fastScrollPopupTextSize="30sp"
+        app:fastScrollPopupBackgroundSize="60dp"
+        app:fastScrollThumbColor="@color/colorAccent"
+        app:fastScrollThumbInactiveColor="@color/colorPrimaryDark"
+        app:fastScrollTrackColor="@color/colorPrimary"
+        app:fastScrollPopupPosition="adjacent"
+        app:fastScrollPopupTextVerticalAlignmentMode="font_metrics"
+        >
+    </com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView>
+
 
     <TextView
         android:id="@+id/text_no_words_found"
