@@ -132,6 +132,13 @@ public class SubAnagramsFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if(getActivity() != null)
+            getActivity().setTitle(getString(R.string.nav_item_sub_anagrams));
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
     }

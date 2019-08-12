@@ -6,20 +6,19 @@
     android:layout_height="match_parent"
     android:layout_marginTop="8dp"
     android:layout_marginBottom="8dp"
-    android:orientation="vertical">
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp">
 
     <TextView
         android:id="@+id/text_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="10dp"
-        android:layout_marginEnd="8dp"
         android:paddingStart="4dp"
         android:paddingEnd="4dp"
         android:textSize="15sp"
         android:textStyle="italic"
-        app:layout_constraintEnd_toEndOf="@id/find_button"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/textinput_layout"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -27,7 +26,6 @@
         android:id="@+id/textinput_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="8dp"
         app:counterEnabled="false"
@@ -49,13 +47,10 @@
         android:id="@+id/find_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
         android:layout_marginTop="10dp"
-        android:layout_marginEnd="8dp"
-        android:layout_toEndOf="@id/textinput_layout"
         android:text="@string/fragment_anagram_find_button_text"
         android:textSize="15sp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/text_description"
         app:layout_constraintStart_toEndOf="@+id/textinput_layout"
         app:layout_constraintTop_toBottomOf="@id/text_description" />
 
@@ -79,27 +74,23 @@
         android:id="@+id/words_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="10dp"
-        android:layout_marginEnd="8dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/find_button"
-        app:layout_constraintStart_toStartOf="@id/textinput_layout"
-        app:layout_constraintTop_toBottomOf="@id/textinput_layout"
-        tools:listitem="@layout/fragment_anagram_list_item"
-        app:fastScrollThumbEnabled="true"
+        app:fastScrollPopupBackgroundSize="60dp"
         app:fastScrollPopupBgColor="@color/colorAccent"
+        app:fastScrollPopupPosition="adjacent"
         app:fastScrollPopupTextColor="@color/white"
         app:fastScrollPopupTextSize="30sp"
-        app:fastScrollPopupBackgroundSize="60dp"
+        app:fastScrollPopupTextVerticalAlignmentMode="font_metrics"
         app:fastScrollThumbColor="@color/colorAccent"
+        app:fastScrollThumbEnabled="true"
         app:fastScrollThumbInactiveColor="@color/colorPrimaryDark"
         app:fastScrollTrackColor="@color/colorPrimary"
-        app:fastScrollPopupPosition="adjacent"
-        app:fastScrollPopupTextVerticalAlignmentMode="font_metrics"
-        >
-    </com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView>
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/textinput_layout"
+        app:layout_constraintTop_toBottomOf="@id/textinput_layout"
+        tools:listitem="@layout/fragment_anagram_list_item" />
 
 
     <TextView
@@ -117,14 +108,14 @@
     <ProgressBar
         android:id="@+id/progressBarLoadingWords"
         style="?android:attr/progressBarStyle"
-        android:indeterminate="true"
-        android:indeterminateTint="@color/colorPrimary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/colorPrimary"
         android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

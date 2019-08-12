@@ -153,6 +153,13 @@ public class BeginsWithFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if(getActivity() != null)
+            getActivity().setTitle(getString(R.string.nav_item_begins_with));
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
     }
