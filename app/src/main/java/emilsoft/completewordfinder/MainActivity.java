@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -139,9 +140,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         Fragment fragment;
@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Dictionary readDictionary() {
         String dictName = sharedPreferences.getString(getString(R.string.sharedpref_current_dictionary), Dictionaries.ENGLISH);
         int maxWordLength = sharedPreferences.getInt(getString(R.string.sharedpref_current_dictionary_max_word_length), MAX_WORD_LENGTH_DEFAULT_VALUE);
-        Log.v(TAG, "MainActivity/readDictionary dictName: "+dictName+" maxWordLength: "+maxWordLength);
+        //Log.v(TAG, "MainActivity/readDictionary dictName: "+dictName+" maxWordLength: "+maxWordLength);
         Dictionary dict = Dictionaries.get(dictName);
         if(dict != null && maxWordLength != MAX_WORD_LENGTH_DEFAULT_VALUE)
             dict.setMaxWordLength(maxWordLength);
@@ -203,14 +203,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         } else
             isWordOrderAscending = WORD_ORDER_DEFAULT;
-        Log.v(TAG, "MainAcitivity/readWordOrder isWordOrderAscending: "+isWordOrderAscending);
+        //Log.v(TAG, "MainAcitivity/readWordOrder isWordOrderAscending: "+isWordOrderAscending);
         return isWordOrderAscending;
     }
 
     @Override
     public void onGetMaxWordLength(int maxWordLength) {
         //SharedPreferences sharedPreferences = getPreferences(Context.MODE_PRIVATE);
-        Log.v(TAG, "MainActivity/ onGetMaxWordLength called: "+maxWordLength);
+        //Log.v(TAG, "MainActivity/ onGetMaxWordLength called: "+maxWordLength);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt(getString(R.string.sharedpref_current_dictionary_max_word_length), maxWordLength);
@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        Log.v(TAG, "MainActivity/ onSharedPreferenceChanged called");
+        //Log.v(TAG, "MainActivity/ onSharedPreferenceChanged called");
         if(key.equals(getString(R.string.sharedpref_current_dictionary))) {
             String dictName = sharedPreferences.getString(key, null);
             if(dictName != null)

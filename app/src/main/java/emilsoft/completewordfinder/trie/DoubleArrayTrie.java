@@ -13,6 +13,7 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.List;
 
+import emilsoft.completewordfinder.BuildConfig;
 import emilsoft.completewordfinder.MainActivity;
 
 @SuppressWarnings("JavadocReference")
@@ -266,14 +267,18 @@ public class DoubleArrayTrie implements Serializable {
 
             offsets.remove(offset);
         }
-        assert offsets.isEmpty();
+        if(BuildConfig.DEBUG && !offsets.isEmpty())
+            throw new AssertionError();
+        //assert offsets.isEmpty();
 
         //Determine a new BASE[currentNode]
         if(!remainingSuffix.isEmpty())
             offsets.add(getOffset(remainingSuffix.charAt(0)));
         if(!tempSuffix.isEmpty())
             offsets.add(getOffset(tempSuffix.charAt(0)));
-        assert !offsets.isEmpty();
+        if(BuildConfig.DEBUG && offsets.isEmpty())
+            throw new AssertionError();
+        //assert !offsets.isEmpty();
         setBase(currentNode, xCheck(offsets));
 
         //tempSuffix is overwritten in the original position oldPos of TAIL
@@ -387,7 +392,10 @@ public class DoubleArrayTrie implements Serializable {
         //If there are no gaps
         int neededPositions = maxOffset - minOffset + 1;
         ensureReachableIndex(base.size() + neededPositions - 1);
-        return base.size() - neededPositions - minOffset;
+        int q = base.size() - neededPositions - minOffset;
+        if (BuildConfig.DEBUG && !(q > 0))
+            throw new AssertionError();
+        return q;
     }
 
     private String longestCommonPrefix(String a, String b) {

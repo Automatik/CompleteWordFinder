@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
 
+import emilsoft.completewordfinder.BuildConfig;
+
 @SuppressWarnings("JavadocReference")
 public class IntegerArrayList implements IntegerList, Cloneable, Serializable {
 
@@ -178,8 +180,12 @@ public class IntegerArrayList implements IntegerList, Cloneable, Serializable {
         if (data == that.data) return true;
         if (data == null || that.data == null) return false;
         //Don't compare lengths, because they can be different but with same number of elements according to size
-        assert(size <= data.length);
-        assert(size <= that.data.length);
+        if(BuildConfig.DEBUG && !(size <= data.length))
+            throw new AssertionError();
+        //assert(size <= data.length);
+        if(BuildConfig.DEBUG && !(size <= that.data.length))
+            throw new AssertionError();
+        //assert(size <= that.data.length);
         for (int i=0; i<size; i++)
             if (data[i] != that.data[i])
                 return false;

@@ -15,13 +15,17 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         Preference dictionaryPref = findPreference(getString(R.string.sharedpref_current_dictionary));
         Preference wordOrderPref = findPreference(getString(R.string.sharedpref_word_order));
 
-        updateDictionarySummary(dictionaryPref,
-                dictionaryPref.getSharedPreferences().getString(getString(R.string.sharedpref_current_dictionary), null));
-        dictionaryPref.setOnPreferenceChangeListener(this);
+        if (dictionaryPref != null) {
+            updateDictionarySummary(dictionaryPref,
+                    dictionaryPref.getSharedPreferences().getString(getString(R.string.sharedpref_current_dictionary), null));
+            dictionaryPref.setOnPreferenceChangeListener(this);
+        }
 
-        updateWordOrderSummary(wordOrderPref,
-                wordOrderPref.getSharedPreferences().getString(getString(R.string.sharedpref_word_order), null));
-        wordOrderPref.setOnPreferenceChangeListener(this);
+        if(wordOrderPref != null) {
+            updateWordOrderSummary(wordOrderPref,
+                    wordOrderPref.getSharedPreferences().getString(getString(R.string.sharedpref_word_order), null));
+            wordOrderPref.setOnPreferenceChangeListener(this);
+        }
     }
 
     @Override

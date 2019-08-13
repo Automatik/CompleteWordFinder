@@ -9,13 +9,13 @@
     <string name="fragment_anagram_textinput_hint">Insert Word</string>
     <string name="fragment_anagram_find_button_text">FIND</string>
     <string name="nav_item_anagrams">Anagrams</string>
-    <string name="nav_item_begins_with">Begins With</string>
-    <string name="nav_item_words_contained">Words Contained</string>
+    <string name="nav_item_begins_with">Starts With</string>
+    <string name="nav_item_words_contained">Word Search</string>
     <string name="nav_item_sub_anagrams">Sub Anagrams</string>
     <string name="nav_item_wildcards">Wildcards</string>
     <string name="text_description_anagrams">Find words from the given word\'s anagrams</string>
     <string name="text_description_begins_with">Find words that start with given letters</string>
-    <string name="text_description_words_contained">Find words contained in given word</string>
+    <string name="text_description_words_contained">Find words contained in given sequence of letters</string>
     <string name="text_description_sub_anagrams">Find words from combination of letters</string>
     <string name="text_description_wildcars">Find words using the wildcard "?"</string>
     <string name="text_no_words_found">No Words Found</string>
@@ -42,9 +42,10 @@
         <item>Ascending</item>
         <item>Descending</item>
     </string-array>
-    <string name="english_dictionary">words_english.txt</string>
-    <string name="italian_dictionary">280000_parole_italiane.txt</string>
+    <!--<string name="english_dictionary">words_english.txt</string>-->
+    <!--<string name="italian_dictionary">280000_parole_italiane.txt</string>-->
     <string name="wildcards_fragment_toast_too_many_wildcards">Too many wildcards. Max is 15</string>
     <string name="wildcards_fragment_toast_only_wildcards">Insert at least one letter</string>
     <string name="toast_max_digits_exceeded">Max digits exceeded</string>
+    <string name="toast_error_retrieving_dictionary">Error retrieving dictionary</string>
 </resources>

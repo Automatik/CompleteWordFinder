@@ -88,9 +88,8 @@ public class AnagramFragment extends Fragment {
         anagramViewModel = ViewModelProviders.of(this).get(AnagramViewModel.class);
         if(getArguments() != null) {
             dictionaryFilename = getArguments().getString(DICTIONARY_FILENAME);
+            readDictionary(dictionaryFilename);
         }
-        //TODO if getArguments = null, use default dictionary name?
-        readDictionary(dictionaryFilename);
     }
 
     @Nullable
@@ -156,8 +155,10 @@ public class AnagramFragment extends Fragment {
                 textinput.setFilters(WordUtils.addMyInputFilters(new InputFilter[]{}));
             }
         });
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        sharedPreferences.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
+        if(getActivity() != null) {
+            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            sharedPreferences.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
+        }
     }
 
     @Override
@@ -197,8 +198,9 @@ public class AnagramFragment extends Fragment {
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            try {
+            if(getActivity() != null)
                 KeyboardHelper.hideKeyboard(getActivity());
+            if(textinput.getText() != null) {
                 textInserted = textinput.getText().toString().toLowerCase();
                 isProgressBarLoadingWordsVisible = true;
                 progressBarLoadingWords.setVisibility(View.VISIBLE);
@@ -207,47 +209,46 @@ public class AnagramFragment extends Fragment {
 
                 int size = anagramViewModel.wordsFound.size();
                 anagramViewModel.wordsFound.clear();
-                if(adapter == null) {
+                if (adapter == null) {
                     adapter = new AnagramRecyclerViewAdapter(anagramViewModel.wordsFound);
                     wordslist.setAdapter(adapter);
-                }
-                else
+                } else
                     adapter.notifyItemRangeRemoved(0, size);
 
-                if(isDictionaryRead) {
+                if (isDictionaryRead) {
                     findAnagramPending = false;
                     findAnagrams(textInserted);
                 } else
                     //the read dictionary task should already being executed
                     findAnagramPending = true;
-
-//                if(anagramViewModel.dictionary.isEmpty())
-//                    readDictionaryFirst(textInserted);
-//                else
-//                    findAnagrams(textInserted);
-
-            } catch (NullPointerException ex) {
-                Log.v(MainActivity.TAG, "text inserted is null");
             }
         }
     };
 
     private void readDictionary(String dictionaryFilename) {
         if(dictionaryFilename == null) {
-            Toast.makeText(getContext(), "Error retrieving dictionary", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.toast_error_retrieving_dictionary), Toast.LENGTH_SHORT).show();
             return;
         }
         readDictionaryTask = new ReadDictionary(getContext(), dictionaryFilename);
-        readDictionaryTask.setListener((dictionary, maxWordLength) -> {
-            anagramViewModel.dictionary = dictionary;
-            anagramViewModel.maxWordLength = maxWordLength;
-            isDictionaryRead = true;
-            textInputLayout.setCounterEnabled(true);
-            textInputLayout.setCounterMaxLength(anagramViewModel.maxWordLength);
-            textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), maxWordLength));
-            if(findAnagramPending) {
-                findAnagramPending = false;
-                findAnagrams(textInserted);
+        readDictionaryTask.setListener(new ReadDictionary.ReadDictionaryTaskListener() {
+            @Override
+            public void onDictionaryReadFinish(ArrayList<String> dictionary, int maxWordLength) {
+                anagramViewModel.dictionary = dictionary;
+                anagramViewModel.maxWordLength = maxWordLength;
+                isDictionaryRead = true;
+                textInputLayout.setCounterEnabled(true);
+                textInputLayout.setCounterMaxLength(anagramViewModel.maxWordLength);
+                textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), maxWordLength));
+                if(findAnagramPending) {
+                    findAnagramPending = false;
+                    findAnagrams(textInserted);
+                }
+            }
+
+            @Override
+            public void onDictionaryReadError() {
+                Toast.makeText(getContext(), getString(R.string.toast_error_retrieving_dictionary), Toast.LENGTH_SHORT).show();
             }
         });
         readDictionaryTask.execute();
@@ -350,7 +351,7 @@ public class AnagramFragment extends Fragment {
         }
     }
 
-    private static class ReadDictionary extends AsyncTask<Void, Void, Void> {
+    private static class ReadDictionary extends AsyncTask<Void, Void, Boolean> {
 
         private WeakReference<Context> context;
         private String filename;
@@ -366,31 +367,35 @@ public class AnagramFragment extends Fragment {
         }
 
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected Boolean doInBackground(Void... voids) {
             try {
-                Log.v(MainActivity.TAG, "Starting reading dictionary");
+                //Log.v(MainActivity.TAG, "Starting reading dictionary");
                 BufferedReader reader = new BufferedReader(new InputStreamReader(context.get().getAssets().open(filename)));
                 String line;
                 while ((line = reader.readLine()) != null) {
                         if(line.length() > maxWordLength)
                             maxWordLength = line.length();
-                        words.add(line); //Should add .toLowerCase()?
+                        words.add(line.toLowerCase());
                 }
                 reader.close();
-                Log.v(MainActivity.TAG, "Finished reading dictionary");
-                return null;
+                //Log.v(MainActivity.TAG, "Finished reading dictionary");
+                return true;
             } catch (IOException ex) {
                 ex.printStackTrace();
-                Log.v(MainActivity.TAG, "AnagramFragment/ReadDictionary: error reading dictionary");
-                return null;
+                //Log.v(MainActivity.TAG, "AnagramFragment/ReadDictionary: error reading dictionary");
+                return false;
             }
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            if(listener != null)
-                listener.onDictionaryReadFinish(words, maxWordLength);
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            if(listener != null) {
+                if(result)
+                    listener.onDictionaryReadFinish(words, maxWordLength);
+                else
+                    listener.onDictionaryReadError();
+            }
         }
 
         public void setListener(ReadDictionaryTaskListener listener) {
@@ -400,6 +405,8 @@ public class AnagramFragment extends Fragment {
         public interface ReadDictionaryTaskListener {
 
             void onDictionaryReadFinish(ArrayList<String> dictionary, int maxWordLength);
+
+            void onDictionaryReadError();
 
         }
     }

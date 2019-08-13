@@ -55,6 +55,8 @@ public class WordsInPatternFragment extends Fragment {
     private static final String TEXT_INSERTED_STATE = "textInserted";
     private static final String TEXT_NO_WORDS_FOUND_STATE = "textNoWordsFound";
     private static final String TEXT_PROGRESSBAR_LOADING_WORDS_STATE = "textNoWordsFound";
+    private static final String MAX_WORD_LENGTH_STATE = "maxWordLengthState";
+    private static final String WORD_ORDER_ASCENDING_STATE = "isWordOrderAscendingState";
     private boolean isTextNoWordsFoundVisible = false, isProgressBarLoadingWordsVisible = false;
     private String dictionaryFilename;
     private int dictionaryAlphabetSize, maxWordLength;
@@ -87,9 +89,11 @@ public class WordsInPatternFragment extends Fragment {
             isWordOrderAscending = getArguments().getBoolean(MainActivity.IS_WORD_ORDER_ASCENDING);
         }
         Dictionary dictionary = new Dictionary(dictionaryFilename, dictionaryAlphabetSize, maxWordLength);
-        trieViewModel = ViewModelProviders.of(getActivity(),
-                new TrieViewModelFactory(getActivity().getApplication(), dictionary)).get(TrieViewModel.class);
-        trieViewModel.addMaxWordLengthListener(maxWordLengthListener);
+        if(getActivity() != null) {
+            trieViewModel = ViewModelProviders.of(getActivity(),
+                    new TrieViewModelFactory(getActivity().getApplication(), dictionary)).get(TrieViewModel.class);
+            trieViewModel.addMaxWordLengthListener(maxWordLengthListener);
+        }
     }
 
     @Nullable
@@ -138,6 +142,8 @@ public class WordsInPatternFragment extends Fragment {
                 isProgressBarLoadingWordsVisible = false;
                 progressBarLoadingWords.setVisibility(View.INVISIBLE);
             }
+            isWordOrderAscending = savedInstanceState.getBoolean(WORD_ORDER_ASCENDING_STATE);
+            maxWordLength = savedInstanceState.getInt(MAX_WORD_LENGTH_STATE);
         }
 
         onSharedPreferenceChangeListener = ((sharedPreferences, key) -> {
@@ -147,8 +153,10 @@ public class WordsInPatternFragment extends Fragment {
            }
         });
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        sharedPreferences.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
+        if(getActivity() != null) {
+            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            sharedPreferences.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
+        }
     }
 
     @Override
@@ -170,6 +178,8 @@ public class WordsInPatternFragment extends Fragment {
             outState.putString(TEXT_INSERTED_STATE,textinput.getText().toString());
         outState.putBoolean(TEXT_NO_WORDS_FOUND_STATE, isTextNoWordsFoundVisible);
         outState.putBoolean(TEXT_PROGRESSBAR_LOADING_WORDS_STATE, isProgressBarLoadingWordsVisible);
+        outState.putBoolean(WORD_ORDER_ASCENDING_STATE, isWordOrderAscending);
+        outState.putInt(MAX_WORD_LENGTH_STATE, maxWordLength);
     }
 
     @Override
@@ -184,12 +194,12 @@ public class WordsInPatternFragment extends Fragment {
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            try {
+            if(getActivity() != null)
                 KeyboardHelper.hideKeyboard(getActivity());
+            if(textinput.getText() != null) {
                 String textInserted = textinput.getText().toString().toLowerCase();
-                Log.v(MainActivity.TAG,"Text Inserted: "+textInserted);
 
-                if(textInserted.length() > maxWordLength) {
+                if (textInserted.length() > maxWordLength) {
                     Toast.makeText(getContext(), getString(R.string.toast_max_digits_exceeded), Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -205,22 +215,21 @@ public class WordsInPatternFragment extends Fragment {
                         task = new FindWordsInPattern(trie, isWordOrderAscending);
                         task.setListener((wordsFound, headersIndex) -> {
 
-                            if(isProgressBarLoadingWordsVisible) {
+                            if (isProgressBarLoadingWordsVisible) {
                                 isProgressBarLoadingWordsVisible = false;
                                 progressBarLoadingWords.setVisibility(View.INVISIBLE);
                             }
-                            if(wordsFound.isEmpty()) {
+                            if (wordsFound.isEmpty()) {
                                 isTextNoWordsFoundVisible = true;
                                 textNoWordsFound.setVisibility(View.VISIBLE);
                             }
                             //headersIndex.length is the number of headers to insert in the recyclerview
                             int size = wordsInPatternViewModel.wordsFound.size() + wordsInPatternViewModel.headersIndex.length;
                             wordsInPatternViewModel.wordsFound.clear();
-                            if(adapter == null) {
+                            if (adapter == null) {
                                 adapter = new HeaderRecyclerViewAdapter(wordsInPatternViewModel.wordsFound, wordsInPatternViewModel.headersIndex);
                                 wordslist.setAdapter(adapter);
-                            }
-                            else
+                            } else
                                 adapter.notifyItemRangeRemoved(0, size);
                             wordsInPatternViewModel.wordsFound.addAll(wordsFound);
                             wordsInPatternViewModel.headersIndex = headersIndex;
@@ -230,14 +239,12 @@ public class WordsInPatternFragment extends Fragment {
                         task.execute(textInserted);
                     }
                 });
-            } catch (NullPointerException ex) {
-                Log.v(MainActivity.TAG, "text inserted is null");
             }
         }
     };
 
     private TrieViewModel.MaxWordLengthListener maxWordLengthListener = (maxWordLength -> {
-        Log.v(MainActivity.TAG, "WordsInPatternFragment/ maxWordLengthListener called");
+        //Log.v(MainActivity.TAG, "WordsInPatternFragment/ maxWordLengthListener called");
         this.maxWordLength = maxWordLength;
         if(maxWordLength != 0) {
             textInputLayout.setCounterEnabled(true);
@@ -262,16 +269,12 @@ public class WordsInPatternFragment extends Fragment {
         @Override
         protected Void doInBackground(String... strings) {
             String textInserted = strings[0];
-            Log.v(MainActivity.TAG,"Beginning match");
-            long start = System.nanoTime();
             words = (ArrayList<String>) trie.match(textInserted);
             if(!words.isEmpty()) {
                 //WordUtils.sortAndRemoveDuplicates(words);
                 headersIndex = WordUtils.sortByWordLength(words, isWordOrderAscending);
                 WordUtils.wordsToUpperCase(words);
             }
-            long stop = System.nanoTime();
-            Log.v(MainActivity.TAG,"WordsInPattern time: "+(((stop-start)/(double)1000000))+" ms");
             return null;
         }
 

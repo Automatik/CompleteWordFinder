@@ -5,19 +5,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="4dp"
-    android:layout_marginEnd="4dp">
+    android:layout_marginStart="@dimen/fragment_anagram_list_item_margin"
+    android:layout_marginEnd="@dimen/fragment_anagram_list_item_margin">
 
     <TextView
         android:id="@+id/anagram_list_word"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textAppearance="?attr/textAppearanceListItem"
-        android:textSize="15sp"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        android:paddingStart="4dp"
-        android:paddingEnd="4dp"
+        android:textSize="@dimen/default_text_size"
+        android:paddingTop="@dimen/fragment_anagram_list_item_textview_padding"
+        android:paddingBottom="@dimen/fragment_anagram_list_item_textview_padding"
+        android:paddingStart="@dimen/fragment_anagram_list_item_textview_padding"
+        android:paddingEnd="@dimen/fragment_anagram_list_item_textview_padding"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

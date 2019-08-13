@@ -5,4 +5,15 @@
     <dimen name="nav_header_vertical_spacing">8dp</dimen>
     <dimen name="nav_header_height">176dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="external_margin_parent">8dp</dimen>
+    <dimen name="internal_margin_views">10dp</dimen>
+    <dimen name="fragment_anagram_text_description_padding">4dp</dimen>
+    <dimen name="default_text_size">15sp</dimen>
+    <dimen name="fragment_anagram_distance_textinput_button_find">8dp</dimen>
+    <dimen name="fragment_anagram_fastscroll_popup_background_size">60dp</dimen>
+    <dimen name="fragment_anagram_fastscroll_popup_text_size">30sp</dimen>
+    <dimen name="fragment_anagram_list_header_margin">0dp</dimen>
+    <dimen name="fragment_anagram_list_header_textview_padding">4dp</dimen>
+    <dimen name="fragment_anagram_list_item_margin">4dp</dimen>
+    <dimen name="fragment_anagram_list_item_textview_padding">4dp</dimen>
 </resources>

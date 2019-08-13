@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="8dp"
-    android:layout_marginBottom="8dp"
-    android:layout_marginStart="8dp"
-    android:layout_marginEnd="8dp">
+    android:layout_marginStart="@dimen/external_margin_parent"
+    android:layout_marginTop="@dimen/external_margin_parent"
+    android:layout_marginEnd="@dimen/external_margin_parent"
+    android:layout_marginBottom="@dimen/external_margin_parent">
 
     <TextView
         android:id="@+id/text_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:paddingStart="4dp"
-        android:paddingEnd="4dp"
-        android:textSize="15sp"
+        android:layout_marginTop="@dimen/internal_margin_views"
+        android:paddingStart="@dimen/fragment_anagram_text_description_padding"
+        android:paddingEnd="@dimen/fragment_anagram_text_description_padding"
+        android:textSize="@dimen/default_text_size"
         android:textStyle="italic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/textinput_layout"
@@ -26,8 +27,8 @@
         android:id="@+id/textinput_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginTop="@dimen/internal_margin_views"
+        android:layout_marginEnd="@dimen/fragment_anagram_distance_textinput_button_find"
         app:counterEnabled="false"
         app:layout_constraintEnd_toStartOf="@+id/find_button"
         app:layout_constraintStart_toStartOf="parent"
@@ -39,7 +40,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/fragment_anagram_textinput_hint"
             android:inputType="text"
-            android:textSize="15sp" />
+            android:textSize="@dimen/default_text_size" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -47,39 +48,23 @@
         android:id="@+id/find_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="@dimen/internal_margin_views"
         android:text="@string/fragment_anagram_find_button_text"
-        android:textSize="15sp"
+        android:textSize="@dimen/default_text_size"
         app:layout_constraintEnd_toEndOf="@id/text_description"
         app:layout_constraintStart_toEndOf="@+id/textinput_layout"
         app:layout_constraintTop_toBottomOf="@id/text_description" />
-
-
-    <!-- <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/words_list"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="8dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/find_button"
-        app:layout_constraintStart_toStartOf="@id/textinput_layout"
-        app:layout_constraintTop_toBottomOf="@id/textinput_layout"
-        tools:listitem="@layout/fragment_anagram_list_item">
-    </androidx.recyclerview.widget.RecyclerView> -->
 
     <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
         android:id="@+id/words_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="10dp"
-        app:fastScrollPopupBackgroundSize="60dp"
+        android:layout_marginTop="@dimen/internal_margin_views"
+        app:fastScrollPopupBackgroundSize="@dimen/fragment_anagram_fastscroll_popup_background_size"
         app:fastScrollPopupBgColor="@color/colorAccent"
         app:fastScrollPopupPosition="adjacent"
         app:fastScrollPopupTextColor="@color/white"
-        app:fastScrollPopupTextSize="30sp"
+        app:fastScrollPopupTextSize="@dimen/fragment_anagram_fastscroll_popup_text_size"
         app:fastScrollPopupTextVerticalAlignmentMode="font_metrics"
         app:fastScrollThumbColor="@color/colorAccent"
         app:fastScrollThumbEnabled="true"
@@ -98,7 +83,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/text_no_words_found"
-        android:textSize="15sp"
+        android:textSize="@dimen/default_text_size"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

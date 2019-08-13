@@ -54,11 +54,11 @@ public final class WordUtils {
 
     public static void sortAndRemoveDuplicates(SparseArray<ArrayList<String>> words) {
         for(int i = 0; i < words.size(); i++)
-            sortAndRemoveDuplicates(words.valueAt(i), false);
+            sortAndRemoveDuplicates(words.valueAt(i), true);
     }
 
     public static void sortAndRemoveDuplicates(List<String> words) {
-        sortAndRemoveDuplicates(words, false);
+        sortAndRemoveDuplicates(words, true);
     }
 
     public static void sortAndRemoveDuplicates(List<String> words, boolean removeWordsWithSingleLetters) {

@@ -28,7 +28,6 @@ public class TrieLiveData extends LiveData<DoubleArrayTrie> {
     public TrieLiveData(Context context, Dictionary dictionary, TrieViewModel.InternalMaxWordLengthListener listener) {
         this.listener = listener;
         createTrie(context, dictionary, false);
-        Log.v(MainActivity.TAG, "TrieLiveData() called");
     }
 
     public void setMaxWordLength(int maxWordLength) {
@@ -63,7 +62,6 @@ public class TrieLiveData extends LiveData<DoubleArrayTrie> {
 
         @Override
         protected DoubleArrayTrie doInBackground(Boolean... booleans) {
-            //String filename = strings[0];
             boolean isDictionaryLanguageChanged = booleans[0];
             String filename = dictionary.getFilename();
             DoubleArrayTrie trie = new DoubleArrayTrie(dictionary.getAlphabetSize());
@@ -74,24 +72,24 @@ public class TrieLiveData extends LiveData<DoubleArrayTrie> {
                     FileInputStream fis = context.get().openFileInput(MainActivity.TRIE_FILENAME);
                     BufferedInputStream bis = new BufferedInputStream(fis);
                     ObjectInputStream ois = new ObjectInputStream(bis);
-                    Log.v(MainActivity.TAG, "Reading trie from file");
+                    //Log.v(MainActivity.TAG, "Reading trie from file");
                     trie = (DoubleArrayTrie) ois.readObject();
-                    Log.v(MainActivity.TAG, "Finished reading trie from file");
+                    //Log.v(MainActivity.TAG, "Finished reading trie from file");
                     ois.close();
                     fis.close();
                 } else {
                     //Read dictionary file
                     BufferedReader reader = new BufferedReader(new InputStreamReader(context.get().getAssets().open(filename))); //context or getApplication() ?
                     String line;
-                    Log.v(MainActivity.TAG, "Beginning trie insertions");
-                    long start = System.nanoTime();
+                    //Log.v(MainActivity.TAG, "Beginning trie insertions");
+                    //long start = System.nanoTime();
                     while ((line = reader.readLine()) != null) {
                         if(line.length() > maxWordLength)
                             maxWordLength = line.length();
-                        trie.insert(line); //Should add .toLowerCase()?
+                        trie.insert(line.toLowerCase());
                     }
-                    long stop = System.nanoTime();
-                    Log.v(MainActivity.TAG,"Trie insertion time: "+(((stop-start)/(double)1000000))+" ms");
+                    //long stop = System.nanoTime();
+                    //Log.v(MainActivity.TAG,"Trie insertion time: "+(((stop-start)/(double)1000000))+" ms");
                     reader.close();
 
                     //Write trie to file. So we skip to build it every time
@@ -102,12 +100,12 @@ public class TrieLiveData extends LiveData<DoubleArrayTrie> {
                     oos.close();
                     fos.close();
 
-                    Log.v(MainActivity.TAG, "Finished writing trie to file");
+                    //Log.v(MainActivity.TAG, "Finished writing trie to file");
                 }
                 return trie;
             } catch (Exception ex) {
                 ex.printStackTrace();
-                Log.v(MainActivity.TAG, "exception while reading/writing trie file");
+                //Log.v(MainActivity.TAG, "exception while reading/writing trie file");
                 return null;
             }
         }
@@ -119,7 +117,7 @@ public class TrieLiveData extends LiveData<DoubleArrayTrie> {
             }
             if(listener != null)
                 listener.onTrieCreate(trie, maxWordLength);
-            Log.v(MainActivity.TAG, "setValue(trie) called in onPostExecute of CreateTrie");
+            //Log.v(MainActivity.TAG, "setValue(trie) called in onPostExecute of CreateTrie");
         }
 
         public interface CreateTrieTaskListener {
@@ -131,7 +129,7 @@ public class TrieLiveData extends LiveData<DoubleArrayTrie> {
 
     private static boolean fileExists(Context context, String filename) {
         File file = context.getFileStreamPath(filename);
-        Log.v(MainActivity.TAG, "File Length = "+file.length());
+        //Log.v(MainActivity.TAG, "File Length = "+file.length());
         if(file == null || !file.exists()) {
             return false;
         }
