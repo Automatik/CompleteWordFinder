@@ -730,12 +730,12 @@ public class DoubleArrayTrie implements Serializable {
     }
 
     private void writeObject(ObjectOutputStream s) throws IOException {
-        Log.v(MainActivity.TAG, "DoubleArrayTrie/writeObject called");
+        //Log.v(MainActivity.TAG, "DoubleArrayTrie/writeObject called");
         s.defaultWriteObject();
     }
 
     private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
-        Log.v(MainActivity.TAG, "DoubleArrayTrie/readObject called");
+        //Log.v(MainActivity.TAG, "DoubleArrayTrie/readObject called");
         s.defaultReadObject();
         freePositions = new TreeSet<>();
 

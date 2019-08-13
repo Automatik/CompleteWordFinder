@@ -11,6 +11,8 @@ import java.util.TreeSet;
 
 public final class WordUtils {
 
+    private static final boolean REMOVE_WORDS_WITH_SINGLE_LETTERS = true;
+
     private WordUtils() {}
 
     public static int[] sortByWordLength(List<String> words) {
@@ -18,7 +20,7 @@ public final class WordUtils {
     }
 
     public static int[] sortByWordLength(List<String> words, boolean ascendingOrder) {
-        SparseArray<ArrayList<String>> arr = divideByWordLength(words);
+        SparseArray<ArrayList<String>> arr = divideByWordLength(words, REMOVE_WORDS_WITH_SINGLE_LETTERS);
         sortAndRemoveDuplicates(arr);
         int numKeys = arr.size();
         //The headersIndex array keeps the indexes in the arraylist where the word's length change, and where will go the header
@@ -39,26 +41,28 @@ public final class WordUtils {
         return headersIndex;
     }
 
-    public static SparseArray<ArrayList<String>> divideByWordLength(List<String> words) {
+    public static SparseArray<ArrayList<String>> divideByWordLength(List<String> words, boolean removeWordsWithSingleLetters) {
         SparseArray<ArrayList<String>> arr = new SparseArray<>();
         for(String w : words) {
             int len = w.length();
-            if(arr.get(len) == null)
-                //Create new key
-                arr.put(len, new ArrayList<>());
-            ArrayList<String> temp = arr.get(len);
-            temp.add(w);
+            if(removeWordsWithSingleLetters && len > 1) {
+                if (arr.get(len) == null)
+                    //Create new key
+                    arr.put(len, new ArrayList<>());
+                ArrayList<String> temp = arr.get(len);
+                temp.add(w);
+            }
         }
         return arr;
     }
 
     public static void sortAndRemoveDuplicates(SparseArray<ArrayList<String>> words) {
         for(int i = 0; i < words.size(); i++)
-            sortAndRemoveDuplicates(words.valueAt(i), true);
+            sortAndRemoveDuplicates(words.valueAt(i), REMOVE_WORDS_WITH_SINGLE_LETTERS);
     }
 
     public static void sortAndRemoveDuplicates(List<String> words) {
-        sortAndRemoveDuplicates(words, true);
+        sortAndRemoveDuplicates(words, REMOVE_WORDS_WITH_SINGLE_LETTERS);
     }
 
     public static void sortAndRemoveDuplicates(List<String> words, boolean removeWordsWithSingleLetters) {
