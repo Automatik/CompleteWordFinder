@@ -200,7 +200,7 @@ public class BeginsWithFragment extends Fragment {
             if(textinput.getText() != null) {
                 String textInserted = textinput.getText().toString().toLowerCase();
 
-                if (textInserted.length() > maxWordLength) {
+                if (textInserted.length() > maxWordLength && maxWordLength != MainActivity.MAX_WORD_LENGTH_DEFAULT_VALUE) {
                     Toast.makeText(getContext(), getString(R.string.toast_max_digits_exceeded), Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -269,15 +269,20 @@ public class BeginsWithFragment extends Fragment {
 
         @Override
         protected Void doInBackground(String... strings) {
-            String textInserted = strings[0];
-            words = trie.startsWith(textInserted);
-            if(!words.isEmpty()) {
-                //Sort?
-                //WordUtils.sortAndRemoveDuplicates(words);
-                headersIndex = WordUtils.sortByWordLength(words, isWordOrderAscending);
-                WordUtils.wordsToUpperCase(words);
+            try {
+                String textInserted = strings[0];
+                words = trie.startsWith(textInserted);
+                if (!words.isEmpty()) {
+                    //Sort?
+                    //WordUtils.sortAndRemoveDuplicates(words);
+                    headersIndex = WordUtils.sortByWordLength(words, isWordOrderAscending);
+                    WordUtils.wordsToUpperCase(words);
+                }
+                return null;
+            } catch (Exception ex) {
+                Log.v(MainActivity.TAG, Log.getStackTraceString(ex));
+                return null;
             }
-            return null;
         }
 
         @Override

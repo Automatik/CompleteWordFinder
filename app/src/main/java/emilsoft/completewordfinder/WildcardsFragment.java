@@ -251,7 +251,7 @@ public class WildcardsFragment extends Fragment {
         if(maxWordLength != 0) {
             textInputLayout.setCounterEnabled(true);
             textInputLayout.setCounterMaxLength(maxWordLength);
-            textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), maxWordLength));
+            textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), true, maxWordLength));
         }
     });
 
@@ -265,7 +265,7 @@ public class WildcardsFragment extends Fragment {
      * {@link #MAX_WILDCARDS}
      */
     private int checkTextInserted(String text) {
-        if(text.length() > maxWordLength)
+        if(text.length() > maxWordLength  && maxWordLength != MainActivity.MAX_WORD_LENGTH_DEFAULT_VALUE)
             return TEXT_INPUT_TOO_MANY_DIGITS;
         int wildcardsCount = 0;
         int i = 0;

@@ -199,17 +199,21 @@ public class SubAnagramsFragment extends Fragment {
                             int size = subAnagramsViewModel.wordsFound.size() + subAnagramsViewModel.headersIndex.length;
 
                             subAnagramsViewModel.wordsFound.clear();
+                            subAnagramsViewModel.headersIndex = new int[0];
                             if (adapter == null) {
-                                //adapter = new AnagramRecyclerViewAdapter(subAnagramsViewModel.wordsFound);
                                 adapter = new HeaderRecyclerViewAdapter(subAnagramsViewModel.wordsFound, subAnagramsViewModel.headersIndex);
                                 wordslist.setAdapter(adapter);
-                            } else
+                            } else {
+                                adapter.setHeadersIndex(subAnagramsViewModel.headersIndex);
                                 adapter.notifyItemRangeRemoved(0, size);
+                            }
 
-                            subAnagramsViewModel.wordsFound.addAll(wordsFound);
-                            subAnagramsViewModel.headersIndex = headersIndex;
-                            adapter.setHeadersIndex(headersIndex);
-                            adapter.notifyItemRangeInserted(0, wordsFound.size() + headersIndex.length);
+                            if(!wordsFound.isEmpty() && headersIndex != null) {
+                                subAnagramsViewModel.wordsFound.addAll(wordsFound);
+                                subAnagramsViewModel.headersIndex = headersIndex;
+                                adapter.setHeadersIndex(headersIndex);
+                                adapter.notifyItemRangeInserted(0, wordsFound.size() + headersIndex.length);
+                            }
                         });
                         task.execute(textInserted);
                     }
