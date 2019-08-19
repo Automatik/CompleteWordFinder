@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -20,41 +19,51 @@
         android:textSize="@dimen/default_text_size"
         android:textStyle="italic"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/textinput_layout"
+        app:layout_constraintStart_toStartOf="@id/input_container"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textinput_layout"
-        android:layout_width="0dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/input_container"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/internal_margin_views"
-        android:layout_marginEnd="@dimen/fragment_anagram_distance_textinput_button_find"
-        app:counterEnabled="false"
-        app:layout_constraintEnd_toStartOf="@+id/find_button"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/guideline_right"
+        app:layout_constraintStart_toStartOf="@id/guideline_left"
         app:layout_constraintTop_toBottomOf="@id/text_description">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/textinput"
-            android:layout_width="match_parent"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textinput_layout"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="@string/fragment_anagram_textinput_hint"
-            android:inputType="text"
-            android:textSize="@dimen/default_text_size" />
+            android:layout_marginEnd="@dimen/fragment_anagram_distance_textinput_button_find"
+            app:counterEnabled="false"
+            app:layout_constraintEnd_toStartOf="@+id/find_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/textinput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/fragment_anagram_textinput_hint"
+                android:inputType="text"
+                android:textSize="@dimen/default_text_size" />
 
-    <Button
-        android:id="@+id/find_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/internal_margin_views"
-        android:text="@string/fragment_anagram_find_button_text"
-        android:textSize="@dimen/default_text_size"
-        android:background="@drawable/button_background"
-        app:layout_constraintEnd_toEndOf="@id/text_description"
-        app:layout_constraintStart_toEndOf="@+id/textinput_layout"
-        app:layout_constraintTop_toBottomOf="@id/text_description" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/find_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_background"
+            android:text="@string/fragment_anagram_find_button_text"
+            android:textSize="@dimen/default_text_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textinput_layout"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
         android:id="@+id/words_list"
@@ -74,8 +83,8 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/textinput_layout"
-        app:layout_constraintTop_toBottomOf="@id/textinput_layout"
+        app:layout_constraintStart_toStartOf="@id/input_container"
+        app:layout_constraintTop_toBottomOf="@id/input_container"
         tools:listitem="@layout/fragment_anagram_list_item" />
 
 
@@ -103,5 +112,24 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <!--
+    GuideLines need only to solve the issue with smartphones with notch.
+    The button Find would otherwise be cut off the screen on the right
+    -->
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.0" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="1.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
