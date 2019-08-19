@@ -51,6 +51,7 @@
         android:layout_marginTop="@dimen/internal_margin_views"
         android:text="@string/fragment_anagram_find_button_text"
         android:textSize="@dimen/default_text_size"
+        android:background="@drawable/button_background"
         app:layout_constraintEnd_toEndOf="@id/text_description"
         app:layout_constraintStart_toEndOf="@+id/textinput_layout"
         app:layout_constraintTop_toBottomOf="@id/text_description" />

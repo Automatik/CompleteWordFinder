@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputFilter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,11 +17,9 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -107,7 +104,7 @@ public class WildcardsFragment extends Fragment {
         find.setOnClickListener(onClickListener);
         //textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters()));
         //textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), true,  maxWordLength));
-        textDescription.setText(R.string.text_description_wildcars);
+        textDescription.setText(R.string.text_description_wildcards);
         if(maxWordLength != 0) {
             textInputLayout.setCounterEnabled(true);
             textInputLayout.setCounterMaxLength(maxWordLength);

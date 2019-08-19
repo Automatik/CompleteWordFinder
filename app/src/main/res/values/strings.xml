@@ -15,9 +15,19 @@
     <string name="nav_item_wildcards">Wildcards</string>
     <string name="text_description_anagrams">Find words from the given word\'s anagrams</string>
     <string name="text_description_begins_with">Find words that start with given letters</string>
-    <string name="text_description_words_contained">Find words contained in given sequence of letters</string>
-    <string name="text_description_sub_anagrams">Find words from combination of letters</string>
-    <string name="text_description_wildcars">Find words using the wildcard "?"</string>
+    <string name="text_description_words_contained">Find words contained in a given sequence of letters</string>
+    <string name="text_description_sub_anagrams">Find words from a combination of letters</string>
+    <string name="text_description_wildcards">Find words using the wildcard \"?\"</string>
+    <string name="text_help_anagrams">Insert a word or a set of letters to find all its anagrams.\nThe max number of letters depends on the longest word present in the dictionary.</string>
+    <string name="text_help_begins_with">Find all the words that start with the given set of letters.\nThe max number of letters depends on the longest word present in the dictionary.</string>
+    <string name="text_help_words_contained">Given a sequence of letters, finds all the existing words from left to right, like in a word search puzzle game.\nThe max number of letters depends on the longest word present in the dictionary.</string>
+    <string name="text_help_sub_anagrams">Given a combination of letters, finds all the possible existing anagrams with same or lesser length.\nDue to computational reasons, the max number of letters is set to 15.</string>
+    <string name="text_help_wildcards">The wildcard \"?\" is a character that can be replaced by any letter. Use the wildcard to find all the words that match the positions of the given letters.\nThe max number of letters depends on the longest word present in the dictionary and the max number of wildcards is 15 due to computational reasons. There must be at least one letter inserted.</string>
+    <string name="text_help_example_anagrams">Given the word \"CAT\" you get the anagram ACT</string>
+    <string name="text_help_example_begins_with">Given the letters \"FLO\" you get the words like FLOP, FLOW, FLOOD, FLOOR and so on…</string>
+    <string name="text_help_example_words_contained">Given the letters \"VERTICALL\" you get the words like VERTICAL, CALL and ALL</string>
+    <string name="text_help_example_sub_anagrams">Given the letters \"AERD\" you get the words like DARE, DEAR, READ, RAD, RED, EAR, ERA and so on…</string>
+    <string name="text_help_example_wildcards">Given the letters \"S??CE\" you get the words like SLICE, SPACE, SINCE and so on…</string>
     <string name="text_no_words_found">No Words Found</string>
     <string name="sharedpref_current_dictionary">current_dictionary</string>
     <string name="sharedpref_default_dictionary">english_dictionary</string>
@@ -48,4 +58,7 @@
     <string name="wildcards_fragment_toast_only_wildcards">Insert at least one letter</string>
     <string name="toast_max_digits_exceeded">Max digits exceeded</string>
     <string name="toast_error_retrieving_dictionary">Error retrieving dictionary</string>
+    <string name="action_help">Help</string>
+    <string name="help_dialog_button_ok">OK</string>
+    <string name="help_dialog_example_title">Example</string>
 </resources>

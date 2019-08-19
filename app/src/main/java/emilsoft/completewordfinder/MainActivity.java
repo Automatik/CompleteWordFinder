@@ -22,6 +22,7 @@ import androidx.preference.PreferenceManager;
 
 import emilsoft.completewordfinder.utils.Dictionaries;
 import emilsoft.completewordfinder.utils.Dictionary;
+import emilsoft.completewordfinder.utils.HelpDialog;
 import emilsoft.completewordfinder.utils.KeyboardHelper;
 import emilsoft.completewordfinder.viewmodel.TrieViewModel;
 import emilsoft.completewordfinder.viewmodel.TrieViewModelFactory;
@@ -136,6 +137,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (id == R.id.action_settings) {
             Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
             startActivity(intent);
+            return true;
+        }
+
+        if (id == R.id.action_help) {
+            final String title = this.getTitle().toString(); //Should replace with Fragment's tag?
+            HelpDialog helpDialog;
+            if(title.equals(getString(R.string.nav_item_anagrams)))
+                helpDialog = new HelpDialog(this, getString(R.string.nav_item_anagrams),
+                        getString(R.string.text_help_anagrams), getString(R.string.text_help_example_anagrams));
+            else if(title.equals(getString(R.string.nav_item_begins_with)))
+                helpDialog = new HelpDialog(this, getString(R.string.nav_item_begins_with),
+                        getString(R.string.text_help_begins_with), getString(R.string.text_help_example_begins_with));
+            else if(title.equals(getString(R.string.nav_item_words_contained)))
+                helpDialog = new HelpDialog(this, getString(R.string.nav_item_words_contained),
+                        getString(R.string.text_help_words_contained), getString(R.string.text_help_example_words_contained));
+            else if(title.equals(getString(R.string.nav_item_sub_anagrams)))
+                helpDialog = new HelpDialog(this, getString(R.string.nav_item_sub_anagrams),
+                        getString(R.string.text_help_sub_anagrams), getString(R.string.text_help_example_sub_anagrams));
+            else //wildcard
+                helpDialog = new HelpDialog(this, getString(R.string.nav_item_wildcards),
+                        getString(R.string.text_help_wildcards), getString(R.string.text_help_example_wildcards));
+            helpDialog.show();
             return true;
         }
 

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -31,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import emilsoft.completewordfinder.trie.DoubleArrayTrie;
 import emilsoft.completewordfinder.utils.Dictionary;
+import emilsoft.completewordfinder.utils.HelpDialog;
 import emilsoft.completewordfinder.utils.KeyboardHelper;
 import emilsoft.completewordfinder.utils.WordUtils;
 import emilsoft.completewordfinder.viewmodel.BeginsWithViewModel;
@@ -171,6 +173,7 @@ public class BeginsWithFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
     }
+
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
