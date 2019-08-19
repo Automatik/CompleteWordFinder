@@ -141,18 +141,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         if (id == R.id.action_help) {
-            final String title = this.getTitle().toString(); //Should replace with Fragment's tag?
+            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.content_frame);
             HelpDialog helpDialog;
-            if(title.equals(getString(R.string.nav_item_anagrams)))
+            if(currentFragment instanceof AnagramFragment)
                 helpDialog = new HelpDialog(this, getString(R.string.nav_item_anagrams),
                         getString(R.string.text_help_anagrams), getString(R.string.text_help_example_anagrams));
-            else if(title.equals(getString(R.string.nav_item_begins_with)))
+            else if(currentFragment instanceof BeginsWithFragment)
                 helpDialog = new HelpDialog(this, getString(R.string.nav_item_begins_with),
                         getString(R.string.text_help_begins_with), getString(R.string.text_help_example_begins_with));
-            else if(title.equals(getString(R.string.nav_item_words_contained)))
+            else if(currentFragment instanceof WordsInPatternFragment)
                 helpDialog = new HelpDialog(this, getString(R.string.nav_item_words_contained),
                         getString(R.string.text_help_words_contained), getString(R.string.text_help_example_words_contained));
-            else if(title.equals(getString(R.string.nav_item_sub_anagrams)))
+            else if(currentFragment instanceof SubAnagramsFragment)
                 helpDialog = new HelpDialog(this, getString(R.string.nav_item_sub_anagrams),
                         getString(R.string.text_help_sub_anagrams), getString(R.string.text_help_example_sub_anagrams));
             else //wildcard
