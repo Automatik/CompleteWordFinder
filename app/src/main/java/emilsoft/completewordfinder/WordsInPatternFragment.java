@@ -6,9 +6,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -157,6 +159,20 @@ public class WordsInPatternFragment extends Fragment {
             sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
             sharedPreferences.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
         }
+
+        //Keyboard Done button event
+        textinput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if(actionId == EditorInfo.IME_ACTION_DONE) {
+                    //https://stackoverflow.com/questions/9596010/android-use-done-button-on-keyboard-to-click-button
+                    //Write logic here that will be executed when user taps next button
+                    find.performClick();
+                    return false; //return false to hide keyboard
+                }
+                return true;
+            }
+        });
     }
 
     @Override
