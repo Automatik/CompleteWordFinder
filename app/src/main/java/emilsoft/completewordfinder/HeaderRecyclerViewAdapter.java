@@ -1,11 +1,14 @@
 package emilsoft.completewordfinder;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -13,6 +16,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
+
+import emilsoft.completewordfinder.utils.MyClipboardManager;
 
 public class HeaderRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     implements FastScrollRecyclerView.SectionedAdapter {
@@ -141,7 +146,7 @@ public class HeaderRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
         return i;
     }
 
-    public class ItemViewHolder extends RecyclerView.ViewHolder {
+    public class ItemViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener{
 
         public final View mView;
         public final TextView mText;
@@ -151,11 +156,24 @@ public class HeaderRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             super(view);
             mView = view;
             mText = (TextView) view.findViewById(R.id.anagram_list_word);
+            view.setHapticFeedbackEnabled(true);
+            view.setOnLongClickListener(this);
+        }
 
+        @Override
+        public boolean onLongClick(View v) {
+            // Return true to indicate the click was handled
+            String text = mText.getText().toString();
+            Context context = v.getContext();
+            MyClipboardManager.copyToClipboard(context, text);
+            v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            Toast.makeText(context, context.getString(R.string.toast_copied_to_clipboard), Toast.LENGTH_SHORT).show();
+            return true;
         }
     }
 
     public class HeaderViewHolder extends RecyclerView.ViewHolder {
+        //No LongClickListener for headers, no need to copy them
 
         public final View mView;
         public final TextView mText;

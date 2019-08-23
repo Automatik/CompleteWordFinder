@@ -37,6 +37,7 @@ import emilsoft.completewordfinder.trie.DoubleArrayTrie;
 import emilsoft.completewordfinder.utils.Dictionary;
 import emilsoft.completewordfinder.utils.HelpDialog;
 import emilsoft.completewordfinder.utils.KeyboardHelper;
+import emilsoft.completewordfinder.utils.MyClipboardManager;
 import emilsoft.completewordfinder.utils.WordUtils;
 import emilsoft.completewordfinder.viewmodel.BeginsWithViewModel;
 import emilsoft.completewordfinder.viewmodel.TrieViewModel;

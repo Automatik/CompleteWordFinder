@@ -3,14 +3,19 @@ package emilsoft.completewordfinder;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.graphics.Color;
+import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import emilsoft.completewordfinder.utils.MyClipboardManager;
 
 public class AnagramRecyclerViewAdapter extends RecyclerView.Adapter<AnagramRecyclerViewAdapter.ViewHolder> {
 
@@ -57,7 +62,7 @@ public class AnagramRecyclerViewAdapter extends RecyclerView.Adapter<AnagramRecy
     }
 
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener {
 
         public final View mView;
         public final TextView mText;
@@ -67,7 +72,19 @@ public class AnagramRecyclerViewAdapter extends RecyclerView.Adapter<AnagramRecy
             super(view);
             mView = view;
             mText = (TextView) view.findViewById(R.id.anagram_list_word);
+            view.setHapticFeedbackEnabled(true);
+            view.setOnLongClickListener(this);
+        }
 
+        @Override
+        public boolean onLongClick(View v) {
+            // Return true to indicate the click was handled
+            String text = mText.getText().toString();
+            Context context = v.getContext();
+            MyClipboardManager.copyToClipboard(context, text);
+            v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            Toast.makeText(context, context.getString(R.string.toast_copied_to_clipboard), Toast.LENGTH_SHORT).show();
+            return true;
         }
     }
 

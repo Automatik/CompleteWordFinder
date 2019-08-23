@@ -61,4 +61,5 @@
     <string name="action_help">Help</string>
     <string name="help_dialog_button_ok">OK</string>
     <string name="help_dialog_example_title">Example</string>
+    <string name="toast_copied_to_clipboard">Word copied to clipboard</string>
 </resources>

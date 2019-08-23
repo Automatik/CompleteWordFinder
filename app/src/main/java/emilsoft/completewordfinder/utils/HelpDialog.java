@@ -1,9 +1,6 @@
 package emilsoft.completewordfinder.utils;
 
 import android.app.Activity;
-import android.content.DialogInterface;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
