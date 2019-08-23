@@ -10,7 +10,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/icon_image_container"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="@dimen/help_dialog_icon_image_container_height"
         android:background="@color/colorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -18,8 +18,8 @@
 
         <ImageView
             android:id="@+id/icon_image"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="@dimen/help_dialog_icon_image_size"
+            android:layout_height="@dimen/help_dialog_icon_image_size"
             android:background="@drawable/ic_help_outline_white_24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -39,7 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="@dimen/help_dialog_message_container_padding">
 
             <TextView
                 android:id="@+id/help_title"
@@ -75,7 +75,7 @@
 
             <Button
                 android:id="@+id/help_button_ok"
-                android:layout_width="200dp"
+                android:layout_width="@dimen/help_dialog_button_ok_width"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/internal_margin_views"
                 android:layout_gravity="center"
