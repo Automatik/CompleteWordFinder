@@ -24,6 +24,7 @@ import emilsoft.completewordfinder.utils.Dictionaries;
 import emilsoft.completewordfinder.utils.Dictionary;
 import emilsoft.completewordfinder.utils.HelpDialog;
 import emilsoft.completewordfinder.utils.KeyboardHelper;
+import emilsoft.completewordfinder.utils.ThemeHelper;
 import emilsoft.completewordfinder.viewmodel.TrieViewModel;
 import emilsoft.completewordfinder.viewmodel.TrieViewModelFactory;
 
@@ -255,5 +256,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(key.equals(getString(R.string.sharedpref_word_order))) {
             isWordOrderAscending = readWordOrder();
         }
+        if(key.equals(getString(R.string.sharedpref_theme)))
+            ThemeHelper.applyTheme(sharedPreferences.getString(key, ThemeHelper.DEFAULT_MODE));
     }
 }

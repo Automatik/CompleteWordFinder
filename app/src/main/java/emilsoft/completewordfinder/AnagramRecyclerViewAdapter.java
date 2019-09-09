@@ -13,7 +13,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import emilsoft.completewordfinder.utils.MyClipboardManager;
 
@@ -45,12 +44,12 @@ public class AnagramRecyclerViewAdapter extends RecyclerView.Adapter<AnagramRecy
         holder.mWord = mWords.get(position);
         holder.mText.setText(holder.mWord);
         if(position % 2 == 0) {
-            holder.mText.setBackgroundColor(defaultBackgroundColor);
-            holder.mText.setTextColor(blackColor);
+            holder.mText.setTextAppearance(R.style.RecyclerViewItemDefaultTheme);
+            holder.mText.setBackgroundResource(R.drawable.list_item_default_background);
         }
         else {
-            holder.mText.setBackgroundColor(alternativeBackgroundColor);
-            holder.mText.setTextColor(whiteColor);
+            holder.mText.setTextAppearance(R.style.RecyclerViewItemAlternativeTheme);
+            holder.mText.setBackgroundResource(R.drawable.list_item_alternative_background);
         }
     }
 

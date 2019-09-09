@@ -2,6 +2,7 @@ package emilsoft.completewordfinder;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -191,7 +192,6 @@ public class BeginsWithFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
     }
-
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {

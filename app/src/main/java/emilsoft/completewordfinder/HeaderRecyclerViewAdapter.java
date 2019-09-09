@@ -2,7 +2,6 @@ package emilsoft.completewordfinder;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -69,8 +68,8 @@ public class HeaderRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             String text = numLetters + " LETTERS";
             HeaderViewHolder mHolder = (HeaderViewHolder) holder;
             mHolder.mText.setText(text);
-            mHolder.mText.setTextColor(blackColor);
-            mHolder.mText.setBackgroundColor(defaultBackgroundColor);
+            mHolder.mText.setTextAppearance(R.style.RecyclerViewItemDefaultTheme);
+            mHolder.mText.setBackgroundResource(R.drawable.list_item_default_background);
         } else if(viewType == TYPE_ITEM && holder instanceof ItemViewHolder) {
             //Get the correct position in mWords
             int mPos = position - (i + 1);
@@ -79,11 +78,11 @@ public class HeaderRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             mHolder.mWord = text;
             mHolder.mText.setText(text);
             if(mPos % 2 == mHeadersIndex[i] % 2) { //instead of mPos % 2 == 0
-                mHolder.mText.setBackgroundColor(defaultBackgroundColor);
-                mHolder.mText.setTextColor(blackColor);
+                mHolder.mText.setTextAppearance(R.style.RecyclerViewItemDefaultTheme);
+                mHolder.mText.setBackgroundResource(R.drawable.list_item_default_background);
             } else {
-                mHolder.mText.setBackgroundColor(alternativeBackgroundColor);
-                mHolder.mText.setTextColor(whiteColor);
+                mHolder.mText.setTextAppearance(R.style.RecyclerViewItemAlternativeTheme);
+                mHolder.mText.setBackgroundResource(R.drawable.list_item_alternative_background);
             }
         } else {
             throw new RuntimeException("No match for viewType "+viewType+" and holder");

@@ -2,7 +2,7 @@
 <androidx.preference.PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <androidx.preference.ListPreference
+    <ListPreference
         android:key="@string/sharedpref_current_dictionary"
         android:title="@string/sharedpref_current_dictionary_title"
         android:summary="@string/sharedpref_default_dictionary"
@@ -10,13 +10,22 @@
         android:entries="@array/dictionariesAlias"
         android:entryValues="@array/dictionaries"/>
 
-    <androidx.preference.ListPreference
+    <ListPreference
         android:key="@string/sharedpref_word_order"
         android:title="@string/sharedpref_word_order_title"
         android:summary="@string/sharedpref_word_order_default"
         android:defaultValue="@string/sharedpref_word_order_default"
         android:entries="@array/wordOrdersAlias"
         android:entryValues="@array/wordOrders"
+        />
+
+    <ListPreference
+        android:key="@string/sharedpref_theme"
+        android:title="@string/sharedpref_theme_title"
+        android:summary="@string/sharedpref_theme_default"
+        android:defaultValue="@string/sharedpref_theme_default"
+        android:entries="@array/themeListAlias"
+        android:entryValues="@array/themeList"
         />
 
 </androidx.preference.PreferenceScreen>

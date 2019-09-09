@@ -2,12 +2,16 @@
 
     <!-- Base application theme. -->
     <!-- <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar"> Dava problemi in fragment_anagram.xml dicendo failed to instantiate one or more classes-->
-    <style name="AppTheme" parent="Base.Theme.AppCompat.Light.DarkActionBar">
+    <!-- parent="Base.Theme.AppCompat.Light.DarkActionBar" cambiato in DayNight con Target API 29 -->
+    <style name="BaseAppTheme" parent="Theme.AppCompat.DayNight.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/defaultBackground</item>
     </style>
+
+    <style name="AppTheme" parent="BaseAppTheme" />
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
@@ -17,5 +21,14 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <!-- Use this in AnagramRecyclerViewAdapter and HeaderRecyclerViewAdapter -->
+    <style name="RecyclerViewItemDefaultTheme">
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="RecyclerViewItemAlternativeTheme">
+        <item name="android:textColor">@color/white</item>
+    </style>
 
 </resources>

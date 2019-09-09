@@ -79,10 +79,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/internal_margin_views"
                 android:layout_gravity="center"
-                android:background="@drawable/button_background"
+                android:background="@drawable/button_background_filled"
                 android:text="@string/help_dialog_button_ok"
                 android:textAlignment="center"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@color/white"
                 android:textSize="@dimen/default_text_size"/>
 
         </LinearLayout>

@@ -36,22 +36,9 @@
     <string name="sharedpref_word_order">word_order</string>
     <string name="sharedpref_word_order_default">descending</string>
     <string name="sharedpref_word_order_title">Word Order</string>
-    <string-array name="dictionaries">
-        <item>english_dictionary</item>
-        <item>italian_dictionary</item>
-    </string-array>
-    <string-array name="dictionariesAlias">
-        <item>English</item>
-        <item>Italian</item>
-    </string-array>
-    <string-array name="wordOrders">
-        <item>ascending</item>
-        <item>descending</item>
-    </string-array>
-    <string-array name="wordOrdersAlias">
-        <item>Ascending</item>
-        <item>Descending</item>
-    </string-array>
+    <string name="sharedpref_theme">theme_pref</string>
+    <string name="sharedpref_theme_title">Theme</string>
+    <string name="sharedpref_theme_default">default</string>
     <!--<string name="english_dictionary">words_english.txt</string>-->
     <!--<string name="italian_dictionary">280000_parole_italiane.txt</string>-->
     <string name="wildcards_fragment_toast_too_many_wildcards">Too many wildcards. Max is 15</string>

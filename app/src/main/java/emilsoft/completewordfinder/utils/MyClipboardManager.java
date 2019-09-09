@@ -9,7 +9,8 @@ public class MyClipboardManager {
     public static void copyToClipboard(Context context, String text) {
         ClipboardManager clipboardManager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = ClipData.newPlainText("Copied Text", text);
-        clipboardManager.setPrimaryClip(clipData);
+        if (clipboardManager != null)
+            clipboardManager.setPrimaryClip(clipData);
     }
 
 }

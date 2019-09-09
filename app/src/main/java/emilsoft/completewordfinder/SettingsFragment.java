@@ -6,6 +6,8 @@ import android.os.Bundle;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
+import emilsoft.completewordfinder.utils.ThemeHelper;
+
 public class SettingsFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceChangeListener {
 
     @Override
@@ -14,6 +16,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
         Preference dictionaryPref = findPreference(getString(R.string.sharedpref_current_dictionary));
         Preference wordOrderPref = findPreference(getString(R.string.sharedpref_word_order));
+        Preference themePref = findPreference(getString(R.string.sharedpref_theme));
 
         if (dictionaryPref != null) {
             updateDictionarySummary(dictionaryPref,
@@ -26,6 +29,12 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                     wordOrderPref.getSharedPreferences().getString(getString(R.string.sharedpref_word_order), null));
             wordOrderPref.setOnPreferenceChangeListener(this);
         }
+
+        if(themePref != null) {
+            updateThemeSummary(themePref,
+                    themePref.getSharedPreferences().getString(getString(R.string.sharedpref_theme), null));
+            themePref.setOnPreferenceChangeListener(this);
+        }
     }
 
     @Override
@@ -34,6 +43,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
             updateDictionarySummary(preference, newValue.toString());
         if(preference.getKey().equals(getString(R.string.sharedpref_word_order)))
             updateWordOrderSummary(preference, newValue.toString());
+        if(preference.getKey().equals(getString(R.string.sharedpref_theme)))
+            updateThemeSummary(preference, newValue.toString());
         return true;
     }
 
@@ -59,6 +70,20 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         if(value == null) {
             //No word order set
             preference.setSummary(values[1]); //Descending
+        } else {
+            int i = 0;
+            while(i < entries.length && !entries[i].equals(value))
+                i++;
+            preference.setSummary(values[i]);
+        }
+    }
+
+    private void updateThemeSummary(Preference preference, String value) {
+        String[] entries = getResources().getStringArray(R.array.themeList);
+        String[] values = getResources().getStringArray(R.array.themeListAlias);
+        if(value == null) {
+            //No theme set
+            preference.setSummary(values[2]); //Default
         } else {
             int i = 0;
             while(i < entries.length && !entries[i].equals(value))

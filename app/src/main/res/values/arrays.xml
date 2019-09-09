@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="dictionaries">
+        <item>english_dictionary</item>
+        <item>italian_dictionary</item>
+    </string-array>
+
+    <string-array name="dictionariesAlias">
+        <item>English</item>
+        <item>Italian</item>
+    </string-array>
+
+    <string-array name="wordOrders">
+        <item>ascending</item>
+        <item>descending</item>
+    </string-array>
+
+    <string-array name="wordOrdersAlias">
+        <item>Ascending</item>
+        <item>Descending</item>
+    </string-array>
+
+    <string-array name="themeList">
+        <item>light</item>
+        <item>dark</item>
+        <item>default</item>
+    </string-array>
+
+    <string-array name="themeListAlias">
+        <item>Light</item>
+        <item>Dark</item>
+        <item>Set by Battery Saver</item>
+    </string-array>
+
+</resources>
