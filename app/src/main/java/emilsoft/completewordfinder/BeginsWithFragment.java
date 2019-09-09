@@ -226,6 +226,9 @@ public class BeginsWithFragment extends Fragment {
                     return;
                 }
 
+                if(textInserted.length() == 0)
+                    return;
+
                 isProgressBarLoadingWordsVisible = true;
                 progressBarLoadingWords.setVisibility(View.VISIBLE);
                 isTextNoWordsFoundVisible = false;
@@ -290,20 +293,16 @@ public class BeginsWithFragment extends Fragment {
 
         @Override
         protected Void doInBackground(String... strings) {
-            try {
-                String textInserted = strings[0];
-                words = trie.startsWith(textInserted);
-                if (!words.isEmpty()) {
-                    //Sort?
-                    //WordUtils.sortAndRemoveDuplicates(words);
-                    headersIndex = WordUtils.sortByWordLength(words, isWordOrderAscending);
-                    WordUtils.wordsToUpperCase(words);
-                }
-                return null;
-            } catch (Exception ex) {
-                Log.v(MainActivity.TAG, Log.getStackTraceString(ex));
-                return null;
-            }
+            String textInserted = strings[0];
+            words = trie.startsWith(textInserted);
+            if (!words.isEmpty()) {
+                //Sort?
+                //WordUtils.sortAndRemoveDuplicates(words);
+                headersIndex = WordUtils.sortByWordLength(words, isWordOrderAscending);
+                WordUtils.wordsToUpperCase(words);
+            } else
+                headersIndex = new int[]{};
+            return null;
         }
 
         @Override

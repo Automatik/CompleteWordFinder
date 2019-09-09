@@ -192,6 +192,9 @@ public class SubAnagramsFragment extends Fragment {
                     return;
                 }
 
+                if(textInserted.length() == 0)
+                    return;
+
                 isProgressBarLoadingWordsVisible = true;
                 progressBarLoadingWords.setVisibility(View.VISIBLE);
                 isTextNoWordsFoundVisible = false;
@@ -259,7 +262,8 @@ public class SubAnagramsFragment extends Fragment {
                 headersIndex = WordUtils.sortByWordLength(words, isWordOrderAscending);
                 //WordUtils.sortAndRemoveDuplicates(words);
                 WordUtils.wordsToUpperCase(words);
-            }
+            } else
+                headersIndex = new int[]{};
             return null;
         }
 

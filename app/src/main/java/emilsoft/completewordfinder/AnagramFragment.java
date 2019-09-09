@@ -218,6 +218,8 @@ public class AnagramFragment extends Fragment {
                 KeyboardHelper.hideKeyboard(getActivity());
             if(textinput.getText() != null) {
                 textInserted = textinput.getText().toString().toLowerCase();
+                if(textInserted.length() == 0)
+                    return;
                 isProgressBarLoadingWordsVisible = true;
                 progressBarLoadingWords.setVisibility(View.VISIBLE);
                 isTextNoWordsFoundVisible = false;

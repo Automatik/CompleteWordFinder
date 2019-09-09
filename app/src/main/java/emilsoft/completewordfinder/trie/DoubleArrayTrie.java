@@ -496,7 +496,7 @@ public class DoubleArrayTrie implements Serializable {
         //Append the endmarker to the word or remove it
         int currentNode = getTrieNode(prefix);
         if(currentNode == EMPTY_VALUE)
-            return null;
+            return new ArrayList<>();
         ArrayList<String> words = new ArrayList<>();
         ArrayDeque<Integer> nodesQueue = new ArrayDeque<>();
         ArrayDeque<String> prefixQueue = new ArrayDeque<>();

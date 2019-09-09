@@ -60,6 +60,7 @@ public class WildcardsFragment extends Fragment {
     private static final int TEXT_INPUT_TOO_MANY_WILDCARDS = 1;
     private static final int TEXT_INPUT_ONLY_WILDCARDS = 2;
     private static final int TEXT_INPUT_TOO_MANY_DIGITS = 3;
+    private static final int TEXT_INPUT_EMPTY = 4;
     private boolean isTextNoWordsFoundVisible = false, isProgressBarLoadingWordsVisible = false;
     private String dictionaryFilename;
     private int dictionaryAlphabetSize, maxWordLength;
@@ -251,8 +252,11 @@ public class WildcardsFragment extends Fragment {
                     case TEXT_INPUT_ONLY_WILDCARDS:
                         Toast.makeText(getContext(), getString(R.string.wildcards_fragment_toast_only_wildcards), Toast.LENGTH_SHORT).show();
                         break;
-                    default: //TEXT_INPUT_TOO_MANY_DIGITS
+                    case TEXT_INPUT_TOO_MANY_DIGITS:
                         Toast.makeText(getContext(), getString(R.string.toast_max_digits_exceeded), Toast.LENGTH_SHORT).show();
+                        break;
+                    default: //TEXT_INPUT_EMPTY
+                        break; //do nothing
                 }
             }
         }
@@ -278,6 +282,8 @@ public class WildcardsFragment extends Fragment {
      * {@link #MAX_WILDCARDS}
      */
     private int checkTextInserted(String text) {
+        if(text.length() == 0)
+            return TEXT_INPUT_EMPTY;
         if(text.length() > maxWordLength  && maxWordLength != MainActivity.MAX_WORD_LENGTH_DEFAULT_VALUE)
             return TEXT_INPUT_TOO_MANY_DIGITS;
         int wildcardsCount = 0;
