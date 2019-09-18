@@ -1,9 +1,10 @@
-package emilsoft.completewordfinder;
+package emilsoft.completewordfinder.fragment;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.text.InputFilter;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,25 +19,27 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import emilsoft.completewordfinder.adapter.HeaderRecyclerViewAdapter;
+import emilsoft.completewordfinder.MainActivity;
+import emilsoft.completewordfinder.R;
 import emilsoft.completewordfinder.trie.DoubleArrayTrie;
 import emilsoft.completewordfinder.utils.Dictionary;
 import emilsoft.completewordfinder.utils.KeyboardHelper;
 import emilsoft.completewordfinder.utils.WordUtils;
-import emilsoft.completewordfinder.viewmodel.SubAnagramsViewModel;
 import emilsoft.completewordfinder.viewmodel.TrieViewModel;
 import emilsoft.completewordfinder.viewmodel.TrieViewModelFactory;
+import emilsoft.completewordfinder.viewmodel.WordsInPatternViewModel;
 
-public class SubAnagramsFragment extends Fragment {
+public class WordsInPatternFragment extends Fragment {
 
     private Button find;
     private TextInputEditText textinput;
@@ -45,32 +48,34 @@ public class SubAnagramsFragment extends Fragment {
     private TextView textDescription, textNoWordsFound;
     private HeaderRecyclerViewAdapter adapter;
     private TrieViewModel trieViewModel;
-    private SubAnagramsViewModel subAnagramsViewModel;
+    private WordsInPatternViewModel wordsInPatternViewModel;
     private ProgressBar progressBarLoadingWords;
-    private FindSubAnagrams task;
+    private FindWordsInPattern task;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.OnSharedPreferenceChangeListener onSharedPreferenceChangeListener;
 
     private static final String TEXT_INSERTED_STATE = "textInserted";
     private static final String TEXT_NO_WORDS_FOUND_STATE = "textNoWordsFound";
     private static final String TEXT_PROGRESSBAR_LOADING_WORDS_STATE = "textNoWordsFound";
+    private static final String MAX_WORD_LENGTH_STATE = "maxWordLengthState";
     private static final String WORD_ORDER_ASCENDING_STATE = "isWordOrderAscendingState";
-    private static final int MAX_WORD_LENGTH = 15; //due to computation reason
     private boolean isTextNoWordsFoundVisible = false, isProgressBarLoadingWordsVisible = false;
     private String dictionaryFilename;
-    private int dictionaryAlphabetSize;
+    private int dictionaryAlphabetSize, maxWordLength;
     private boolean isWordOrderAscending;
 
-    public SubAnagramsFragment() {
+    public WordsInPatternFragment() {
         isWordOrderAscending = MainActivity.WORD_ORDER_DEFAULT;
     }
 
-    public static SubAnagramsFragment newInstance(Dictionary dictionary, boolean isWordOrderAscending) {
+    public static WordsInPatternFragment newInstance(Dictionary dictionary, boolean isWordOrderAscending) {
 
         Bundle args = new Bundle();
         args.putString(MainActivity.DICTIONARY_FILENAME, dictionary.getFilename());
         args.putInt(MainActivity.DICTIONARY_ALPHABET_SIZE, dictionary.getAlphabetSize());
         args.putInt(MainActivity.DICTIONARY_MAX_WORD, dictionary.getMaxWordLength());
         args.putBoolean(MainActivity.IS_WORD_ORDER_ASCENDING, isWordOrderAscending);
-        SubAnagramsFragment fragment = new SubAnagramsFragment();
+        WordsInPatternFragment fragment = new WordsInPatternFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -78,16 +83,19 @@ public class SubAnagramsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        subAnagramsViewModel = ViewModelProviders.of(this).get(SubAnagramsViewModel.class);
+        wordsInPatternViewModel = ViewModelProviders.of(this).get(WordsInPatternViewModel.class);
         if(getArguments() != null) {
             dictionaryFilename = getArguments().getString(MainActivity.DICTIONARY_FILENAME);
             dictionaryAlphabetSize = getArguments().getInt(MainActivity.DICTIONARY_ALPHABET_SIZE);
+            maxWordLength = getArguments().getInt(MainActivity.DICTIONARY_MAX_WORD);
             isWordOrderAscending = getArguments().getBoolean(MainActivity.IS_WORD_ORDER_ASCENDING);
         }
-        Dictionary dictionary = new Dictionary(dictionaryFilename, dictionaryAlphabetSize);
-        if(getActivity() != null)
+        Dictionary dictionary = new Dictionary(dictionaryFilename, dictionaryAlphabetSize, maxWordLength);
+        if(getActivity() != null) {
             trieViewModel = ViewModelProviders.of(getActivity(),
                     new TrieViewModelFactory(getActivity().getApplication(), dictionary)).get(TrieViewModel.class);
+            trieViewModel.addMaxWordLengthListener(maxWordLengthListener);
+        }
     }
 
     @Nullable
@@ -103,10 +111,14 @@ public class SubAnagramsFragment extends Fragment {
         progressBarLoadingWords = (ProgressBar) view.findViewById(R.id.progressBarLoadingWords);
         find.setOnClickListener(onClickListener);
         //textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters()));
-        textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), MAX_WORD_LENGTH));
-        textDescription.setText(R.string.text_description_sub_anagrams);
-        textInputLayout.setCounterEnabled(true);
-        textInputLayout.setCounterMaxLength(MAX_WORD_LENGTH);
+        //textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), maxWordLength));
+        textDescription.setText(R.string.text_description_words_contained);
+        if(maxWordLength != 0) {
+            textInputLayout.setCounterEnabled(true);
+            textInputLayout.setCounterMaxLength(maxWordLength);
+            textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), maxWordLength));
+        } else
+            textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters()));
         return view;
     }
 
@@ -116,8 +128,8 @@ public class SubAnagramsFragment extends Fragment {
         if(savedInstanceState != null) {
             String textInserted = savedInstanceState.getString(TEXT_INSERTED_STATE);
             textinput.setText(textInserted);
-            if(subAnagramsViewModel.wordsFound != null && adapter == null) {
-                adapter = new HeaderRecyclerViewAdapter(subAnagramsViewModel.wordsFound, subAnagramsViewModel.headersIndex);
+            if(wordsInPatternViewModel.wordsFound != null && adapter == null) {
+                adapter = new HeaderRecyclerViewAdapter(wordsInPatternViewModel.wordsFound, wordsInPatternViewModel.headersIndex);
                 wordslist.setAdapter(adapter);
             }
             isTextNoWordsFoundVisible = savedInstanceState.getBoolean(TEXT_NO_WORDS_FOUND_STATE);
@@ -133,6 +145,19 @@ public class SubAnagramsFragment extends Fragment {
                 progressBarLoadingWords.setVisibility(View.INVISIBLE);
             }
             isWordOrderAscending = savedInstanceState.getBoolean(WORD_ORDER_ASCENDING_STATE);
+            maxWordLength = savedInstanceState.getInt(MAX_WORD_LENGTH_STATE);
+        }
+
+        onSharedPreferenceChangeListener = ((sharedPreferences, key) -> {
+           if(key.equals(getString(R.string.sharedpref_current_dictionary))) {
+               textInputLayout.setCounterEnabled(false);
+               textinput.setFilters(WordUtils.addMyInputFilters(new InputFilter[]{}));
+           }
+        });
+
+        if(getActivity() != null) {
+            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            sharedPreferences.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
         }
 
         //Keyboard Done button event
@@ -154,7 +179,7 @@ public class SubAnagramsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if(getActivity() != null)
-            getActivity().setTitle(getString(R.string.nav_item_sub_anagrams));
+            getActivity().setTitle(getString(R.string.nav_item_words_contained));
     }
 
     @Override
@@ -170,12 +195,15 @@ public class SubAnagramsFragment extends Fragment {
         outState.putBoolean(TEXT_NO_WORDS_FOUND_STATE, isTextNoWordsFoundVisible);
         outState.putBoolean(TEXT_PROGRESSBAR_LOADING_WORDS_STATE, isProgressBarLoadingWordsVisible);
         outState.putBoolean(WORD_ORDER_ASCENDING_STATE, isWordOrderAscending);
+        outState.putInt(MAX_WORD_LENGTH_STATE, maxWordLength);
     }
 
     @Override
     public void onDestroy() {
         if(task != null)
             task.setListener(null);
+        if(sharedPreferences != null)
+            sharedPreferences.unregisterOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
         super.onDestroy();
     }
 
@@ -187,7 +215,7 @@ public class SubAnagramsFragment extends Fragment {
             if(textinput.getText() != null) {
                 String textInserted = textinput.getText().toString().toLowerCase();
 
-                if (textInserted.length() > MAX_WORD_LENGTH) {
+                if (textInserted.length() > maxWordLength && maxWordLength != MainActivity.MAX_WORD_LENGTH_DEFAULT_VALUE) {
                     Toast.makeText(getContext(), getString(R.string.toast_max_digits_exceeded), Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -203,7 +231,7 @@ public class SubAnagramsFragment extends Fragment {
                 trieViewModel.getTrie().observe(getActivity(), new Observer<DoubleArrayTrie>() {
                     @Override
                     public void onChanged(DoubleArrayTrie trie) {
-                        task = new FindSubAnagrams(trie, isWordOrderAscending);
+                        task = new FindWordsInPattern(trie, isWordOrderAscending);
                         task.setListener((wordsFound, headersIndex) -> {
 
                             if (isProgressBarLoadingWordsVisible) {
@@ -215,24 +243,17 @@ public class SubAnagramsFragment extends Fragment {
                                 textNoWordsFound.setVisibility(View.VISIBLE);
                             }
                             //headersIndex.length is the number of headers to insert in the recyclerview
-                            int size = subAnagramsViewModel.wordsFound.size() + subAnagramsViewModel.headersIndex.length;
-
-                            subAnagramsViewModel.wordsFound.clear();
-                            subAnagramsViewModel.headersIndex = new int[0];
+                            int size = wordsInPatternViewModel.wordsFound.size() + wordsInPatternViewModel.headersIndex.length;
+                            wordsInPatternViewModel.wordsFound.clear();
                             if (adapter == null) {
-                                adapter = new HeaderRecyclerViewAdapter(subAnagramsViewModel.wordsFound, subAnagramsViewModel.headersIndex);
+                                adapter = new HeaderRecyclerViewAdapter(wordsInPatternViewModel.wordsFound, wordsInPatternViewModel.headersIndex);
                                 wordslist.setAdapter(adapter);
-                            } else {
-                                adapter.setHeadersIndex(subAnagramsViewModel.headersIndex);
+                            } else
                                 adapter.notifyItemRangeRemoved(0, size);
-                            }
-
-                            if(!wordsFound.isEmpty() && headersIndex != null) {
-                                subAnagramsViewModel.wordsFound.addAll(wordsFound);
-                                subAnagramsViewModel.headersIndex = headersIndex;
-                                adapter.setHeadersIndex(headersIndex);
-                                adapter.notifyItemRangeInserted(0, wordsFound.size() + headersIndex.length);
-                            }
+                            wordsInPatternViewModel.wordsFound.addAll(wordsFound);
+                            wordsInPatternViewModel.headersIndex = headersIndex;
+                            adapter.setHeadersIndex(headersIndex);
+                            adapter.notifyItemRangeInserted(0, wordsFound.size() + headersIndex.length);
                         });
                         task.execute(textInserted);
                     }
@@ -241,15 +262,25 @@ public class SubAnagramsFragment extends Fragment {
         }
     };
 
-    private static class FindSubAnagrams extends AsyncTask<String, Void, Void> {
+    private TrieViewModel.MaxWordLengthListener maxWordLengthListener = (maxWordLength -> {
+        //Log.v(MainActivity.TAG, "WordsInPatternFragment/ maxWordLengthListener called");
+        this.maxWordLength = maxWordLength;
+        if(maxWordLength != 0) {
+            textInputLayout.setCounterEnabled(true);
+            textInputLayout.setCounterMaxLength(maxWordLength);
+            textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), maxWordLength));
+        }
+    });
+
+    private static class FindWordsInPattern extends AsyncTask<String, Void, Void> {
 
         private DoubleArrayTrie trie;
         private ArrayList<String> words;
         private int[] headersIndex;
-        private FindSubAnagramsTaskListener listener;
+        private FindWordsInPatternTaskListener listener;
         private boolean isWordOrderAscending;
 
-        public FindSubAnagrams(DoubleArrayTrie trie, boolean isWordOrderAscending) {
+        public FindWordsInPattern(DoubleArrayTrie trie, boolean isWordOrderAscending) {
             this.trie = trie;
             this.isWordOrderAscending = isWordOrderAscending;
         }
@@ -257,10 +288,10 @@ public class SubAnagramsFragment extends Fragment {
         @Override
         protected Void doInBackground(String... strings) {
             String textInserted = strings[0];
-            words = (ArrayList<String>) trie.permute(textInserted.toCharArray());
+            words = (ArrayList<String>) trie.match(textInserted);
             if(!words.isEmpty()) {
-                headersIndex = WordUtils.sortByWordLength(words, isWordOrderAscending);
                 //WordUtils.sortAndRemoveDuplicates(words);
+                headersIndex = WordUtils.sortByWordLength(words, isWordOrderAscending);
                 WordUtils.wordsToUpperCase(words);
             } else
                 headersIndex = new int[]{};
@@ -271,17 +302,18 @@ public class SubAnagramsFragment extends Fragment {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             if(listener != null)
-                listener.onFindSubAnagramsTaskFinished(words, headersIndex);
+                listener.onFindWordsInPatternTaskFinished(words, headersIndex);
         }
 
-        public void setListener(FindSubAnagramsTaskListener listener) {
+        public void setListener(FindWordsInPatternTaskListener listener) {
             this.listener = listener;
         }
 
-        public interface FindSubAnagramsTaskListener {
+        public interface FindWordsInPatternTaskListener {
 
-            void onFindSubAnagramsTaskFinished(ArrayList<String> wordsFound, int[] headersIndex);
+            void onFindWordsInPatternTaskFinished(ArrayList<String> wordsFound, int[] headersIndex);
 
         }
     }
+
 }

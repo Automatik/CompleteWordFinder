@@ -1,13 +1,10 @@
 package emilsoft.completewordfinder;
 
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -20,6 +17,11 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.PreferenceManager;
 
+import emilsoft.completewordfinder.fragment.AnagramFragment;
+import emilsoft.completewordfinder.fragment.BeginsWithFragment;
+import emilsoft.completewordfinder.fragment.SubAnagramsFragment;
+import emilsoft.completewordfinder.fragment.WildcardsFragment;
+import emilsoft.completewordfinder.fragment.WordsInPatternFragment;
 import emilsoft.completewordfinder.utils.Dictionaries;
 import emilsoft.completewordfinder.utils.Dictionary;
 import emilsoft.completewordfinder.utils.HelpDialog;
@@ -28,7 +30,6 @@ import emilsoft.completewordfinder.utils.ThemeHelper;
 import emilsoft.completewordfinder.viewmodel.TrieViewModel;
 import emilsoft.completewordfinder.viewmodel.TrieViewModelFactory;
 
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;

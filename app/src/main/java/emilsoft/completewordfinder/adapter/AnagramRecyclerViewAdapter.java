@@ -1,10 +1,9 @@
-package emilsoft.completewordfinder;
+package emilsoft.completewordfinder.adapter;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,21 +13,17 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import emilsoft.completewordfinder.R;
 import emilsoft.completewordfinder.utils.MyClipboardManager;
 
 public class AnagramRecyclerViewAdapter extends RecyclerView.Adapter<AnagramRecyclerViewAdapter.ViewHolder> {
 
     private ArrayList<String> mWords;
-    private int defaultBackgroundColor, alternativeBackgroundColor, whiteColor, blackColor;
 
     public AnagramRecyclerViewAdapter(ArrayList<String> words) {
         if (words == null)
             mWords = new ArrayList<>(0);
         else mWords = words;
-        defaultBackgroundColor = Color.parseColor("#FAFAFA");
-        alternativeBackgroundColor = Color.parseColor("#008577");
-        whiteColor = Color.parseColor("#FFFFFF");
-        blackColor = Color.parseColor("#000000");
     }
 
     @NonNull

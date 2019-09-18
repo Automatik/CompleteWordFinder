@@ -9,4 +9,5 @@
     <color name="black">#000000</color>
     <color name="defaultBackground">#FAFAFA</color>
     <color name="nightBackground">#303030</color>
+    <color name="ic_launcher_background">#008577</color>
 </resources>

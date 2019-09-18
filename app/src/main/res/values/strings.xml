@@ -6,6 +6,7 @@
     <string name="nav_header_subtitle">words &amp; anagrams</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+    <string name="activity_bubble_title">Bubble Activity</string>
     <string name="fragment_anagram_textinput_hint">Insert Word</string>
     <string name="fragment_anagram_find_button_text">FIND</string>
     <string name="nav_item_anagrams">Anagrams</string>

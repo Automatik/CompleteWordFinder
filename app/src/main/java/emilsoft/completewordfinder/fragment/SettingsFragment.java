@@ -1,12 +1,11 @@
-package emilsoft.completewordfinder;
+package emilsoft.completewordfinder.fragment;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
-import emilsoft.completewordfinder.utils.ThemeHelper;
+import emilsoft.completewordfinder.R;
 
 public class SettingsFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceChangeListener {
 

@@ -1,15 +1,12 @@
-package emilsoft.completewordfinder;
+package emilsoft.completewordfinder.fragment;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputFilter;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -22,23 +19,21 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.view.inputmethod.EditorInfoCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import emilsoft.completewordfinder.adapter.HeaderRecyclerViewAdapter;
+import emilsoft.completewordfinder.MainActivity;
+import emilsoft.completewordfinder.R;
 import emilsoft.completewordfinder.trie.DoubleArrayTrie;
 import emilsoft.completewordfinder.utils.Dictionary;
-import emilsoft.completewordfinder.utils.HelpDialog;
 import emilsoft.completewordfinder.utils.KeyboardHelper;
-import emilsoft.completewordfinder.utils.MyClipboardManager;
 import emilsoft.completewordfinder.utils.WordUtils;
 import emilsoft.completewordfinder.viewmodel.BeginsWithViewModel;
 import emilsoft.completewordfinder.viewmodel.TrieViewModel;

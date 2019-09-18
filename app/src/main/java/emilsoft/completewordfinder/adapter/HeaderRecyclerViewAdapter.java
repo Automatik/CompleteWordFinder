@@ -1,7 +1,6 @@
-package emilsoft.completewordfinder;
+package emilsoft.completewordfinder.adapter;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
+import emilsoft.completewordfinder.R;
 import emilsoft.completewordfinder.utils.MyClipboardManager;
 
 public class HeaderRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
@@ -23,7 +23,6 @@ public class HeaderRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
 
     private ArrayList<String> mWords;
     private int[] mHeadersIndex;
-    private int defaultBackgroundColor, alternativeBackgroundColor, whiteColor, blackColor;
     private final static int TYPE_HEADER = 0, TYPE_ITEM = 1;
 
     public HeaderRecyclerViewAdapter(ArrayList<String> words, int[] headersIndex) {
@@ -33,10 +32,6 @@ public class HeaderRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
         if(headersIndex == null)
             mHeadersIndex = new int[0];
         else mHeadersIndex = headersIndex;
-        defaultBackgroundColor = Color.parseColor("#FAFAFA");
-        alternativeBackgroundColor = Color.parseColor("#008577");
-        whiteColor = Color.parseColor("#FFFFFF");
-        blackColor = Color.parseColor("#000000");
     }
 
     @NonNull

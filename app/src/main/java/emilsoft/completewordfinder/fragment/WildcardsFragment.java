@@ -1,4 +1,4 @@
-package emilsoft.completewordfinder;
+package emilsoft.completewordfinder.fragment;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -28,6 +28,9 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import emilsoft.completewordfinder.adapter.AnagramRecyclerViewAdapter;
+import emilsoft.completewordfinder.MainActivity;
+import emilsoft.completewordfinder.R;
 import emilsoft.completewordfinder.trie.DoubleArrayTrie;
 import emilsoft.completewordfinder.utils.Dictionary;
 import emilsoft.completewordfinder.utils.KeyboardHelper;
