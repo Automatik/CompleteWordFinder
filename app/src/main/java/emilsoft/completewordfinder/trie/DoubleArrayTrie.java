@@ -541,8 +541,13 @@ public class DoubleArrayTrie implements Serializable {
                 if(getBase(currentNode) >= EMPTY_VALUE) {
                     int nextNode = getBase(currentNode) + getOffset(nextLetter);
                     if(nextNode < getDASize()) {
-                        if (getCheck(nextNode) == currentNode && getBase(nextNode) < EMPTY_VALUE)
-                            words.add(composeWord(prefix, getBase(nextNode)));
+                        if (getCheck(nextNode) == currentNode && getBase(nextNode) < EMPTY_VALUE) {
+                            String word = composeWord(prefix, getBase(nextNode));
+                            String suffix = pattern.substring(i);
+                            //Check if the letters in the tail are the prefix for the remaining pattern
+                            if(suffix.startsWith(word))
+                                words.add(word);
+                        }
                         if (getBase(nextNode) >= EMPTY_VALUE) {
                             int tailNode = getBase(nextNode) + getOffset(ENDMARKER);
                             if (getCheck(tailNode) == nextNode && getBase(tailNode) < EMPTY_VALUE)

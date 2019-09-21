@@ -1,12 +1,11 @@
 <resources>
-    <string name="app_name">CompleteWordFinder</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Complete Word Finder</string>
+    <string name="app_name" translatable="false">Complete Word Finder</string>
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
+    <string name="nav_header_title" translatable="false">Complete Word Finder</string>
     <string name="nav_header_subtitle">words &amp; anagrams</string>
-    <string name="nav_header_desc">Navigation header</string>
+    <string name="nav_header_desc" translatable="false">Navigation header</string>
     <string name="action_settings">Settings</string>
-    <string name="activity_bubble_title">Bubble Activity</string>
     <string name="fragment_anagram_textinput_hint">Insert Word</string>
     <string name="fragment_anagram_find_button_text">FIND</string>
     <string name="nav_item_anagrams">Anagrams</string>
@@ -22,7 +21,7 @@
     <string name="text_help_anagrams">Insert a word or a set of letters to find all its anagrams.\nThe max number of letters depends on the longest word present in the dictionary.</string>
     <string name="text_help_begins_with">Find all the words that start with the given set of letters.\nThe max number of letters depends on the longest word present in the dictionary.</string>
     <string name="text_help_words_contained">Given a sequence of letters, finds all the existing words from left to right, like in a word search puzzle game.\nThe max number of letters depends on the longest word present in the dictionary.</string>
-    <string name="text_help_sub_anagrams">Given a combination of letters, finds all the possible existing anagrams with same or lesser length.\nDue to computational reasons, the max number of letters is set to 15.</string>
+    <string name="text_help_sub_anagrams">Given a combination of letters, finds all the possible existing anagrams with same or lesser length. Due to computational reasons, the max number of letters is set to 15.</string>
     <string name="text_help_wildcards">The wildcard \"?\" is a character that can be replaced by any letter. Use the wildcard to find all the words that match the positions of the given letters.\nThe max number of letters depends on the longest word present in the dictionary and the max number of wildcards is 15 due to computational reasons. There must be at least one letter inserted.</string>
     <string name="text_help_example_anagrams">Given the word \"CAT\" you get the anagram ACT</string>
     <string name="text_help_example_begins_with">Given the letters \"FLO\" you get the words like FLOP, FLOW, FLOOD, FLOOR and so on…</string>
@@ -30,16 +29,16 @@
     <string name="text_help_example_sub_anagrams">Given the letters \"AERD\" you get the words like DARE, DEAR, READ, RAD, RED, EAR, ERA and so on…</string>
     <string name="text_help_example_wildcards">Given the letters \"S??CE\" you get the words like SLICE, SPACE, SINCE and so on…</string>
     <string name="text_no_words_found">No Words Found</string>
-    <string name="sharedpref_current_dictionary">current_dictionary</string>
-    <string name="sharedpref_default_dictionary">english_dictionary</string>
+    <string name="sharedpref_current_dictionary" translatable="false">current_dictionary</string>
+    <string name="sharedpref_default_dictionary" translatable="false">english_dictionary</string>
     <string name="sharedpref_current_dictionary_title">Dictionary</string>
-    <string name="sharedpref_current_dictionary_max_word_length">max_word_length</string>
-    <string name="sharedpref_word_order">word_order</string>
-    <string name="sharedpref_word_order_default">descending</string>
+    <string name="sharedpref_current_dictionary_max_word_length" translatable="false">max_word_length</string>
+    <string name="sharedpref_word_order" translatable="false">word_order</string>
+    <string name="sharedpref_word_order_default" translatable="false">descending</string>
     <string name="sharedpref_word_order_title">Word Order</string>
-    <string name="sharedpref_theme">theme_pref</string>
+    <string name="sharedpref_theme" translatable="false">theme_pref</string>
     <string name="sharedpref_theme_title">Theme</string>
-    <string name="sharedpref_theme_default">default</string>
+    <string name="sharedpref_theme_default" translatable="false">default</string>
     <!--<string name="english_dictionary">words_english.txt</string>-->
     <!--<string name="italian_dictionary">280000_parole_italiane.txt</string>-->
     <string name="wildcards_fragment_toast_too_many_wildcards">Too many wildcards. Max is 15</string>
@@ -50,4 +49,12 @@
     <string name="help_dialog_button_ok">OK</string>
     <string name="help_dialog_example_title">Example</string>
     <string name="toast_copied_to_clipboard">Word copied to clipboard</string>
+    <string name="array_dictionariesAlias_english">English</string>
+    <string name="array_dictionariesAlias_italian">Italian</string>
+    <string name="array_wordOrdersAlias_ascending">Ascending</string>
+    <string name="array_wordOrdersAlias_descending">Descending</string>
+    <string name="array_themeListAlias_light">Light</string>
+    <string name="array_themeListAlias_dark">Dark</string>
+    <string name="array_themeListAlias_default">Set by Battery Saver</string>
+    <string name="array_themeListAlias_default_v28">System default</string>
 </resources>

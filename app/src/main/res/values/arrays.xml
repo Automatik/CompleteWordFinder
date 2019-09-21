@@ -7,8 +7,8 @@
     </string-array>
 
     <string-array name="dictionariesAlias">
-        <item>English</item>
-        <item>Italian</item>
+        <item>@string/array_dictionariesAlias_english</item>
+        <item>@string/array_dictionariesAlias_italian</item>
     </string-array>
 
     <string-array name="wordOrders">
@@ -17,8 +17,8 @@
     </string-array>
 
     <string-array name="wordOrdersAlias">
-        <item>Ascending</item>
-        <item>Descending</item>
+        <item>@string/array_wordOrdersAlias_ascending</item>
+        <item>@string/array_wordOrdersAlias_descending</item>
     </string-array>
 
     <string-array name="themeList">
@@ -28,9 +28,9 @@
     </string-array>
 
     <string-array name="themeListAlias">
-        <item>Light</item>
-        <item>Dark</item>
-        <item>Set by Battery Saver</item>
+        <item>@string/array_themeListAlias_light</item>
+        <item>@string/array_themeListAlias_dark</item>
+        <item>@string/array_themeListAlias_default</item>
     </string-array>
 
 </resources>
