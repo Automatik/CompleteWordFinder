@@ -165,7 +165,7 @@ public class BeginsWithFragment extends Fragment {
         textinput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if(actionId == EditorInfo.IME_ACTION_DONE) {
+                if((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
                     //https://stackoverflow.com/questions/9596010/android-use-done-button-on-keyboard-to-click-button
                     //Write logic here that will be executed when user taps next button
                     find.performClick();

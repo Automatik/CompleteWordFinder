@@ -47,7 +47,8 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/fragment_anagram_textinput_hint"
                 android:inputType="text"
-                android:textSize="@dimen/default_text_size" />
+                android:textSize="@dimen/default_text_size"
+                android:imeOptions="actionDone"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
