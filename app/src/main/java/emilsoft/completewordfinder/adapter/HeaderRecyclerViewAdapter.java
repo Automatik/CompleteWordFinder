@@ -1,6 +1,7 @@
 package emilsoft.completewordfinder.adapter;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,7 @@ public class HeaderRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
     implements FastScrollRecyclerView.SectionedAdapter {
 
     private ArrayList<String> mWords;
+    private Context context;
     private int[] mHeadersIndex;
     private final static int TYPE_HEADER = 0, TYPE_ITEM = 1;
 
@@ -63,7 +65,12 @@ public class HeaderRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             String text = numLetters + " LETTERS";
             HeaderViewHolder mHolder = (HeaderViewHolder) holder;
             mHolder.mText.setText(text);
-            mHolder.mText.setTextAppearance(R.style.RecyclerViewItemDefaultTheme);
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                mHolder.mText.setTextAppearance(R.style.RecyclerViewItemDefaultTheme);
+            else {
+                if(context != null)
+                    mHolder.mText.setTextAppearance(context, R.style.RecyclerViewItemDefaultTheme);
+            }
             mHolder.mText.setBackgroundResource(R.drawable.list_item_default_background);
         } else if(viewType == TYPE_ITEM && holder instanceof ItemViewHolder) {
             //Get the correct position in mWords
@@ -73,10 +80,20 @@ public class HeaderRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             mHolder.mWord = text;
             mHolder.mText.setText(text);
             if(mPos % 2 == mHeadersIndex[i] % 2) { //instead of mPos % 2 == 0
-                mHolder.mText.setTextAppearance(R.style.RecyclerViewItemDefaultTheme);
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                    mHolder.mText.setTextAppearance(R.style.RecyclerViewItemDefaultTheme);
+                else {
+                    if(context != null)
+                        mHolder.mText.setTextAppearance(context, R.style.RecyclerViewItemDefaultTheme);
+                }
                 mHolder.mText.setBackgroundResource(R.drawable.list_item_default_background);
             } else {
-                mHolder.mText.setTextAppearance(R.style.RecyclerViewItemAlternativeTheme);
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                    mHolder.mText.setTextAppearance(R.style.RecyclerViewItemAlternativeTheme);
+                else {
+                    if(context != null)
+                        mHolder.mText.setTextAppearance(context, R.style.RecyclerViewItemAlternativeTheme);
+                }
                 mHolder.mText.setBackgroundResource(R.drawable.list_item_alternative_background);
             }
         } else {
@@ -109,6 +126,12 @@ public class HeaderRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
         int header = binarySearch(mHeadersIndex, position);
         int numLetters = mWords.get(mHeadersIndex[header]).length();
         return Integer.toString(numLetters);
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        context = recyclerView.getContext();
     }
 
     public void setHeadersIndex(int[] headersIndex) {

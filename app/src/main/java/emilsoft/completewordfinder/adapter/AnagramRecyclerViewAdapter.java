@@ -1,9 +1,13 @@
 package emilsoft.completewordfinder.adapter;
 
 import androidx.annotation.NonNull;
+import androidx.core.os.BuildCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Color;
+import android.os.Build;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +23,7 @@ import emilsoft.completewordfinder.utils.MyClipboardManager;
 public class AnagramRecyclerViewAdapter extends RecyclerView.Adapter<AnagramRecyclerViewAdapter.ViewHolder> {
 
     private ArrayList<String> mWords;
+    private Context context;
 
     public AnagramRecyclerViewAdapter(ArrayList<String> words) {
         if (words == null)
@@ -39,11 +44,21 @@ public class AnagramRecyclerViewAdapter extends RecyclerView.Adapter<AnagramRecy
         holder.mWord = mWords.get(position);
         holder.mText.setText(holder.mWord);
         if(position % 2 == 0) {
-            holder.mText.setTextAppearance(R.style.RecyclerViewItemDefaultTheme);
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                holder.mText.setTextAppearance(R.style.RecyclerViewItemDefaultTheme);
+            else {
+                if(context != null)
+                    holder.mText.setTextAppearance(context, R.style.RecyclerViewItemDefaultTheme);
+            }
             holder.mText.setBackgroundResource(R.drawable.list_item_default_background);
         }
         else {
-            holder.mText.setTextAppearance(R.style.RecyclerViewItemAlternativeTheme);
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                holder.mText.setTextAppearance(R.style.RecyclerViewItemAlternativeTheme);
+            else {
+                if(context != null)
+                    holder.mText.setTextAppearance(context, R.style.RecyclerViewItemAlternativeTheme);
+            }
             holder.mText.setBackgroundResource(R.drawable.list_item_alternative_background);
         }
     }
@@ -55,6 +70,11 @@ public class AnagramRecyclerViewAdapter extends RecyclerView.Adapter<AnagramRecy
         return 0;
     }
 
+    @Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        context = recyclerView.getContext();
+    }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener {
 
