@@ -10,6 +10,7 @@ android {
         versionName "1.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         //resConfigs "en" //use this if support only english
+        resConfigs "en", "it"
     }
 
     buildTypes {
