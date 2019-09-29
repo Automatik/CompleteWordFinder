@@ -2,6 +2,8 @@ package emilsoft.completewordfinder;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -9,6 +11,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.navigation.NavigationView;
+import com.kobakei.ratethisapp.RateThisApp;
+
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -46,6 +50,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static final String IS_WORD_ORDER_ASCENDING = "isWordOrderAscending";
 
     public static final boolean WORD_ORDER_DEFAULT = false; //descending
+    public static final int CRITERIA_INSTALL_DAYS = 0;
+    public static final int CRITERIA_LAUNCH_TIMES = 1;
 
     private Dictionary dict; //Dictionary in use
     private SharedPreferences sharedPreferences;
@@ -107,6 +113,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mModel = ViewModelProviders.of(this,
                 new TrieViewModelFactory(this.getApplication(), dict)).get(TrieViewModel.class);
         mModel.addMaxWordLengthListener(this);
+
+        rateThisApp();
     }
 
     @Override
@@ -139,6 +147,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
             startActivity(intent);
             return true;
+        }
+
+        if(id == R.id.action_rate_app) {
+            String appPackage = getPackageName();
+            try {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackage));
+                intent.setPackage("com.android.vending");
+                startActivity(intent);
+            } catch (android.content.ActivityNotFoundException ex) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackage));
+                intent.setPackage("com.android.vending");
+                startActivity(intent);
+            }
+            RateThisApp.stopRateDialog(this);
         }
 
         if (id == R.id.action_help) {
@@ -259,5 +281,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         if(key.equals(getString(R.string.sharedpref_theme)))
             ThemeHelper.applyTheme(sharedPreferences.getString(key, ThemeHelper.DEFAULT_MODE));
+    }
+
+    public void rateThisApp() {
+        RateThisApp.Config config = new RateThisApp.Config(CRITERIA_INSTALL_DAYS, CRITERIA_LAUNCH_TIMES);
+        //Other translations are already available in the RateThisApp's jar
+        config.setTitle(R.string.rate_app_title);
+        config.setMessage(R.string.rate_app_message);
+        config.setYesButtonText(R.string.rate_app_yes_button);
+        config.setNoButtonText(R.string.rate_app_no_button);
+        config.setCancelButtonText(R.string.rate_app_cancel_button);
+        RateThisApp.init(config);
+        //Monitor launch times and interval from installation
+        RateThisApp.onCreate(this);
+        //If the condition is satisfied, "Rate this app" dialog will be shown
+        RateThisApp.showRateDialogIfNeeded(this);
     }
 }

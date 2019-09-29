@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Complete Word Finder</string>
     <string name="action_help">Aiuto</string>
     <string name="action_settings">Impostazioni</string>
     <string name="fragment_anagram_find_button_text">TROVA</string>
@@ -45,4 +44,10 @@
     <string name="array_wordOrdersAlias_ascending">Ascendente</string>
     <string name="array_wordOrdersAlias_descending">Discendente</string>
     <string name="array_themeListAlias_default_v28">Default di sistema</string>
+    <string name="rate_app_cancel_button">Più tardi</string>
+    <string name="rate_app_message">Se ti piace usare questa app, vorresti prendere un momento per recensirla? Ci vorrà meno di un minuto. Grazie per il tuo supporto!</string>
+    <string name="rate_app_no_button">No, grazie</string>
+    <string name="rate_app_title">Valuta Complete Word Finder</string>
+    <string name="rate_app_yes_button">Valuta Ora</string>
+    <string name="action_rate_app">Valuta App</string>
 </resources>

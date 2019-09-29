@@ -6,6 +6,7 @@
     <string name="nav_header_subtitle">words &amp; anagrams</string>
     <string name="nav_header_desc" translatable="false">Navigation header</string>
     <string name="action_settings">Settings</string>
+    <string name="action_rate_app">Rate App</string>
     <string name="fragment_anagram_textinput_hint">Insert Word</string>
     <string name="fragment_anagram_find_button_text">FIND</string>
     <string name="nav_item_anagrams">Anagrams</string>
@@ -49,6 +50,11 @@
     <string name="help_dialog_button_ok">OK</string>
     <string name="help_dialog_example_title">Example</string>
     <string name="toast_copied_to_clipboard">Word copied to clipboard</string>
+    <string name="rate_app_title">Rate Complete Word Finder</string>
+    <string name="rate_app_message">If you enjoy using this app, would you mind taking a moment to rate it? It won\'t take more than a minute. Thank you for your support!</string>
+    <string name="rate_app_yes_button">Rate now</string>
+    <string name="rate_app_no_button">No, thanks</string>
+    <string name="rate_app_cancel_button">Later</string>
     <string name="array_dictionariesAlias_english">English</string>
     <string name="array_dictionariesAlias_italian">Italian</string>
     <string name="array_wordOrdersAlias_ascending">Ascending</string>
