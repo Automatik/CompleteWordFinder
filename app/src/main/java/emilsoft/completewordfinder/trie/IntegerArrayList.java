@@ -194,7 +194,11 @@ public class IntegerArrayList implements IntegerList, Cloneable, Serializable {
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(size);
+        int result;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            result = Objects.hash(size);
+        else
+            result = 1 + size;
         //result = 31 * result + Arrays.hashCode(data);
         result = 31 * result;
         int tempResult = 0;

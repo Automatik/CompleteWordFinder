@@ -5,9 +5,4 @@
         <item name="windowNoTitle">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
-
-    <style name="RateAppDialog" parent="Theme.AppCompat.DayNight.Dialog.Alert">
-        <item name="android:colorPrimary">@color/colorPrimary</item>
-        <item name="android:colorAccent">@color/colorAccent</item>
-    </style>
 </resources>
