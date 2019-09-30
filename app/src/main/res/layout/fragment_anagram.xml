@@ -36,6 +36,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/fragment_anagram_distance_textinput_button_find"
+            android:layout_marginRight="@dimen/fragment_anagram_distance_textinput_button_find"
             app:counterEnabled="false"
             app:layout_constraintEnd_toStartOf="@+id/find_button"
             app:layout_constraintStart_toStartOf="parent"

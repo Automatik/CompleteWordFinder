@@ -54,6 +54,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/internal_margin_views"
                 android:textAlignment="textStart"
+                android:gravity="start"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
             <TextView
@@ -71,6 +72,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/internal_margin_views"
                 android:textAlignment="textStart"
+                android:gravity="start"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
             <Button
