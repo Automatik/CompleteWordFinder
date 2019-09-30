@@ -157,7 +157,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(intent);
             } catch (android.content.ActivityNotFoundException ex) {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackage));
-                intent.setPackage("com.android.vending");
                 startActivity(intent);
             }
             RateThisApp.stopRateDialog(this);
