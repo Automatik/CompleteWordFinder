@@ -27,7 +27,7 @@ import emilsoft.completewordfinder.fragment.WildcardsFragment;
 import emilsoft.completewordfinder.fragment.WordsInPatternFragment;
 import emilsoft.completewordfinder.utils.Dictionaries;
 import emilsoft.completewordfinder.utils.Dictionary;
-import emilsoft.completewordfinder.utils.HelpDialog;
+import emilsoft.completewordfinder.dialog.HelpDialog;
 import emilsoft.completewordfinder.utils.KeyboardHelper;
 import emilsoft.completewordfinder.utils.ThemeHelper;
 import emilsoft.completewordfinder.viewmodel.TrieViewModel;

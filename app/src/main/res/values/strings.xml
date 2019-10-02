@@ -7,6 +7,8 @@
     <string name="nav_header_desc" translatable="false">Navigation header</string>
     <string name="action_settings">Settings</string>
     <string name="action_rate_app">Rate App</string>
+    <string name="action_help">Help</string>
+    <string name="action_filter">Filter</string>
     <string name="fragment_anagram_textinput_hint">Insert Word</string>
     <string name="fragment_anagram_find_button_text">FIND</string>
     <string name="nav_item_anagrams">Anagrams</string>
@@ -46,7 +48,6 @@
     <string name="wildcards_fragment_toast_only_wildcards">Insert at least one letter</string>
     <string name="toast_max_digits_exceeded">Max digits exceeded</string>
     <string name="toast_error_retrieving_dictionary">Error retrieving dictionary</string>
-    <string name="action_help">Help</string>
     <string name="help_dialog_button_ok">OK</string>
     <string name="help_dialog_example_title">Example</string>
     <string name="toast_copied_to_clipboard">Word copied to clipboard</string>
@@ -55,6 +56,10 @@
     <string name="rate_app_yes_button">Rate now</string>
     <string name="rate_app_no_button">No, thanks</string>
     <string name="rate_app_cancel_button">Later</string>
+    <string name="filter_dialog_title">Filter</string>
+    <string name="filter_dialog_message">Enter the letters that can be replaced by wildcards. For example, given the expression S??CE and the filter made of the letters ILN you get the words like SINCE and SLICE but not the word SPACE. </string>
+    <string name="filter_dialog_textinput_hint">Allowed Letters</string>
+    <string name="filter_dialog_button_apply">APPLY</string>
     <string name="array_dictionariesAlias_english">English</string>
     <string name="array_dictionariesAlias_italian">Italian</string>
     <string name="array_wordOrdersAlias_ascending">Ascending</string>

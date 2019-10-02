@@ -1,4 +1,4 @@
-package emilsoft.completewordfinder.utils;
+package emilsoft.completewordfinder.dialog;
 
 import android.app.Activity;
 import android.view.LayoutInflater;

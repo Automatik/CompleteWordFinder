@@ -693,12 +693,12 @@ public class DoubleArrayTrie implements Serializable {
                     int offset = getOffset(c);
                     int nextNode = getBase(root) + offset;
                     if (nextNode < getDASize() && getCheck(nextNode) == root)
-                        query(expression, nextIndex, nextNode, current + c, words);
+                        query(expression, alphabet, nextIndex, nextNode, current + c, words);
                 }
             } else {
                 int nextNode = getBase(root) + getOffset(next);
                 if(nextNode < getDASize() && getCheck(nextNode) == root)
-                    query(expression, index + 1, nextNode, current + next, words);
+                    query(expression, alphabet, index + 1, nextNode, current + next, words);
             }
         }
     }

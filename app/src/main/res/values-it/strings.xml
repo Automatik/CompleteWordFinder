@@ -50,4 +50,9 @@
     <string name="rate_app_title">Valuta Complete Word Finder</string>
     <string name="rate_app_yes_button">Valuta Ora</string>
     <string name="action_rate_app">Valuta App</string>
+    <string name="action_filter">Filtro</string>
+    <string name="filter_dialog_button_apply">APPLICA</string>
+    <string name="filter_dialog_textinput_hint">Lettere consentite</string>
+    <string name="filter_dialog_title">Filtro</string>
+    <string name="filter_dialog_message">Inserire le lettere che possono essere rimpiazzate dai jolly. Per esempio, data l\'espressione P??TA e il filtro composto dalle lettere EOR si ottengono le parole come POETA e PORTA ma non la parola PISTA.</string>
 </resources>

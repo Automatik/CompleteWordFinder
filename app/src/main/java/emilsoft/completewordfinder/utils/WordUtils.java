@@ -99,6 +99,38 @@ public final class WordUtils {
         }
     }
 
+    public static int[] getWildcardsPositions(String text, final char WILDCARD) {
+        int[] positions = new int[text.length()];
+        int count = 0;
+        char[] chars = text.toCharArray();
+        for(int i = 0; i < chars.length; i++) {
+            char c = chars[i];
+            if(c == WILDCARD) {
+                positions[count] = i;
+                count++;
+            }
+        }
+        int[] wildcardsPositions = new int[count];
+        System.arraycopy(positions, 0, wildcardsPositions, 0, count);
+        return wildcardsPositions;
+    }
+
+    /**
+     * @return true if the word doesn't match with the filter
+     */
+    public static boolean isWordToBeFiltered(String word, int[] wildcardsPositions, char[] filter) {
+        char[] letters = word.toCharArray();
+        for (int wildcardPosition : wildcardsPositions) {
+            char letter = letters[wildcardPosition];
+            int j = 0;
+            while (j < filter.length && filter[j] != letter)
+                j++;
+            if (j == filter.length)
+                return true;
+        }
+        return false;
+    }
+
     public static InputFilter[] addMyInputFilters(InputFilter[] inputFilters) {
         return addMyInputFilters(inputFilters, false);
     }

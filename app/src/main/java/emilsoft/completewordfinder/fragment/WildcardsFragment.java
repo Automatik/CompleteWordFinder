@@ -22,9 +22,12 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.TreeSet;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -34,6 +37,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import emilsoft.completewordfinder.adapter.AnagramRecyclerViewAdapter;
 import emilsoft.completewordfinder.MainActivity;
 import emilsoft.completewordfinder.R;
+import emilsoft.completewordfinder.dialog.FilterDialog;
 import emilsoft.completewordfinder.trie.DoubleArrayTrie;
 import emilsoft.completewordfinder.utils.Dictionary;
 import emilsoft.completewordfinder.utils.KeyboardHelper;
@@ -217,7 +221,16 @@ public class WildcardsFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if(id == R.id.action_filter) {
-            return true;
+            if (getActivity() != null) {
+                FilterDialog filterDialog = new FilterDialog(getActivity(),
+                        getString(R.string.filter_dialog_title),
+                        getString(R.string.filter_dialog_message),
+                        wildcardsViewModel.filteredLetters,
+                        dictionaryAlphabetSize);
+                filterDialog.setOnButtonApplyListener(onButtonApplyListener);
+                filterDialog.show();
+                return true;
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -229,7 +242,7 @@ public class WildcardsFragment extends Fragment {
                 KeyboardHelper.hideKeyboard(getActivity());
             if(textinput.getText() != null) {
                 String textInserted = textinput.getText().toString().toLowerCase();
-
+                wildcardsViewModel.textPressed = textInserted;
                 //Maybe move this check in the input filter
                 int check = checkTextInserted(textInserted);
                 switch (check) {
@@ -242,7 +255,10 @@ public class WildcardsFragment extends Fragment {
                         trieViewModel.getTrie().observe(getActivity(), new Observer<DoubleArrayTrie>() {
                             @Override
                             public void onChanged(DoubleArrayTrie trie) {
-                                task = new FindWildcards(trie);
+                                if(wildcardsViewModel.isFilterApplied)
+                                    task = new FindWildcards(trie, wildcardsViewModel.filteredLetters);
+                                else
+                                    task = new FindWildcards(trie);
                                 task.setListener(wordsFound -> {
 
                                     if (isProgressBarLoadingWordsVisible) {
@@ -294,6 +310,33 @@ public class WildcardsFragment extends Fragment {
         }
     });
 
+    private FilterDialog.OnButtonApplyListener onButtonApplyListener = (filteredLetters) -> {
+        if(!filteredLetters.isEmpty()) {
+            wildcardsViewModel.isFilterApplied = true;
+            //Remove possible duplicates
+            TreeSet<Character> letters = new TreeSet<>();
+            for(char c : filteredLetters.toCharArray())
+                letters.add(c);
+            Iterator<Character> it = letters.iterator();
+            StringBuilder sb = new StringBuilder();
+            while(it.hasNext())
+                sb.append(it.next());
+            wildcardsViewModel.filteredLetters = sb.toString().toLowerCase();
+
+            ArrayList<String> words = wildcardsViewModel.wordsFound;
+            if(!words.isEmpty() && checkTextInserted(wildcardsViewModel.textPressed) == TEXT_INPUT_OK && adapter != null) {
+                //Apply filter to current words
+                int[] wildcardsPositions = WordUtils.getWildcardsPositions(wildcardsViewModel.textPressed, DoubleArrayTrie.WILDCARD);
+                char[] filter = wildcardsViewModel.filteredLetters.toCharArray();
+                Iterator<String> it2 = words.iterator();
+                while(it2.hasNext())
+                    if(WordUtils.isWordToBeFiltered(it2.next().toLowerCase(), wildcardsPositions, filter))
+                        it2.remove();
+                adapter.notifyDataSetChanged();
+            }
+        }
+    };
+
     /**
      * Check if there is at least one letter (and not only wildcards)
      * and if there aren't more wildcards than
@@ -326,15 +369,27 @@ public class WildcardsFragment extends Fragment {
         private DoubleArrayTrie trie;
         private ArrayList<String> words;
         private FindWildcardsTaskListener listener;
+        private boolean isFilterApplied;
+        private String filteredLetters;
 
         public FindWildcards(DoubleArrayTrie trie) {
             this.trie = trie;
+            isFilterApplied = false;
+        }
+
+        public FindWildcards(DoubleArrayTrie trie, String filteredLetters) {
+            this.trie = trie;
+            isFilterApplied = true;
+            this.filteredLetters = filteredLetters;
         }
 
         @Override
         protected Void doInBackground(String... strings) {
             String textInserted = strings[0];
-            words = (ArrayList<String>) trie.query(textInserted);
+            if(isFilterApplied)
+                words = (ArrayList<String>) trie.query(textInserted, filteredLetters.toCharArray());
+            else
+                words = (ArrayList<String>) trie.query(textInserted);
             if(!words.isEmpty()) {
                 WordUtils.sortAndRemoveDuplicates(words);
                 WordUtils.wordsToUpperCase(words);
