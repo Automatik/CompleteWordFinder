@@ -173,10 +173,10 @@ public class WildcardsFragment extends Fragment {
         textinput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if(actionId == EditorInfo.IME_ACTION_DONE) {
+                if((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
                     //https://stackoverflow.com/questions/9596010/android-use-done-button-on-keyboard-to-click-button
                     //Write logic here that will be executed when user taps next button
-                    find.performClick();
+                    findButtonClick();
                     return false; //return false to hide keyboard
                 }
                 return true;
@@ -244,68 +244,72 @@ public class WildcardsFragment extends Fragment {
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if(getActivity() != null)
-                KeyboardHelper.hideKeyboard(getActivity());
-            if(textinput.getText() != null) {
-                String textInserted = textinput.getText().toString().toLowerCase();
-                wildcardsViewModel.textPressed = textInserted;
-                //Maybe move this check in the input filter
-                int check = checkTextInserted(textInserted);
-                switch (check) {
-                    case TEXT_INPUT_OK:
-                        isProgressBarLoadingWordsVisible = true;
-                        progressBarLoadingWords.setVisibility(View.VISIBLE);
-                        isTextNoWordsFoundVisible = false;
-                        textNoWordsFound.setVisibility(View.INVISIBLE);
-
-                        trieViewModel.getTrie().observe(getActivity(), new Observer<DoubleArrayTrie>() {
-                            @Override
-                            public void onChanged(DoubleArrayTrie trie) {
-                                if(wildcardsViewModel.isFilterApplied)
-                                    task = new FindWildcards(trie, wildcardsViewModel.filteredLetters);
-                                else
-                                    task = new FindWildcards(trie);
-                                task.setListener(wordsFound -> {
-
-                                    if (isProgressBarLoadingWordsVisible) {
-                                        isProgressBarLoadingWordsVisible = false;
-                                        progressBarLoadingWords.setVisibility(View.INVISIBLE);
-                                    }
-                                    if (wordsFound.isEmpty()) {
-                                        isTextNoWordsFoundVisible = true;
-                                        textNoWordsFound.setVisibility(View.VISIBLE);
-                                    }
-
-                                    int size = wildcardsViewModel.wordsFound.size();
-                                    wildcardsViewModel.wordsFound.clear();
-                                    if (adapter == null) {
-                                        adapter = new AnagramRecyclerViewAdapter(wildcardsViewModel.wordsFound);
-                                        wordslist.setAdapter(adapter);
-                                    } else
-                                        adapter.notifyItemRangeRemoved(0, size);
-                                    wildcardsViewModel.wordsFound.addAll(wordsFound);
-                                    wildcardsViewModel.wordsBackup.addAll(wordsFound);
-                                    adapter.notifyItemRangeInserted(0, wordsFound.size());
-                                });
-                                task.execute(textInserted);
-                            }
-                        });
-                        break;
-                    case TEXT_INPUT_TOO_MANY_WILDCARDS:
-                        Toast.makeText(getContext(), getString(R.string.wildcards_fragment_toast_too_many_wildcards), Toast.LENGTH_SHORT).show();
-                        break;
-                    case TEXT_INPUT_ONLY_WILDCARDS:
-                        Toast.makeText(getContext(), getString(R.string.wildcards_fragment_toast_only_wildcards), Toast.LENGTH_SHORT).show();
-                        break;
-                    case TEXT_INPUT_TOO_MANY_DIGITS:
-                        Toast.makeText(getContext(), getString(R.string.toast_max_digits_exceeded), Toast.LENGTH_SHORT).show();
-                        break;
-                    default: //TEXT_INPUT_EMPTY
-                        break; //do nothing
-                }
-            }
+            findButtonClick();
         }
     };
+
+    private void findButtonClick() {
+        if(getActivity() != null)
+            KeyboardHelper.hideKeyboard(getActivity());
+        if(textinput.getText() != null) {
+            String textInserted = textinput.getText().toString().toLowerCase();
+            wildcardsViewModel.textPressed = textInserted;
+            //Maybe move this check in the input filter
+            int check = checkTextInserted(textInserted);
+            switch (check) {
+                case TEXT_INPUT_OK:
+                    isProgressBarLoadingWordsVisible = true;
+                    progressBarLoadingWords.setVisibility(View.VISIBLE);
+                    isTextNoWordsFoundVisible = false;
+                    textNoWordsFound.setVisibility(View.INVISIBLE);
+
+                    trieViewModel.getTrie().observe(getActivity(), new Observer<DoubleArrayTrie>() {
+                        @Override
+                        public void onChanged(DoubleArrayTrie trie) {
+                            if(wildcardsViewModel.isFilterApplied)
+                                task = new FindWildcards(trie, wildcardsViewModel.filteredLetters);
+                            else
+                                task = new FindWildcards(trie);
+                            task.setListener(wordsFound -> {
+
+                                if (isProgressBarLoadingWordsVisible) {
+                                    isProgressBarLoadingWordsVisible = false;
+                                    progressBarLoadingWords.setVisibility(View.INVISIBLE);
+                                }
+                                if (wordsFound.isEmpty()) {
+                                    isTextNoWordsFoundVisible = true;
+                                    textNoWordsFound.setVisibility(View.VISIBLE);
+                                }
+
+                                int size = wildcardsViewModel.wordsFound.size();
+                                wildcardsViewModel.wordsFound.clear();
+                                if (adapter == null) {
+                                    adapter = new AnagramRecyclerViewAdapter(wildcardsViewModel.wordsFound);
+                                    wordslist.setAdapter(adapter);
+                                } else
+                                    adapter.notifyItemRangeRemoved(0, size);
+                                wildcardsViewModel.wordsFound.addAll(wordsFound);
+                                wildcardsViewModel.wordsBackup.addAll(wordsFound);
+                                adapter.notifyItemRangeInserted(0, wordsFound.size());
+                            });
+                            task.execute(textInserted);
+                        }
+                    });
+                    break;
+                case TEXT_INPUT_TOO_MANY_WILDCARDS:
+                    Toast.makeText(getContext(), getString(R.string.wildcards_fragment_toast_too_many_wildcards), Toast.LENGTH_SHORT).show();
+                    break;
+                case TEXT_INPUT_ONLY_WILDCARDS:
+                    Toast.makeText(getContext(), getString(R.string.wildcards_fragment_toast_only_wildcards), Toast.LENGTH_SHORT).show();
+                    break;
+                case TEXT_INPUT_TOO_MANY_DIGITS:
+                    Toast.makeText(getContext(), getString(R.string.toast_max_digits_exceeded), Toast.LENGTH_SHORT).show();
+                    break;
+                default: //TEXT_INPUT_EMPTY
+                    break; //do nothing
+            }
+        }
+    }
 
     private TrieViewModel.MaxWordLengthListener maxWordLengthListener = (maxWordLength -> {
         //Log.v(MainActivity.TAG, "WildcardsFragment/ maxWordLengthListener called");

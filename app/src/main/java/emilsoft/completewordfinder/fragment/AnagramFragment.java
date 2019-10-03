@@ -166,10 +166,10 @@ public class AnagramFragment extends Fragment {
         textinput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if(actionId == EditorInfo.IME_ACTION_DONE) {
+                if((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
                     //https://stackoverflow.com/questions/9596010/android-use-done-button-on-keyboard-to-click-button
                     //Write logic here that will be executed when user taps next button
-                    find.performClick();
+                    findButtonClick();
                     return false; //return false to hide keyboard
                 }
                 return true;
@@ -214,34 +214,38 @@ public class AnagramFragment extends Fragment {
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if(getActivity() != null)
-                KeyboardHelper.hideKeyboard(getActivity());
-            if(textinput.getText() != null) {
-                textInserted = textinput.getText().toString().toLowerCase();
-                if(textInserted.length() == 0)
-                    return;
-                isProgressBarLoadingWordsVisible = true;
-                progressBarLoadingWords.setVisibility(View.VISIBLE);
-                isTextNoWordsFoundVisible = false;
-                textNoWordsFound.setVisibility(View.INVISIBLE);
-
-                int size = anagramViewModel.wordsFound.size();
-                anagramViewModel.wordsFound.clear();
-                if (adapter == null) {
-                    adapter = new AnagramRecyclerViewAdapter(anagramViewModel.wordsFound);
-                    wordslist.setAdapter(adapter);
-                } else
-                    adapter.notifyItemRangeRemoved(0, size);
-
-                if (isDictionaryRead) {
-                    findAnagramPending = false;
-                    findAnagrams(textInserted);
-                } else
-                    //the read dictionary task should already being executed
-                    findAnagramPending = true;
-            }
+            findButtonClick();
         }
     };
+
+    private void findButtonClick() {
+        if(getActivity() != null)
+            KeyboardHelper.hideKeyboard(getActivity());
+        if(textinput.getText() != null) {
+            textInserted = textinput.getText().toString().toLowerCase();
+            if(textInserted.length() == 0)
+                return;
+            isProgressBarLoadingWordsVisible = true;
+            progressBarLoadingWords.setVisibility(View.VISIBLE);
+            isTextNoWordsFoundVisible = false;
+            textNoWordsFound.setVisibility(View.INVISIBLE);
+
+            int size = anagramViewModel.wordsFound.size();
+            anagramViewModel.wordsFound.clear();
+            if (adapter == null) {
+                adapter = new AnagramRecyclerViewAdapter(anagramViewModel.wordsFound);
+                wordslist.setAdapter(adapter);
+            } else
+                adapter.notifyItemRangeRemoved(0, size);
+
+            if (isDictionaryRead) {
+                findAnagramPending = false;
+                findAnagrams(textInserted);
+            } else
+                //the read dictionary task should already being executed
+                findAnagramPending = true;
+        }
+    }
 
     private void readDictionary(String dictionaryFilename) {
         if(dictionaryFilename == null) {

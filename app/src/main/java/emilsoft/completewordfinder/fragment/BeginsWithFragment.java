@@ -168,7 +168,7 @@ public class BeginsWithFragment extends Fragment {
                 if((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
                     //https://stackoverflow.com/questions/9596010/android-use-done-button-on-keyboard-to-click-button
                     //Write logic here that will be executed when user taps next button
-                    find.performClick();
+                    findButtonClick();
                     return false; //return false to hide keyboard
                 }
                 return true;
@@ -211,57 +211,61 @@ public class BeginsWithFragment extends Fragment {
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if(getActivity() != null)
-                KeyboardHelper.hideKeyboard(getActivity());
-            if(textinput.getText() != null) {
-                String textInserted = textinput.getText().toString().toLowerCase();
-
-                if (textInserted.length() > maxWordLength && maxWordLength != MainActivity.MAX_WORD_LENGTH_DEFAULT_VALUE) {
-                    Toast.makeText(getContext(), getString(R.string.toast_max_digits_exceeded), Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                if(textInserted.length() == 0)
-                    return;
-
-                isProgressBarLoadingWordsVisible = true;
-                progressBarLoadingWords.setVisibility(View.VISIBLE);
-                isTextNoWordsFoundVisible = false;
-                textNoWordsFound.setVisibility(View.INVISIBLE);
-
-                trieViewModel.getTrie().observe(getActivity(), new Observer<DoubleArrayTrie>() {
-                    @Override
-                    public void onChanged(DoubleArrayTrie trie) {
-                        task = new FindBeginsWith(trie, isWordOrderAscending);
-                        task.setListener((wordsFound, headersIndex) -> {
-
-                            if (isProgressBarLoadingWordsVisible) {
-                                isProgressBarLoadingWordsVisible = false;
-                                progressBarLoadingWords.setVisibility(View.INVISIBLE);
-                            }
-                            if (wordsFound.isEmpty()) {
-                                isTextNoWordsFoundVisible = true;
-                                textNoWordsFound.setVisibility(View.VISIBLE);
-                            }
-                            //headersIndex.length is the number of headers to insert in the recyclerview
-                            int size = beginsWithViewModel.wordsFound.size() + beginsWithViewModel.headersIndex.length;
-                            beginsWithViewModel.wordsFound.clear();
-                            if (adapter == null) {
-                                adapter = new HeaderRecyclerViewAdapter(beginsWithViewModel.wordsFound, beginsWithViewModel.headersIndex);
-                                wordslist.setAdapter(adapter);
-                            } else
-                                adapter.notifyItemRangeRemoved(0, size);
-                            beginsWithViewModel.wordsFound.addAll(wordsFound);
-                            beginsWithViewModel.headersIndex = headersIndex;
-                            adapter.setHeadersIndex(headersIndex);
-                            adapter.notifyItemRangeInserted(0, wordsFound.size() + headersIndex.length);
-                        });
-                        task.execute(textInserted);
-                    }
-                });
-            }
+            findButtonClick();
         }
     };
+
+    private void findButtonClick() {
+        if(getActivity() != null)
+            KeyboardHelper.hideKeyboard(getActivity());
+        if(textinput.getText() != null) {
+            String textInserted = textinput.getText().toString().toLowerCase();
+
+            if (textInserted.length() > maxWordLength && maxWordLength != MainActivity.MAX_WORD_LENGTH_DEFAULT_VALUE) {
+                Toast.makeText(getContext(), getString(R.string.toast_max_digits_exceeded), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if(textInserted.length() == 0)
+                return;
+
+            isProgressBarLoadingWordsVisible = true;
+            progressBarLoadingWords.setVisibility(View.VISIBLE);
+            isTextNoWordsFoundVisible = false;
+            textNoWordsFound.setVisibility(View.INVISIBLE);
+
+            trieViewModel.getTrie().observe(getActivity(), new Observer<DoubleArrayTrie>() {
+                @Override
+                public void onChanged(DoubleArrayTrie trie) {
+                    task = new FindBeginsWith(trie, isWordOrderAscending);
+                    task.setListener((wordsFound, headersIndex) -> {
+
+                        if (isProgressBarLoadingWordsVisible) {
+                            isProgressBarLoadingWordsVisible = false;
+                            progressBarLoadingWords.setVisibility(View.INVISIBLE);
+                        }
+                        if (wordsFound.isEmpty()) {
+                            isTextNoWordsFoundVisible = true;
+                            textNoWordsFound.setVisibility(View.VISIBLE);
+                        }
+                        //headersIndex.length is the number of headers to insert in the recyclerview
+                        int size = beginsWithViewModel.wordsFound.size() + beginsWithViewModel.headersIndex.length;
+                        beginsWithViewModel.wordsFound.clear();
+                        if (adapter == null) {
+                            adapter = new HeaderRecyclerViewAdapter(beginsWithViewModel.wordsFound, beginsWithViewModel.headersIndex);
+                            wordslist.setAdapter(adapter);
+                        } else
+                            adapter.notifyItemRangeRemoved(0, size);
+                        beginsWithViewModel.wordsFound.addAll(wordsFound);
+                        beginsWithViewModel.headersIndex = headersIndex;
+                        adapter.setHeadersIndex(headersIndex);
+                        adapter.notifyItemRangeInserted(0, wordsFound.size() + headersIndex.length);
+                    });
+                    task.execute(textInserted);
+                }
+            });
+        }
+    }
 
     private TrieViewModel.MaxWordLengthListener maxWordLengthListener = (maxWordLength -> {
         //Log.v(MainActivity.TAG, "BeginsWithFragment/ maxWordLengthListener called");
