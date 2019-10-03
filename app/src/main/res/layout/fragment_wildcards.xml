@@ -5,8 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginStart="@dimen/external_margin_parent"
+    android:layout_marginLeft="@dimen/external_margin_parent"
     android:layout_marginTop="@dimen/external_margin_parent"
     android:layout_marginEnd="@dimen/external_margin_parent"
+    android:layout_marginRight="@dimen/external_margin_parent"
     android:layout_marginBottom="@dimen/external_margin_parent">
 
     <TextView
@@ -15,7 +17,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/internal_margin_views"
         android:paddingStart="@dimen/fragment_anagram_text_description_padding"
+        android:paddingLeft="@dimen/fragment_anagram_text_description_padding"
         android:paddingEnd="@dimen/fragment_anagram_text_description_padding"
+        android:paddingRight="@dimen/fragment_anagram_text_description_padding"
         android:textSize="@dimen/default_text_size"
         android:textStyle="italic"
         app:layout_constraintEnd_toEndOf="parent"

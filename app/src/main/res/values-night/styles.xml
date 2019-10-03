@@ -6,6 +6,11 @@
     </style>
 
     <!-- Use this in AnagramRecyclerViewAdapter and HeaderRecyclerViewAdapter -->
+    <style name="RecyclerViewHeaderDefaultTheme">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="RecyclerViewItemDefaultTheme">
         <item name="android:textColor">@color/white</item>
     </style>

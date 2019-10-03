@@ -6,18 +6,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="@dimen/fragment_anagram_list_header_margin"
-    android:layout_marginEnd="@dimen/fragment_anagram_list_header_margin">
+    android:layout_marginLeft="@dimen/fragment_anagram_list_header_margin"
+    android:layout_marginEnd="@dimen/fragment_anagram_list_header_margin"
+    android:layout_marginRight="@dimen/fragment_anagram_list_header_margin">
 
     <TextView
         android:id="@+id/anagram_list_header"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/fragment_anagram_list_header_textview_padding"
-        android:paddingBottom="@dimen/fragment_anagram_list_header_textview_padding"
-        android:paddingStart="@dimen/fragment_anagram_list_header_textview_padding"
-        android:paddingEnd="@dimen/fragment_anagram_list_header_textview_padding"
+        android:padding="@dimen/fragment_anagram_list_header_textview_padding"
         android:textSize="@dimen/default_text_size"
-        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>

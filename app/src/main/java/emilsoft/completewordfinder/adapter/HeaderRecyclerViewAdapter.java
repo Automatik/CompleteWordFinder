@@ -66,10 +66,10 @@ public class HeaderRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView
             HeaderViewHolder mHolder = (HeaderViewHolder) holder;
             mHolder.mText.setText(text);
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                mHolder.mText.setTextAppearance(R.style.RecyclerViewItemDefaultTheme);
+                mHolder.mText.setTextAppearance(R.style.RecyclerViewHeaderDefaultTheme);
             else {
                 if(context != null)
-                    mHolder.mText.setTextAppearance(context, R.style.RecyclerViewItemDefaultTheme);
+                    mHolder.mText.setTextAppearance(context, R.style.RecyclerViewHeaderDefaultTheme);
             }
             mHolder.mText.setBackgroundResource(R.drawable.list_item_default_background);
         } else if(viewType == TYPE_ITEM && holder instanceof ItemViewHolder) {
