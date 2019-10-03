@@ -1,11 +1,13 @@
 package emilsoft.completewordfinder.fragment;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import emilsoft.completewordfinder.R;
+import emilsoft.completewordfinder.utils.Dictionaries;
 
 public class SettingsFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceChangeListener {
 
@@ -17,9 +19,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         Preference wordOrderPref = findPreference(getString(R.string.sharedpref_word_order));
         Preference themePref = findPreference(getString(R.string.sharedpref_theme));
 
+
         if (dictionaryPref != null) {
-            updateDictionarySummary(dictionaryPref,
-                    dictionaryPref.getSharedPreferences().getString(getString(R.string.sharedpref_current_dictionary), null));
+            String dict = dictionaryPref.getSharedPreferences().getString(getString(R.string.sharedpref_current_dictionary), null);
+            updateDictionarySummary(dictionaryPref,dict);
             dictionaryPref.setOnPreferenceChangeListener(this);
         }
 
@@ -51,16 +54,13 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         String[] entries = getResources().getStringArray(R.array.dictionaries);
         String[] values = getResources().getStringArray(R.array.dictionariesAlias);
         if(value == null) {
-            //No dictionary set, use the default dictionary
-            //preference.setSummary(DICTIONARY_SUMMARY_TEXT+getString(R.string.sharedpref_default_dictionary));
-            preference.setSummary(values[0]); //English
-        } else {
-            //preference.setSummary(DICTIONARY_SUMMARY_TEXT+value);
-            int i = 0;
-            while(i < entries.length && !entries[i].equals(value))
-                i++;
-            preference.setSummary(values[i]);
+            value = Dictionaries.getDictionaryFromDefaultLocaleOnStartup();
+            preference.setDefaultValue(value);
         }
+        int i = 0;
+        while(i < entries.length && !entries[i].equals(value))
+            i++;
+        preference.setSummary(values[i]);
     }
 
     private void updateWordOrderSummary(Preference preference, String value) {

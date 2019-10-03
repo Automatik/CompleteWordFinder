@@ -3,7 +3,6 @@ package emilsoft.completewordfinder;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -37,6 +36,9 @@ import emilsoft.completewordfinder.viewmodel.TrieViewModelFactory;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
+
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
         TrieViewModel.MaxWordLengthListener, SharedPreferences.OnSharedPreferenceChangeListener {
@@ -95,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
         //Read Dictionary in use
-        //String dictName = sharedPreferences.getString(getString(R.string.sharedpref_current_dictionary), getString(R.string.sharedpref_default_dictionary));
         dict = readDictionary();
 
         //Read Word Order in use
@@ -228,9 +229,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private Dictionary readDictionary() {
-        String dictName = sharedPreferences.getString(getString(R.string.sharedpref_current_dictionary), Dictionaries.ENGLISH);
+        String dictName = sharedPreferences.getString(getString(R.string.sharedpref_current_dictionary), null);
+        if(dictName == null) {
+            dictName = Dictionaries.getDictionaryFromDefaultLocaleOnStartup();
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(getString(R.string.sharedpref_current_dictionary), dictName);
+            editor.apply();
+        }
         int maxWordLength = sharedPreferences.getInt(getString(R.string.sharedpref_current_dictionary_max_word_length), MAX_WORD_LENGTH_DEFAULT_VALUE);
-        //Log.v(TAG, "MainActivity/readDictionary dictName: "+dictName+" maxWordLength: "+maxWordLength);
         Dictionary dict = Dictionaries.get(dictName);
         if(dict != null && maxWordLength != MAX_WORD_LENGTH_DEFAULT_VALUE)
             dict.setMaxWordLength(maxWordLength);
@@ -251,15 +257,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         } else
             isWordOrderAscending = WORD_ORDER_DEFAULT;
-        //Log.v(TAG, "MainAcitivity/readWordOrder isWordOrderAscending: "+isWordOrderAscending);
         return isWordOrderAscending;
     }
 
     @Override
     public void onGetMaxWordLength(int maxWordLength) {
-        //SharedPreferences sharedPreferences = getPreferences(Context.MODE_PRIVATE);
-        //Log.v(TAG, "MainActivity/ onGetMaxWordLength called: "+maxWordLength);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt(getString(R.string.sharedpref_current_dictionary_max_word_length), maxWordLength);
         editor.apply();

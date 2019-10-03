@@ -5,8 +5,6 @@
     <ListPreference
         android:key="@string/sharedpref_current_dictionary"
         android:title="@string/sharedpref_current_dictionary_title"
-        android:summary="@string/sharedpref_default_dictionary"
-        android:defaultValue="@string/sharedpref_default_dictionary"
         android:entries="@array/dictionariesAlias"
         android:entryValues="@array/dictionaries"/>
 

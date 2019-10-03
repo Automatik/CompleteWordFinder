@@ -1,6 +1,7 @@
 package emilsoft.completewordfinder.utils;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 public class Dictionaries {
 
@@ -18,6 +19,17 @@ public class Dictionaries {
 
     public static Dictionary get(String key) {
         return dictionaries.get(key);
+    }
+
+    public static String getDictionaryFromDefaultLocaleOnStartup() {
+        String lang = Locale.getDefault().getLanguage();
+        String dict;
+        switch (lang) {
+            case "en" : dict = ENGLISH; break;
+            case "it" : dict = ITALIAN; break;
+            default: dict = ENGLISH;
+        }
+        return dict;
     }
 
 }
