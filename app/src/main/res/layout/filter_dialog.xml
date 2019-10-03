@@ -70,7 +70,7 @@
 					android:layout_height="wrap_content"
 					android:hint="@string/filter_dialog_textinput_hint"
 					android:inputType="text"
-					android:textSize="@dimen/default_text_size"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
 					android:imeOptions="actionDone">
 				</com.google.android.material.textfield.TextInputEditText>
 
