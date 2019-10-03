@@ -40,6 +40,7 @@ import emilsoft.completewordfinder.dialog.FilterDialog;
 import emilsoft.completewordfinder.trie.DoubleArrayTrie;
 import emilsoft.completewordfinder.utils.Dictionary;
 import emilsoft.completewordfinder.utils.KeyboardHelper;
+import emilsoft.completewordfinder.utils.ProgressBarHelper;
 import emilsoft.completewordfinder.utils.WordUtils;
 import emilsoft.completewordfinder.viewmodel.TrieViewModel;
 import emilsoft.completewordfinder.viewmodel.TrieViewModelFactory;
@@ -116,6 +117,7 @@ public class WildcardsFragment extends Fragment {
         textDescription = (TextView) view.findViewById(R.id.wildcards_text_description);
         textNoWordsFound = (TextView) view.findViewById(R.id.wildcards_text_no_words_found);
         progressBarLoadingWords = (ProgressBar) view.findViewById(R.id.wildcards_progressBarLoadingWords);
+        ProgressBarHelper.setInderminateTint(progressBarLoadingWords, getContext());
         find.setOnClickListener(onClickListener);
         //textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters()));
         //textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), true,  maxWordLength));

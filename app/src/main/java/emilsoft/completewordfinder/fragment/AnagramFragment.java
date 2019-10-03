@@ -19,6 +19,7 @@ import emilsoft.completewordfinder.adapter.AnagramRecyclerViewAdapter;
 import emilsoft.completewordfinder.R;
 import emilsoft.completewordfinder.utils.Dictionary;
 import emilsoft.completewordfinder.utils.KeyboardHelper;
+import emilsoft.completewordfinder.utils.ProgressBarHelper;
 import emilsoft.completewordfinder.utils.WordUtils;
 import emilsoft.completewordfinder.viewmodel.AnagramViewModel;
 
@@ -106,6 +107,7 @@ public class AnagramFragment extends Fragment {
         textDescription = (TextView) view.findViewById(R.id.text_description);
         textNoWordsFound = (TextView) view.findViewById(R.id.text_no_words_found);
         progressBarLoadingWords = (ProgressBar) view.findViewById(R.id.progressBarLoadingWords);
+        ProgressBarHelper.setInderminateTint(progressBarLoadingWords, getContext());
         find.setOnClickListener(onClickListener);
         textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters()));
         textDescription.setText(R.string.text_description_anagrams);
