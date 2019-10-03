@@ -16,6 +16,9 @@
     <dimen name="fragment_anagram_list_header_textview_padding">4dp</dimen>
     <dimen name="fragment_anagram_list_item_margin">4dp</dimen>
     <dimen name="fragment_anagram_list_item_textview_padding">4dp</dimen>
+    <dimen name="fragment_wildcards_filter_container_margin_top">4dp</dimen>
+    <dimen name="fragment_wildcards_filter_icon_size">25dp</dimen>
+    <dimen name="fragment_wildcards_filter_distance_icon_filter_text">2dp</dimen>
     <dimen name="help_dialog_icon_image_container_height">80dp</dimen>
     <dimen name="help_dialog_icon_image_size">50dp</dimen>
     <dimen name="help_dialog_message_container_padding">16dp</dimen>

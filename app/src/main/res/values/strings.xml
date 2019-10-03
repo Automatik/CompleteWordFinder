@@ -60,6 +60,8 @@
     <string name="filter_dialog_message">Enter the letters that can be replaced by wildcards. For example, given the expression S??CE and the filter made of the letters ILN you get the words like SINCE and SLICE but not the word SPACE. </string>
     <string name="filter_dialog_textinput_hint">Allowed Letters</string>
     <string name="filter_dialog_button_apply">APPLY</string>
+    <string name="wildcards_fragment_no_filter">No Filter</string>
+    <string name="wildcards_fragment_yes_filter">Filter:</string>
     <string name="array_dictionariesAlias_english">English</string>
     <string name="array_dictionariesAlias_italian">Italian</string>
     <string name="array_wordOrdersAlias_ascending">Ascending</string>

@@ -27,7 +27,6 @@ import java.util.TreeSet;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -52,7 +51,7 @@ public class WildcardsFragment extends Fragment {
     private TextInputEditText textinput;
     private TextInputLayout textInputLayout;
     private RecyclerView wordslist;
-    private TextView textDescription, textNoWordsFound;
+    private TextView textDescription, textNoWordsFound, textFilter;
     private AnagramRecyclerViewAdapter adapter;
     private TrieViewModel trieViewModel;
     private WildcardsViewModel wildcardsViewModel;
@@ -65,6 +64,7 @@ public class WildcardsFragment extends Fragment {
     private static final String TEXT_NO_WORDS_FOUND_STATE = "textNoWordsFound";
     private static final String TEXT_PROGRESSBAR_LOADING_WORDS_STATE = "textNoWordsFound";
     private static final String MAX_WORD_LENGTH_STATE = "maxWordLengthState";
+    private static final String TEXT_FILTER_STATE = "textFilter";
     private static final int MAX_WILDCARDS = 15; //due to computation reason
     private static final int TEXT_INPUT_OK = 0;
     private static final int TEXT_INPUT_TOO_MANY_WILDCARDS = 1;
@@ -107,18 +107,20 @@ public class WildcardsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_anagram, container, false);
-        textinput = (TextInputEditText) view.findViewById(R.id.textinput);
-        textInputLayout = (TextInputLayout) view.findViewById(R.id.textinput_layout);
-        find = (Button) view.findViewById(R.id.find_button);
-        wordslist = (RecyclerView) view.findViewById(R.id.words_list);
-        textDescription = (TextView) view.findViewById(R.id.text_description);
-        textNoWordsFound = (TextView) view.findViewById(R.id.text_no_words_found);
-        progressBarLoadingWords = (ProgressBar) view.findViewById(R.id.progressBarLoadingWords);
+        View view = inflater.inflate(R.layout.fragment_wildcards, container, false);
+        textinput = (TextInputEditText) view.findViewById(R.id.wildcards_textinput);
+        textInputLayout = (TextInputLayout) view.findViewById(R.id.wildcards_textinput_layout);
+        textFilter = (TextView) view.findViewById(R.id.wildcards_filter_text);
+        find = (Button) view.findViewById(R.id.wildcards_find_button);
+        wordslist = (RecyclerView) view.findViewById(R.id.wildcards_words_list);
+        textDescription = (TextView) view.findViewById(R.id.wildcards_text_description);
+        textNoWordsFound = (TextView) view.findViewById(R.id.wildcards_text_no_words_found);
+        progressBarLoadingWords = (ProgressBar) view.findViewById(R.id.wildcards_progressBarLoadingWords);
         find.setOnClickListener(onClickListener);
         //textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters()));
         //textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), true,  maxWordLength));
         textDescription.setText(R.string.text_description_wildcards);
+        textFilter.setText(getString(R.string.wildcards_fragment_no_filter));
         if(maxWordLength != 0) {
             textInputLayout.setCounterEnabled(true);
             textInputLayout.setCounterMaxLength(maxWordLength);
@@ -134,6 +136,8 @@ public class WildcardsFragment extends Fragment {
         if(savedInstanceState != null) {
             String textInserted = savedInstanceState.getString(TEXT_INSERTED_STATE);
             textinput.setText(textInserted);
+            String stringFilter = savedInstanceState.getString(TEXT_FILTER_STATE);
+            textFilter.setText(stringFilter);
             if(wildcardsViewModel.wordsFound != null && adapter == null) {
                 adapter = new AnagramRecyclerViewAdapter(wildcardsViewModel.wordsFound);
                 wordslist.setAdapter(adapter);
@@ -196,7 +200,9 @@ public class WildcardsFragment extends Fragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         if(textinput != null && textinput.getText() != null)
-            outState.putString(TEXT_INSERTED_STATE,textinput.getText().toString());
+            outState.putString(TEXT_INSERTED_STATE, textinput.getText().toString());
+        if(textFilter != null && textFilter.getText() != null)
+            outState.putString(TEXT_FILTER_STATE, textFilter.getText().toString());
         outState.putBoolean(TEXT_NO_WORDS_FOUND_STATE, isTextNoWordsFoundVisible);
         outState.putBoolean(TEXT_PROGRESSBAR_LOADING_WORDS_STATE, isProgressBarLoadingWordsVisible);
         outState.putInt(MAX_WORD_LENGTH_STATE, maxWordLength);
@@ -278,6 +284,7 @@ public class WildcardsFragment extends Fragment {
                                     } else
                                         adapter.notifyItemRangeRemoved(0, size);
                                     wildcardsViewModel.wordsFound.addAll(wordsFound);
+                                    wildcardsViewModel.wordsBackup.addAll(wordsFound);
                                     adapter.notifyItemRangeInserted(0, wordsFound.size());
                                 });
                                 task.execute(textInserted);
@@ -323,19 +330,42 @@ public class WildcardsFragment extends Fragment {
                 sb.append(it.next());
             wildcardsViewModel.filteredLetters = sb.toString().toLowerCase();
 
-            ArrayList<String> words = wildcardsViewModel.wordsFound;
-            if(!words.isEmpty() && checkTextInserted(wildcardsViewModel.textPressed) == TEXT_INPUT_OK && adapter != null) {
+            //Update Filter TextView
+            String filterText = getString(R.string.wildcards_fragment_yes_filter) + " " + wildcardsViewModel.filteredLetters.toUpperCase();
+            textFilter.setText(filterText);
+
+            //Refresh current RecyclerView Items
+            if(!wildcardsViewModel.wordsBackup.isEmpty() && checkTextInserted(wildcardsViewModel.textPressed) == TEXT_INPUT_OK && adapter != null) {
                 //Apply filter to current words
-                int[] wildcardsPositions = WordUtils.getWildcardsPositions(wildcardsViewModel.textPressed, DoubleArrayTrie.WILDCARD);
-                char[] filter = wildcardsViewModel.filteredLetters.toCharArray();
-                Iterator<String> it2 = words.iterator();
-                while(it2.hasNext())
-                    if(WordUtils.isWordToBeFiltered(it2.next().toLowerCase(), wildcardsPositions, filter))
-                        it2.remove();
+                if(wildcardsViewModel.wordsFound.size() != wildcardsViewModel.wordsBackup.size()) {
+                    wildcardsViewModel.wordsFound.clear();
+                    wildcardsViewModel.wordsFound.addAll(wildcardsViewModel.wordsBackup);
+                }
+                applyFilterOnItems(wildcardsViewModel.wordsFound);
+            }
+        } else {
+            wildcardsViewModel.isFilterApplied = false;
+            wildcardsViewModel.filteredLetters = null;
+            textFilter.setText(getString(R.string.wildcards_fragment_no_filter));
+
+            //Bring back all words
+            if(wildcardsViewModel.wordsFound.size() != wildcardsViewModel.wordsBackup.size() && adapter != null) {
+                wildcardsViewModel.wordsFound.clear();
+                wildcardsViewModel.wordsFound.addAll(wildcardsViewModel.wordsBackup);
                 adapter.notifyDataSetChanged();
             }
         }
     };
+
+    private void applyFilterOnItems(ArrayList<String> words) {
+        int[] wildcardsPositions = WordUtils.getWildcardsPositions(wildcardsViewModel.textPressed, DoubleArrayTrie.WILDCARD);
+        char[] filter = wildcardsViewModel.filteredLetters.toCharArray();
+        Iterator<String> it2 = words.iterator();
+        while(it2.hasNext())
+            if(WordUtils.isWordToBeFiltered(it2.next().toLowerCase(), wildcardsPositions, filter))
+                it2.remove();
+        adapter.notifyDataSetChanged();
+    }
 
     /**
      * Check if there is at least one letter (and not only wildcards)

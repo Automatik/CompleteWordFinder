@@ -1,9 +1,11 @@
 package emilsoft.completewordfinder.dialog;
 
 import android.app.Activity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -19,6 +21,7 @@ public class FilterDialog {
 
     private AlertDialog filterDialog;
     private OnButtonApplyListener listener;
+    private TextInputEditText textinput;
 
     public FilterDialog(Activity activity, String title, String message, String filteredLetters, int dictionaryAlphabetSize) {
         ViewGroup viewGroup = activity.findViewById(R.id.content_frame);
@@ -26,7 +29,7 @@ public class FilterDialog {
         TextView titleText = dialogView.findViewById(R.id.filter_title);
         TextView messageText = dialogView.findViewById(R.id.filter_message);
         TextInputLayout textInputLayout = dialogView.findViewById(R.id.textinput_filter_layout);
-        TextInputEditText textinput = dialogView.findViewById(R.id.textinput_filter);
+        textinput = dialogView.findViewById(R.id.textinput_filter);
         Button applyButton = dialogView.findViewById(R.id.filter_button_apply);
 
         titleText.setText(title);
@@ -40,11 +43,26 @@ public class FilterDialog {
         builder.setView(dialogView);
         filterDialog = builder.create();
         applyButton.setOnClickListener(view -> {
-            if(listener != null && textinput.getText() != null) {
-                listener.onClick(textinput.getText().toString());
-            }
-            filterDialog.dismiss();
+            click();
         });
+        //Keyboard Done button event
+        textinput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+                    click();
+                    return false; //return false to hide keyboard
+                }
+                return true;
+            }
+        });
+    }
+
+    private void click() {
+        if(listener != null && textinput.getText() != null) {
+            listener.onClick(textinput.getText().toString());
+        }
+        filterDialog.dismiss();
     }
 
     public void show() {

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginStart="@dimen/external_margin_parent"
+    android:layout_marginTop="@dimen/external_margin_parent"
+    android:layout_marginEnd="@dimen/external_margin_parent"
+    android:layout_marginBottom="@dimen/external_margin_parent">
+
+    <TextView
+        android:id="@+id/wildcards_text_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/internal_margin_views"
+        android:paddingStart="@dimen/fragment_anagram_text_description_padding"
+        android:paddingEnd="@dimen/fragment_anagram_text_description_padding"
+        android:textSize="@dimen/default_text_size"
+        android:textStyle="italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/wildcards_input_container"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/wildcards_input_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/internal_margin_views"
+        app:layout_constraintEnd_toEndOf="@id/wildcards_guideline_right"
+        app:layout_constraintStart_toStartOf="@id/wildcards_guideline_left"
+        app:layout_constraintTop_toBottomOf="@id/wildcards_text_description">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/wildcards_textinput_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/fragment_anagram_distance_textinput_button_find"
+            android:layout_marginRight="@dimen/fragment_anagram_distance_textinput_button_find"
+            app:counterEnabled="false"
+            app:layout_constraintEnd_toStartOf="@+id/wildcards_find_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/wildcards_textinput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/fragment_anagram_textinput_hint"
+                android:imeOptions="actionDone"
+                android:inputType="text"
+                android:textSize="@dimen/default_text_size" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/wildcards_find_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_background_filled"
+            android:text="@string/fragment_anagram_find_button_text"
+            android:textColor="@color/white"
+            android:textSize="@dimen/default_text_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/wildcards_textinput_layout"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/wildcards_filter_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/fragment_anagram_list_item_margin"
+        android:layout_marginLeft="@dimen/fragment_anagram_list_item_margin"
+        android:layout_marginTop="@dimen/fragment_wildcards_filter_container_margin_top"
+        app:layout_constraintEnd_toEndOf="@id/wildcards_guideline_right"
+        app:layout_constraintStart_toStartOf="@id/wildcards_guideline_left"
+        app:layout_constraintTop_toBottomOf="@id/wildcards_input_container">
+
+        <ImageView
+            android:id="@+id/wildcards_filter_image"
+            android:layout_width="@dimen/fragment_wildcards_filter_icon_size"
+            android:layout_height="@dimen/fragment_wildcards_filter_icon_size"
+            android:background="@drawable/ic_wildcards_filter_list_daynight_24dp"
+            android:layout_marginEnd="@dimen/fragment_wildcards_filter_distance_icon_filter_text"
+            android:layout_marginRight="@dimen/fragment_wildcards_filter_distance_icon_filter_text"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/wildcards_filter_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:id="@+id/wildcards_filter_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:textAlignment="textStart"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:maxLines="1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/wildcards_filter_image"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+        android:id="@+id/wildcards_words_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/internal_margin_views"
+        app:fastScrollPopupBackgroundSize="@dimen/fragment_anagram_fastscroll_popup_background_size"
+        app:fastScrollPopupBgColor="@color/colorAccent"
+        app:fastScrollPopupPosition="adjacent"
+        app:fastScrollPopupTextColor="@color/white"
+        app:fastScrollPopupTextSize="@dimen/fragment_anagram_fastscroll_popup_text_size"
+        app:fastScrollPopupTextVerticalAlignmentMode="font_metrics"
+        app:fastScrollThumbColor="@color/colorAccent"
+        app:fastScrollThumbEnabled="true"
+        app:fastScrollThumbInactiveColor="@color/colorPrimaryDark"
+        app:fastScrollTrackColor="@color/colorPrimary"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/wildcards_input_container"
+        app:layout_constraintTop_toBottomOf="@id/wildcards_filter_container"
+        tools:listitem="@layout/fragment_anagram_list_item" />
+
+
+    <TextView
+        android:id="@+id/wildcards_text_no_words_found"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/text_no_words_found"
+        android:textSize="@dimen/default_text_size"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/wildcards_progressBarLoadingWords"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/colorPrimary"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!--
+    GuideLines need only to solve the issue with smartphones with notch.
+    The button Find would otherwise be cut off the screen on the right
+    -->
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/wildcards_guideline_left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.0" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/wildcards_guideline_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="1.0" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
