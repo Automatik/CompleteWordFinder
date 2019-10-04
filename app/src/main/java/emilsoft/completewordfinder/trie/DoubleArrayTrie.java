@@ -624,22 +624,6 @@ public class DoubleArrayTrie implements Serializable {
         return words;
     }
 
-    /**
-     * Finds all the words that fit in the given string expression according to the wildcards' position.
-     * However, the wildcards can be replaced only by the letters specified.
-     * e.g: given the expression "s??ce" and the allowed letters [i, l, n] the words found will be
-     * "slice", "since", ecc ... and "space" will be discarded.
-     * @see #WILDCARD for the character to use as wildcard
-     * @param expression the string containing the letters and wildcards
-     * @param allowedLetters the letters allowed to be replaced by the wildcards
-     * @return ArrayList containing all the words found
-     */
-    public ArrayList<String> query(String expression, char[] allowedLetters) {
-        ArrayList<String> words = new ArrayList<>();
-        query(expression.toCharArray(), allowedLetters, 0, ROOT, "", words);
-        return words;
-    }
-
     private void query(char[] expression, int index, int root, String current, List<String> words){
         String word;
         if(getBase(root) < EMPTY_VALUE) {
@@ -667,38 +651,6 @@ public class DoubleArrayTrie implements Serializable {
                 int nextNode = getBase(root) + getOffset(next);
                 if(nextNode < getDASize() && getCheck(nextNode) == root)
                     query(expression, index + 1, nextNode, current + next, words);
-            }
-        }
-    }
-
-    private void query(char[] expression, char[] alphabet, int index, int root, String current, List<String> words) {
-        String word;
-        if(getBase(root) < EMPTY_VALUE) {
-            word = composeWord(current, getBase(root));
-            if(word.length() == expression.length && areEquals(word.substring(index),new String(expression).substring(index)))
-                words.add(word);
-            return;
-        }
-        else {
-            int nextNode = getBase(root) + getOffset(ENDMARKER);
-            if (nextNode < getDASize() && getCheck(nextNode) == root && getBase(nextNode) < EMPTY_VALUE
-                    && (word = composeWord(current, ENDMARKER, getBase(nextNode))).length() == expression.length)
-                words.add(word);
-        }
-        if(index < expression.length) {
-            char next = expression[index];
-            if(next == WILDCARD) {
-                int nextIndex = index + 1;
-                for (char c : alphabet) {
-                    int offset = getOffset(c);
-                    int nextNode = getBase(root) + offset;
-                    if (nextNode < getDASize() && getCheck(nextNode) == root)
-                        query(expression, alphabet, nextIndex, nextNode, current + c, words);
-                }
-            } else {
-                int nextNode = getBase(root) + getOffset(next);
-                if(nextNode < getDASize() && getCheck(nextNode) == root)
-                    query(expression, alphabet, index + 1, nextNode, current + next, words);
             }
         }
     }
