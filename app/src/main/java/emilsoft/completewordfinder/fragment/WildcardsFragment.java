@@ -268,10 +268,7 @@ public class WildcardsFragment extends Fragment {
                     trieViewModel.getTrie().observe(getActivity(), new Observer<DoubleArrayTrie>() {
                         @Override
                         public void onChanged(DoubleArrayTrie trie) {
-                            if(wildcardsViewModel.isFilterApplied)
-                                task = new FindWildcards(trie, wildcardsViewModel.filteredLetters);
-                            else
-                                task = new FindWildcards(trie);
+                            task = new FindWildcards(trie);
                             task.setListener(wordsFound -> {
 
                                 if (isProgressBarLoadingWordsVisible) {
@@ -285,6 +282,7 @@ public class WildcardsFragment extends Fragment {
 
                                 int size = wildcardsViewModel.wordsFound.size();
                                 wildcardsViewModel.wordsFound.clear();
+                                wildcardsViewModel.wordsBackup.clear();
                                 if (adapter == null) {
                                     adapter = new AnagramRecyclerViewAdapter(wildcardsViewModel.wordsFound);
                                     wordslist.setAdapter(adapter);
@@ -293,6 +291,9 @@ public class WildcardsFragment extends Fragment {
                                 wildcardsViewModel.wordsFound.addAll(wordsFound);
                                 wildcardsViewModel.wordsBackup.addAll(wordsFound);
                                 adapter.notifyItemRangeInserted(0, wordsFound.size());
+
+                                if(wildcardsViewModel.isFilterApplied)
+                                    applyFilterOnItems(wildcardsViewModel.wordsFound);
                             });
                             task.execute(textInserted);
                         }
@@ -314,7 +315,6 @@ public class WildcardsFragment extends Fragment {
     }
 
     private TrieViewModel.MaxWordLengthListener maxWordLengthListener = (maxWordLength -> {
-        //Log.v(MainActivity.TAG, "WildcardsFragment/ maxWordLengthListener called");
         this.maxWordLength = maxWordLength;
         if(maxWordLength != 0) {
             textInputLayout.setCounterEnabled(true);
@@ -422,10 +422,10 @@ public class WildcardsFragment extends Fragment {
         @Override
         protected Void doInBackground(String... strings) {
             String textInserted = strings[0];
-            if(isFilterApplied)
-                words = (ArrayList<String>) trie.query(textInserted, filteredLetters.toCharArray());
-            else
-                words = (ArrayList<String>) trie.query(textInserted);
+//            if(isFilterApplied)
+//                words = (ArrayList<String>) trie.query(textInserted, filteredLetters.toCharArray());
+//            else
+            words = (ArrayList<String>) trie.query(textInserted);
             if(!words.isEmpty()) {
                 WordUtils.sortAndRemoveDuplicates(words);
                 WordUtils.wordsToUpperCase(words);
