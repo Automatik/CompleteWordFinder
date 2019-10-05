@@ -405,26 +405,14 @@ public class WildcardsFragment extends Fragment {
         private DoubleArrayTrie trie;
         private ArrayList<String> words;
         private FindWildcardsTaskListener listener;
-        private boolean isFilterApplied;
-        private String filteredLetters;
 
         public FindWildcards(DoubleArrayTrie trie) {
             this.trie = trie;
-            isFilterApplied = false;
-        }
-
-        public FindWildcards(DoubleArrayTrie trie, String filteredLetters) {
-            this.trie = trie;
-            isFilterApplied = true;
-            this.filteredLetters = filteredLetters;
         }
 
         @Override
         protected Void doInBackground(String... strings) {
             String textInserted = strings[0];
-//            if(isFilterApplied)
-//                words = (ArrayList<String>) trie.query(textInserted, filteredLetters.toCharArray());
-//            else
             words = (ArrayList<String>) trie.query(textInserted);
             if(!words.isEmpty()) {
                 WordUtils.sortAndRemoveDuplicates(words);
