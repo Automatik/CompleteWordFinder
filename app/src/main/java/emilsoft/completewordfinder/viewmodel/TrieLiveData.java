@@ -26,8 +26,9 @@ public class TrieLiveData extends LiveData<DoubleArrayTrie> {
     private TrieViewModel.InternalMaxWordLengthListener listener;
     private OnCreateTrieListener createTrieListener;
 
-    public TrieLiveData(Context context, Dictionary dictionary, boolean isTrieVersionChanged, TrieViewModel.InternalMaxWordLengthListener listener) {
-        this.listener = listener;
+    public TrieLiveData(Context context, Dictionary dictionary, boolean isTrieVersionChanged, TrieViewModel.InternalMaxWordLengthListener internalMaxWordLengthListener, OnCreateTrieListener createTrieListener) {
+        this.listener = internalMaxWordLengthListener;
+        this.createTrieListener = createTrieListener;
         createTrie(context, dictionary, false, isTrieVersionChanged);
     }
 
@@ -47,10 +48,6 @@ public class TrieLiveData extends LiveData<DoubleArrayTrie> {
     public void createTrie(Context context, Dictionary dictionary, boolean isDictionaryLanguageChanged, boolean isTrieVersionChanged) {
         CreateTrie task = new CreateTrie(context, dictionary, isDictionaryLanguageChanged, isTrieVersionChanged, createTrieTaskListener);
         task.execute();
-    }
-
-    public void setOnCreateTrieListener(OnCreateTrieListener listener) {
-        createTrieListener = listener;
     }
 
     public static class CreateTrie extends AsyncTask<Void, Void, DoubleArrayTrie> {

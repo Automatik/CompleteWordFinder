@@ -39,7 +39,6 @@ public class TrieViewModel extends AndroidViewModel implements SharedPreferences
             for (MaxWordLengthListener listener : listeners)
                 listener.onGetMaxWordLength(maxWordLength);
         });
-        mTrie = new TrieLiveData(application, dictionary, isTrieVersionChanged, internalMaxWordLengthListener);
 
         TrieLiveData.OnCreateTrieListener onCreateTrieListener = () -> {
             if (isTrieVersionChanged) {
@@ -48,7 +47,8 @@ public class TrieViewModel extends AndroidViewModel implements SharedPreferences
                 editor.apply();
             }
         };
-        mTrie.setOnCreateTrieListener(onCreateTrieListener);
+
+        mTrie = new TrieLiveData(application, dictionary, isTrieVersionChanged, internalMaxWordLengthListener, onCreateTrieListener);
     }
 
     public LiveData<DoubleArrayTrie> getTrie() {
