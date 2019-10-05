@@ -24,10 +24,11 @@ import emilsoft.completewordfinder.utils.Dictionary;
 public class TrieLiveData extends LiveData<DoubleArrayTrie> {
 
     private TrieViewModel.InternalMaxWordLengthListener listener;
+    private OnCreateTrieListener createTrieListener;
 
-    public TrieLiveData(Context context, Dictionary dictionary, TrieViewModel.InternalMaxWordLengthListener listener) {
+    public TrieLiveData(Context context, Dictionary dictionary, boolean isTrieVersionChanged, TrieViewModel.InternalMaxWordLengthListener listener) {
         this.listener = listener;
-        createTrie(context, dictionary, false);
+        createTrie(context, dictionary, false, isTrieVersionChanged);
     }
 
     public void setMaxWordLength(int maxWordLength) {
@@ -39,36 +40,45 @@ public class TrieLiveData extends LiveData<DoubleArrayTrie> {
         setValue(trie);
         if(maxWordLength != 0)
             setMaxWordLength(maxWordLength);
+        if(createTrieListener != null)
+            createTrieListener.onCreateTrie();
     };
 
-    public void createTrie(Context context, Dictionary dictionary, boolean isDictionaryLanguageChanged) {
-        CreateTrie task = new CreateTrie(context, dictionary, createTrieTaskListener);
-        task.execute(isDictionaryLanguageChanged);
+    public void createTrie(Context context, Dictionary dictionary, boolean isDictionaryLanguageChanged, boolean isTrieVersionChanged) {
+        CreateTrie task = new CreateTrie(context, dictionary, isDictionaryLanguageChanged, isTrieVersionChanged, createTrieTaskListener);
+        task.execute();
     }
 
-    public static class CreateTrie extends AsyncTask<Boolean, Void, DoubleArrayTrie> {
+    public void setOnCreateTrieListener(OnCreateTrieListener listener) {
+        createTrieListener = listener;
+    }
+
+    public static class CreateTrie extends AsyncTask<Void, Void, DoubleArrayTrie> {
 
         private WeakReference<Context> context;
         private CreateTrieTaskListener listener;
         private Dictionary dictionary;
         private int maxWordLength;
+        private boolean isDictionaryLanguageChanged;
+        private boolean isTrieVersionChanged;
 
-        public CreateTrie(Context context, Dictionary dictionary, CreateTrieTaskListener listener) {
+        public CreateTrie(Context context, Dictionary dictionary, boolean isDictionaryLanguageChanged, boolean isTrieVersionChanged, CreateTrieTaskListener listener) {
             this.context = new WeakReference<>(context);
             this.dictionary = dictionary;
+            this.isDictionaryLanguageChanged = isDictionaryLanguageChanged;
+            this.isTrieVersionChanged = isTrieVersionChanged;
             this.listener = listener;
             maxWordLength = 0;
         }
 
         @Override
-        protected DoubleArrayTrie doInBackground(Boolean... booleans) {
-            boolean isDictionaryLanguageChanged = booleans[0];
+        protected DoubleArrayTrie doInBackground(Void... voids) {
             String filename = dictionary.getFilename();
             DoubleArrayTrie trie = new DoubleArrayTrie(dictionary.getAlphabetSize());
 
             try {
                 // If trie already exists, read it
-                if (!isDictionaryLanguageChanged && fileExists(context.get(), MainActivity.TRIE_FILENAME)) {
+                if (!isDictionaryLanguageChanged && !isTrieVersionChanged && fileExists(context.get(), MainActivity.TRIE_FILENAME)) {
                     FileInputStream fis = context.get().openFileInput(MainActivity.TRIE_FILENAME);
                     BufferedInputStream bis = new BufferedInputStream(fis);
                     ObjectInputStream ois = new ObjectInputStream(bis);
@@ -120,11 +130,20 @@ public class TrieLiveData extends LiveData<DoubleArrayTrie> {
             //Log.v(MainActivity.TAG, "setValue(trie) called in onPostExecute of CreateTrie");
         }
 
-        public interface CreateTrieTaskListener {
+        private interface CreateTrieTaskListener {
 
             void onTrieCreate(DoubleArrayTrie trie, int maxWordLength);
 
         }
+    }
+
+    /**
+     * This listener is to inform the TrieViewModel when the Trie has been created
+     */
+    public interface OnCreateTrieListener {
+
+        void onCreateTrie();
+
     }
 
     private static boolean fileExists(Context context, String filename) {

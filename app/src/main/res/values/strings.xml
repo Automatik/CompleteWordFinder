@@ -42,6 +42,7 @@
     <string name="sharedpref_theme" translatable="false">theme_pref</string>
     <string name="sharedpref_theme_title">Theme</string>
     <string name="sharedpref_theme_default" translatable="false">default</string>
+    <string name="sharedpref_trie_version" translatable="false">trie_version</string>
     <!--<string name="english_dictionary">words_english.txt</string>-->
     <!--<string name="italian_dictionary">280000_parole_italiane.txt</string>-->
     <string name="wildcards_fragment_toast_too_many_wildcards">Too many wildcards. Max is 15</string>

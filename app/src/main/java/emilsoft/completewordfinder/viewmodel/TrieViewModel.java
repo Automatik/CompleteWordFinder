@@ -20,6 +20,7 @@ public class TrieViewModel extends AndroidViewModel implements SharedPreferences
 
     private final TrieLiveData mTrie;
     private final SharedPreferences sharedPreferences;
+    private boolean isTrieVersionChanged;
 
     private static List<MaxWordLengthListener> listeners;
 
@@ -30,11 +31,24 @@ public class TrieViewModel extends AndroidViewModel implements SharedPreferences
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(application);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
+        //Check Trie's version
+        int version = sharedPreferences.getInt(application.getString(R.string.sharedpref_trie_version), 0);
+        isTrieVersionChanged = version < DoubleArrayTrie.TRIE_VERSION;
+
         InternalMaxWordLengthListener internalMaxWordLengthListener = (maxWordLength -> {
             for (MaxWordLengthListener listener : listeners)
                 listener.onGetMaxWordLength(maxWordLength);
         });
-        mTrie = new TrieLiveData(application, dictionary, internalMaxWordLengthListener);
+        mTrie = new TrieLiveData(application, dictionary, isTrieVersionChanged, internalMaxWordLengthListener);
+
+        TrieLiveData.OnCreateTrieListener onCreateTrieListener = () -> {
+            if (isTrieVersionChanged) {
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt(getApplication().getString(R.string.sharedpref_trie_version), DoubleArrayTrie.TRIE_VERSION);
+                editor.apply();
+            }
+        };
+        mTrie.setOnCreateTrieListener(onCreateTrieListener);
     }
 
     public LiveData<DoubleArrayTrie> getTrie() {
@@ -59,7 +73,7 @@ public class TrieViewModel extends AndroidViewModel implements SharedPreferences
             String dictionaryName = sharedPreferences.getString(key, null);
             if(dictionaryName != null) {
                 Dictionary dictionary = Dictionaries.get(dictionaryName);
-                mTrie.createTrie(app, dictionary, true);
+                mTrie.createTrie(app, dictionary, true, isTrieVersionChanged);
             }
         }
     }
