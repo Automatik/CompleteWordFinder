@@ -57,4 +57,6 @@
     <string name="filter_dialog_message">Inserire le lettere che possono essere rimpiazzate dai jolly. Per esempio, data l\'espressione P??TA e il filtro composto dalle lettere EOR si ottengono le parole come POETA e PORTA ma non la parola PISTA.</string>
     <string name="wildcards_fragment_no_filter">Nessun Filtro</string>
     <string name="wildcards_fragment_yes_filter">Filtro:</string>
+    <string name="array_dictionariesAlias_french">Francese</string>
+    <string name="array_dictionariesAlias_swedish">Svedese</string>
 </resources>

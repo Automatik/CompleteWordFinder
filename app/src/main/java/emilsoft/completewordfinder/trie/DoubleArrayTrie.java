@@ -19,7 +19,7 @@ import emilsoft.completewordfinder.MainActivity;
 @SuppressWarnings("JavadocReference")
 public class DoubleArrayTrie implements Serializable {
 
-    public static final int TRIE_VERSION = 1;
+    public static final int TRIE_VERSION = 2;
 
     /**
      * The default alphabet size correspond to the english alphabet

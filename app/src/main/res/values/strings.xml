@@ -65,6 +65,8 @@
     <string name="wildcards_fragment_yes_filter">Filter:</string>
     <string name="array_dictionariesAlias_english">English</string>
     <string name="array_dictionariesAlias_italian">Italian</string>
+    <string name="array_dictionariesAlias_french">French</string>
+    <string name="array_dictionariesAlias_swedish">Swedish</string>
     <string name="array_wordOrdersAlias_ascending">Ascending</string>
     <string name="array_wordOrdersAlias_descending">Descending</string>
     <string name="array_themeListAlias_light">Light</string>

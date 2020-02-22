@@ -4,11 +4,15 @@
     <string-array name="dictionaries">
         <item>english_dictionary</item>
         <item>italian_dictionary</item>
+        <item>french_dictionary</item>
+        <item>swedish_dictionary</item>
     </string-array>
 
     <string-array name="dictionariesAlias">
         <item>@string/array_dictionariesAlias_english</item>
         <item>@string/array_dictionariesAlias_italian</item>
+        <item>@string/array_dictionariesAlias_french</item>
+        <item>@string/array_dictionariesAlias_swedish</item>
     </string-array>
 
     <string-array name="wordOrders">
