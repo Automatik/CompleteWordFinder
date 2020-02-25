@@ -319,7 +319,13 @@ public class AnagramFragment extends Fragment {
         for(char c: letters){
             if(c < 65)
                 return -1;
-            int pos = c - 65; //65 is the position of A in ASCII Table
+            int pos;
+            switch (c) {
+                case 'Å': pos = 26; break;
+                case 'Ä': pos = 27; break;
+                case 'Ö': pos = 28; break;
+                default: pos = c - 65; //65 is the position of A in ASCII Table
+            }
             result *= PRIMES[pos];
         }
         return result;

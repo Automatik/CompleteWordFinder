@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.util.Supplier;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -33,6 +34,7 @@ import emilsoft.completewordfinder.utils.ThemeHelper;
 import emilsoft.completewordfinder.viewmodel.TrieViewModel;
 import emilsoft.completewordfinder.viewmodel.TrieViewModelFactory;
 
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -98,6 +100,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //Read Dictionary in use
         dict = readDictionary();
+
+        Supplier<Dictionary> dictionarySupplier = () -> {
+            Log.v(TAG, "Supplier MainActivity called");
+            return dict;
+        };
+        Dictionaries.setDictionarySupplier(dictionarySupplier);
 
         //Read Word Order in use
         isWordOrderAscending = readWordOrder();

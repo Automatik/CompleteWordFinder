@@ -15,6 +15,7 @@ import java.util.List;
 
 import emilsoft.completewordfinder.BuildConfig;
 import emilsoft.completewordfinder.MainActivity;
+import emilsoft.completewordfinder.utils.Dictionaries;
 
 @SuppressWarnings("JavadocReference")
 public class DoubleArrayTrie implements Serializable {
@@ -77,6 +78,8 @@ public class DoubleArrayTrie implements Serializable {
      */
     private transient TreeSet<Integer> freePositions;
 
+    private String dictionaryName;
+
     public DoubleArrayTrie() {
         this(ENGLISH_ALPHABET_SIZE);
     }
@@ -90,6 +93,9 @@ public class DoubleArrayTrie implements Serializable {
         setAlphabetSize(alphabetSize);
         endmarkerOffset = alphabetSize + 1;
 
+        dictionaryName = Dictionaries.getCurrentDictionaryName();
+        if (dictionaryName == null)
+            Log.v(MainActivity.TAG, "DoubleArrayTrie/ dictionaryName is null");
 
         //index 0 will not be used
         base.add(0, EMPTY_VALUE);
@@ -477,11 +483,30 @@ public class DoubleArrayTrie implements Serializable {
 
     private int getOffset(int letter) {
         //+ 1 because 'a' = 1
-        return (letter == ENDMARKER) ? endmarkerOffset : letter - FIRST_ALPHABET_CHARACTER + 1;
+        switch (dictionaryName) {
+            case Dictionaries.SWEDISH:
+                switch (letter) {
+                    case 'å': return 'z' + 1 - FIRST_ALPHABET_CHARACTER + 1;
+                    case 'ä': return 'z' + 2 - FIRST_ALPHABET_CHARACTER + 1;
+                    case 'ö': return 'z' + 3 - FIRST_ALPHABET_CHARACTER + 1;
+                    case ENDMARKER: return endmarkerOffset;
+                    default: return letter - FIRST_ALPHABET_CHARACTER + 1;
+                }
+            default: return (letter == ENDMARKER) ? endmarkerOffset : letter - FIRST_ALPHABET_CHARACTER + 1;
+        }
     }
 
     private char getCharFromOffset(int offset) {
-        return (char)((offset == endmarkerOffset) ? ENDMARKER : offset + FIRST_ALPHABET_CHARACTER - 1);
+        switch (dictionaryName) {
+            case Dictionaries.SWEDISH:
+                switch (offset) {
+                    case 'z' + 1 - FIRST_ALPHABET_CHARACTER + 1: return 'å';
+                    case 'z' + 2 - FIRST_ALPHABET_CHARACTER + 1: return 'ä';
+                    case 'z' + 3 - FIRST_ALPHABET_CHARACTER + 1: return 'ö';
+                    default: return (char)((offset == endmarkerOffset) ? ENDMARKER : offset + FIRST_ALPHABET_CHARACTER - 1);
+                }
+            default: return (char)((offset == endmarkerOffset) ? ENDMARKER : offset + FIRST_ALPHABET_CHARACTER - 1);
+        }
     }
 
     private String appendEndmarker(String word) {

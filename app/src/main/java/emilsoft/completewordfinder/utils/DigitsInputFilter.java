@@ -19,6 +19,7 @@ public class DigitsInputFilter implements InputFilter {
     // https://developer.android.com/reference/android/text/InputFilter.html#filter(java.lang.CharSequence
 
     private boolean allowWildcard; //the "?" character is allowed
+    private String currentDictionary;
 
     private static final char wildcard = '?';
 
@@ -29,6 +30,9 @@ public class DigitsInputFilter implements InputFilter {
 
     public DigitsInputFilter(boolean allowWildcard) {
         this.allowWildcard = allowWildcard;
+        currentDictionary = Dictionaries.getCurrentDictionaryName();
+        if (currentDictionary == null)
+            currentDictionary = Dictionaries.ENGLISH;
     }
 
     @Override
@@ -60,6 +64,15 @@ public class DigitsInputFilter implements InputFilter {
         int ch = (int) c;
         if((ch >= a && ch <= z) || (ch >= A && ch <= Z))
             return true;
+        switch (currentDictionary) {
+            case Dictionaries.ITALIAN:
+            case Dictionaries.FRENCH:
+            case Dictionaries.ENGLISH:
+                break;
+            case Dictionaries.SWEDISH:
+                if (c == 'ö' || c == 'ä' || c == 'å' || c == 'Ö' || c == 'Ä' || c == 'Å')
+                    return true;
+        }
         return allowWildcard && c == wildcard;
     }
 }
