@@ -29,6 +29,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -91,7 +92,7 @@ public class WildcardsFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        wildcardsViewModel = ViewModelProviders.of(this).get(WildcardsViewModel.class);
+        wildcardsViewModel = new ViewModelProvider(this).get(WildcardsViewModel.class);
         if(getArguments() != null) {
             dictionaryFilename = getArguments().getString(MainActivity.DICTIONARY_FILENAME);
             dictionaryAlphabetSize = getArguments().getInt(MainActivity.DICTIONARY_ALPHABET_SIZE);
@@ -99,7 +100,7 @@ public class WildcardsFragment extends Fragment {
         }
         Dictionary dictionary = new Dictionary(dictionaryFilename, dictionaryAlphabetSize, maxWordLength);
         if(getActivity() != null) {
-            trieViewModel = ViewModelProviders.of(getActivity(),
+            trieViewModel = new ViewModelProvider(getActivity(),
                     new TrieViewModelFactory(getActivity().getApplication(), dictionary)).get(TrieViewModel.class);
             trieViewModel.addMaxWordLengthListener(maxWordLengthListener);
         }

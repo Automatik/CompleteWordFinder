@@ -18,6 +18,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.PreferenceManager;
 
@@ -119,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         //TrieViewModel model = ViewModelProviders.of(this).get(TrieViewModel.class);
-        mModel = ViewModelProviders.of(this,
+        mModel = new ViewModelProvider(this,
                 new TrieViewModelFactory(this.getApplication(), dict)).get(TrieViewModel.class);
         mModel.addMaxWordLengthListener(this);
 

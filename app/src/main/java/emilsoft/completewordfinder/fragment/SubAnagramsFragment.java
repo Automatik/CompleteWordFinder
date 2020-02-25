@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -79,7 +80,7 @@ public class SubAnagramsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        subAnagramsViewModel = ViewModelProviders.of(this).get(SubAnagramsViewModel.class);
+        subAnagramsViewModel = new ViewModelProvider(this).get(SubAnagramsViewModel.class);
         if(getArguments() != null) {
             dictionaryFilename = getArguments().getString(MainActivity.DICTIONARY_FILENAME);
             dictionaryAlphabetSize = getArguments().getInt(MainActivity.DICTIONARY_ALPHABET_SIZE);
@@ -87,7 +88,7 @@ public class SubAnagramsFragment extends Fragment {
         }
         Dictionary dictionary = new Dictionary(dictionaryFilename, dictionaryAlphabetSize);
         if(getActivity() != null)
-            trieViewModel = ViewModelProviders.of(getActivity(),
+            trieViewModel = new ViewModelProvider(getActivity(),
                     new TrieViewModelFactory(getActivity().getApplication(), dictionary)).get(TrieViewModel.class);
     }
 

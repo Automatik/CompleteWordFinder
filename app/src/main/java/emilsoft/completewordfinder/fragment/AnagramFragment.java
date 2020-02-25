@@ -11,6 +11,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -88,7 +89,7 @@ public class AnagramFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        anagramViewModel = ViewModelProviders.of(this).get(AnagramViewModel.class);
+        anagramViewModel = new ViewModelProvider(this).get(AnagramViewModel.class);
         if(getArguments() != null) {
             dictionaryFilename = getArguments().getString(DICTIONARY_FILENAME);
             readDictionary(dictionaryFilename);

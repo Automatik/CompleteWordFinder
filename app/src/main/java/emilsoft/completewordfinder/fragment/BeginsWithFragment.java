@@ -24,6 +24,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -85,7 +86,7 @@ public class BeginsWithFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        beginsWithViewModel = ViewModelProviders.of(this).get(BeginsWithViewModel.class);
+        beginsWithViewModel = new ViewModelProvider(this).get(BeginsWithViewModel.class);
         if(getArguments() != null) {
             dictionaryFilename = getArguments().getString(MainActivity.DICTIONARY_FILENAME);
             dictionaryAlphabetSize = getArguments().getInt(MainActivity.DICTIONARY_ALPHABET_SIZE);
@@ -94,7 +95,7 @@ public class BeginsWithFragment extends Fragment {
         }
         Dictionary dictionary = new Dictionary(dictionaryFilename, dictionaryAlphabetSize, maxWordLength);
         if(getActivity() != null) {
-            trieViewModel = ViewModelProviders.of(getActivity(),
+            trieViewModel = new ViewModelProvider(getActivity(),
                     new TrieViewModelFactory(getActivity().getApplication(), dictionary)).get(TrieViewModel.class);
             trieViewModel.addMaxWordLengthListener(maxWordLengthListener);
         }
