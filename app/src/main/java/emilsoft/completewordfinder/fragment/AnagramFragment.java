@@ -16,15 +16,21 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import emilsoft.completewordfinder.MainActivity;
 import emilsoft.completewordfinder.adapter.AnagramRecyclerViewAdapter;
 import emilsoft.completewordfinder.R;
+import emilsoft.completewordfinder.utils.Dictionaries;
 import emilsoft.completewordfinder.utils.Dictionary;
 import emilsoft.completewordfinder.utils.KeyboardHelper;
 import emilsoft.completewordfinder.utils.ProgressBarHelper;
 import emilsoft.completewordfinder.utils.WordUtils;
+import emilsoft.completewordfinder.utils.ZipUtils;
 import emilsoft.completewordfinder.viewmodel.AnagramViewModel;
+import emilsoft.completewordfinder.viewmodel.TrieViewModel;
+import emilsoft.completewordfinder.viewmodel.TrieViewModelFactory;
 
 import android.text.InputFilter;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -70,17 +76,21 @@ public class AnagramFragment extends Fragment {
 
     private String textInserted, dictionaryFilename;
     private boolean isTextNoWordsFoundVisible = false, isProgressBarLoadingWordsVisible = false;
-    private boolean isDictionaryRead, findAnagramPending;
+    private boolean isDictionaryRead, findAnagramPending, isReadTaskExecuted;
 
     public AnagramFragment() {
         isDictionaryRead = false;
         findAnagramPending = false;
+        isReadTaskExecuted = false;
     }
 
     public static AnagramFragment newInstance(Dictionary dictionary) {
         
         Bundle args = new Bundle();
-        args.putString(DICTIONARY_FILENAME, dictionary.getFilename());
+//        args.putString(DICTIONARY_FILENAME, Dictionaries.getTxtFilenameFromZipFilename(dictionary.getFilename()));
+        args.putString(MainActivity.DICTIONARY_FILENAME, dictionary.getFilename());
+        args.putInt(MainActivity.DICTIONARY_ALPHABET_SIZE, dictionary.getAlphabetSize());
+        args.putInt(MainActivity.DICTIONARY_MAX_WORD, dictionary.getMaxWordLength());
         AnagramFragment fragment = new AnagramFragment();
         fragment.setArguments(args);
         return fragment;
@@ -91,7 +101,24 @@ public class AnagramFragment extends Fragment {
         super.onCreate(savedInstanceState);
         anagramViewModel = new ViewModelProvider(this).get(AnagramViewModel.class);
         if(getArguments() != null) {
-            dictionaryFilename = getArguments().getString(DICTIONARY_FILENAME);
+            Dictionary dictionary = new Dictionary(
+                getArguments().getString(MainActivity.DICTIONARY_FILENAME),
+                getArguments().getInt(MainActivity.DICTIONARY_ALPHABET_SIZE),
+                getArguments().getInt(MainActivity.DICTIONARY_MAX_WORD)
+            );
+            dictionaryFilename = Dictionaries.getTxtFilenameFromZipFilename(dictionary.getFilename());
+            if(getActivity() != null) {
+                TrieViewModel trieViewModel = new ViewModelProvider(getActivity(),
+                        new TrieViewModelFactory(getActivity().getApplication(), dictionary)).get(TrieViewModel.class);
+                trieViewModel.setDictionaryUnzipListener(new TrieViewModel.DictionaryUnzipListener() {
+                    @Override
+                    public void onDictionaryUnzip() {
+                        if (!isReadTaskExecuted && readDictionaryTask != null) {
+                            readDictionaryTask.execute();
+                        }
+                    }
+                });
+            }
             readDictionary(dictionaryFilename);
         }
     }
@@ -276,7 +303,10 @@ public class AnagramFragment extends Fragment {
                 Toast.makeText(getContext(), getString(R.string.toast_error_retrieving_dictionary), Toast.LENGTH_SHORT).show();
             }
         });
-        readDictionaryTask.execute();
+        if (!isReadTaskExecuted && ZipUtils.fileExists(getContext(), dictionaryFilename)) {
+            readDictionaryTask.execute();
+            isReadTaskExecuted = true;
+        }
     }
 
     private void findAnagrams(String textInserted) {
@@ -400,8 +430,8 @@ public class AnagramFragment extends Fragment {
         @Override
         protected Boolean doInBackground(Void... voids) {
             try {
-                //Log.v(MainActivity.TAG, "Starting reading dictionary");
-                BufferedReader reader = new BufferedReader(new InputStreamReader(context.get().getAssets().open(filename)));
+//                Log.v(MainActivity.TAG, "Starting reading dictionary");
+                BufferedReader reader = new BufferedReader(new InputStreamReader(context.get().openFileInput(filename)));
                 String line;
                 while ((line = reader.readLine()) != null) {
                         if(line.length() > maxWordLength)

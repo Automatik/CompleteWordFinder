@@ -103,7 +103,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         dict = readDictionary();
 
         Supplier<Dictionary> dictionarySupplier = () -> {
-            Log.v(TAG, "Supplier MainActivity called");
             return dict;
         };
         Dictionaries.setDictionarySupplier(dictionarySupplier);

@@ -15,10 +15,10 @@ public class Dictionaries {
     public static final String ENGLISH = "english_dictionary";
     public static final String FRENCH = "french_dictionary";
     public static final String SWEDISH = "swedish_dictionary";
-    private static final String ITALIAN_DICT = "280000_parole_italiane.txt";
-    private static final String ENGLISH_DICT = "english_sowpods.txt";
-    private static final String FRENCH_DICT = "french_ods4.txt";
-    private static final String SWEDISH_DICT = "swedish.txt";
+    private static final String ITALIAN_DICT = "italian.zip"; //280000_parole_italiane
+    private static final String ENGLISH_DICT = "english.zip"; //sowpods
+    private static final String FRENCH_DICT = "french.zip"; //ods4
+    private static final String SWEDISH_DICT = "swedish.zip"; //ordlista
     private static HashMap<String, Dictionary> dictionaries;
     private static Supplier<Dictionary> dictSupplier;
 
@@ -56,12 +56,10 @@ public class Dictionaries {
     }
 
     public static Dictionary getCurrentDictionary() {
-        Log.v(MainActivity.TAG, "Dict: "+dictSupplier.get().getFilename());
         return (dictSupplier == null) ? null : dictSupplier.get();
     }
 
     public static String getCurrentDictionaryName() {
-        Log.v(MainActivity.TAG, "Dict: "+dictSupplier.get().getFilename());
         if (dictSupplier == null)
             return null;
         Dictionary dict = dictSupplier.get();
@@ -74,6 +72,10 @@ public class Dictionaries {
             case SWEDISH_DICT: return SWEDISH;
             default: return null;
         }
+    }
+
+    public static String getTxtFilenameFromZipFilename(String zipFilename) {
+        return zipFilename.substring(0, zipFilename.length() - 4).concat(".txt");
     }
 
 }

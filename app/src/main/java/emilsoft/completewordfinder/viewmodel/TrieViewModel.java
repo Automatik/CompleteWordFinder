@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.preference.PreferenceManager;
 
+import emilsoft.completewordfinder.MainActivity;
 import emilsoft.completewordfinder.R;
 import emilsoft.completewordfinder.trie.DoubleArrayTrie;
 import emilsoft.completewordfinder.utils.Dictionaries;
@@ -23,6 +24,7 @@ public class TrieViewModel extends AndroidViewModel implements SharedPreferences
     private boolean isTrieVersionChanged;
 
     private static List<MaxWordLengthListener> listeners;
+    private DictionaryUnzipListener dictionaryUnzipListener;
 
     public TrieViewModel(Application application, Dictionary dictionary) {
         super(application);
@@ -48,7 +50,13 @@ public class TrieViewModel extends AndroidViewModel implements SharedPreferences
             }
         };
 
-        mTrie = new TrieLiveData(application, dictionary, isTrieVersionChanged, internalMaxWordLengthListener, onCreateTrieListener);
+        TrieLiveData.DictionaryUnzipListener internalDictionaryUnzipListener = () -> {
+            if (dictionaryUnzipListener != null)
+                dictionaryUnzipListener.onDictionaryUnzip();
+        };
+
+        mTrie = new TrieLiveData(application, dictionary, isTrieVersionChanged,
+                internalMaxWordLengthListener, onCreateTrieListener, internalDictionaryUnzipListener);
     }
 
     public LiveData<DoubleArrayTrie> getTrie() {
@@ -58,6 +66,10 @@ public class TrieViewModel extends AndroidViewModel implements SharedPreferences
     public void addMaxWordLengthListener(MaxWordLengthListener listener) {
         listeners.add(listener);
         //should also implement removeListener() ?
+    }
+
+    public void setDictionaryUnzipListener(DictionaryUnzipListener listener) {
+        dictionaryUnzipListener = listener;
     }
 
     @Override
@@ -73,7 +85,7 @@ public class TrieViewModel extends AndroidViewModel implements SharedPreferences
             String dictionaryName = sharedPreferences.getString(key, null);
             if(dictionaryName != null) {
                 Dictionary dictionary = Dictionaries.get(dictionaryName);
-                mTrie.createTrie(app, dictionary, true, isTrieVersionChanged);
+                mTrie.createTrie(app, dictionary, true, isTrieVersionChanged); //Should isTrieVersionChanged be set to false here?
             }
         }
     }
@@ -87,6 +99,12 @@ public class TrieViewModel extends AndroidViewModel implements SharedPreferences
     protected interface InternalMaxWordLengthListener {
 
         void onGetMaxWordLength(int maxWordLength);
+
+    }
+
+    public interface DictionaryUnzipListener {
+
+        void onDictionaryUnzip();
 
     }
 
