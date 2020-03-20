@@ -17,11 +17,11 @@
     <string name="text_description_words_contained">Hitta ord som finns i en given bokstavssekvens</string>
     <string name="text_description_sub_anagrams">Hitta ord från en kombination av bokstäver</string>
     <string name="text_description_wildcards">Hitta ord med jokertecknet \"?\"</string>
-    <string name="text_help_anagrams">Infoga ett ord eller en uppsättning bokstäver för att hitta alla anagram. Det maximala antalet bokstäver beror på det längsta ordet som finns i ordboken.</string>
-    <string name="text_help_begins_with">Hitta alla ord som börjar med den angivna uppsättningen bokstäver. Det maximala antalet bokstäver beror på det längsta ordet som finns i ordboken.</string>
-    <string name="text_help_words_contained">Given en bokstavssekvens, hittas alla befintliga ord från vänster till höger, som i ett ordsökningspusselspel. Det maximala antalet bokstäver beror på det längsta ordet som finns i ordboken.</string>
+    <string name="text_help_anagrams">Infoga ett ord eller en uppsättning bokstäver för att hitta alla anagram.\nDet maximala antalet bokstäver beror på det längsta ordet som finns i ordboken.</string>
+    <string name="text_help_begins_with">Hitta alla ord som börjar med den angivna uppsättningen bokstäver.\nDet maximala antalet bokstäver beror på det längsta ordet som finns i ordboken.</string>
+    <string name="text_help_words_contained">Given en bokstavssekvens, hittas alla befintliga ord från vänster till höger, som i ett ordsökningspusselspel.\nDet maximala antalet bokstäver beror på det längsta ordet som finns i ordboken.</string>
     <string name="text_help_sub_anagrams">Given en kombination av bokstäver, hittas alla möjliga befintliga anagram med samma eller mindre längd. Av datorberäkningsskäl är maxantalet bokstäver inställt till 15.</string>
-    <string name="text_help_wildcards">Jokertecknet \"?\" är ett tecken som kan ersättas av valfri bokstav. Använd jokertecken för att hitta alla ord som matchar positionerna för de givna bokstäverna. Det maximala antalet bokstäver beror på det längsta ordet som finns i ordboken. Det maximala antalet jokertecken är 15 på grund av datorberäkningsskäl. Det måste finnas minst en bokstav.</string>
+    <string name="text_help_wildcards">Jokertecknet \"?\" är ett tecken som kan ersättas av valfri bokstav. Använd jokertecken för att hitta alla ord som matchar positionerna för de givna bokstäverna.\nDet maximala antalet bokstäver beror på det längsta ordet som finns i ordboken. Det maximala antalet jokertecken är 15 på grund av datorberäkningsskäl. Det måste finnas minst en bokstav.</string>
     <string name="text_help_example_anagrams">Använder du ordet \"TANGO\" får du anagrammet TOGAN</string>
     <string name="text_help_example_begins_with">Använder du bokstäverna \"STO\" får du orden STOR, STOL, STOLT, STORK osv…</string>
     <string name="text_help_example_words_contained">Använder du bokstäverna \"OSTRAFFLIG\" får du orden OSTRAFFLIG, STRAFF, OST</string>

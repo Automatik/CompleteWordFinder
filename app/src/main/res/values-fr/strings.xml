@@ -39,7 +39,7 @@
     <string name="help_dialog_example_title">Exemple</string>
     <string name="toast_copied_to_clipboard">Mot copié dans le presse-papiers</string>
     <string name="rate_app_title">Evaluer Complete Word Finder</string>
-    <string name="rate_app_message">Si vous aimez utiliser cette application, merci de prendre un moment pour l\'évaluer. Cela ne prendra pas plus d'une minute. Merci pour votre soutien!</string>
+    <string name="rate_app_message">Si vous aimez utiliser cette application, merci de prendre un moment pour l\'évaluer. Cela ne prendra pas plus d\'une minute. Merci pour votre soutien!</string>
     <string name="rate_app_yes_button">Evaluez maintenant</string>
     <string name="rate_app_no_button">Non, merci.</string>
     <string name="rate_app_cancel_button">Plus tard</string>
