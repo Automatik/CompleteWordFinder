@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -120,6 +121,9 @@ public class WildcardsFragment extends Fragment {
         progressBarLoadingWords = (ProgressBar) view.findViewById(R.id.wildcards_progressBarLoadingWords);
         ProgressBarHelper.setInderminateTint(progressBarLoadingWords, getContext());
         find.setOnClickListener(onClickListener);
+        ImageView textFilterImage = (ImageView) view.findViewById(R.id.wildcards_filter_image);
+        textFilterImage.setOnClickListener(onFilterClickListener);
+        textFilter.setOnClickListener(onFilterClickListener);
         //textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters()));
         //textinput.setFilters(WordUtils.addMyInputFilters(textinput.getFilters(), true,  maxWordLength));
         textDescription.setText(R.string.text_description_wildcards);
@@ -230,16 +234,8 @@ public class WildcardsFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if(id == R.id.action_filter) {
-            if (getActivity() != null) {
-                FilterDialog filterDialog = new FilterDialog(getActivity(),
-                        getString(R.string.filter_dialog_title),
-                        getString(R.string.filter_dialog_message),
-                        wildcardsViewModel.filteredLetters,
-                        dictionaryAlphabetSize);
-                filterDialog.setOnButtonApplyListener(onButtonApplyListener);
-                filterDialog.show();
-                return true;
-            }
+            createFilterDialog();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -250,6 +246,25 @@ public class WildcardsFragment extends Fragment {
             findButtonClick();
         }
     };
+
+    private View.OnClickListener onFilterClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            createFilterDialog();
+        }
+    };
+
+    private void createFilterDialog() {
+        if (getActivity() != null) {
+            FilterDialog filterDialog = new FilterDialog(getActivity(),
+                    getString(R.string.filter_dialog_title),
+                    getString(R.string.filter_dialog_message),
+                    wildcardsViewModel.filteredLetters,
+                    dictionaryAlphabetSize);
+            filterDialog.setOnButtonApplyListener(onButtonApplyListener);
+            filterDialog.show();
+        }
+    }
 
     private void findButtonClick() {
         if(getActivity() != null)
