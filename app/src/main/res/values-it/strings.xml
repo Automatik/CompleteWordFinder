@@ -52,7 +52,7 @@
     <string name="action_rate_app">Valuta App</string>
     <string name="action_filter">Filtro</string>
     <string name="filter_dialog_button_apply">APPLICA</string>
-    <string name="filter_dialog_textinput_hint">Lettere consentite</string>
+    <string name="filter_dialog_textinput_hint">Lettere Consentite</string>
     <string name="filter_dialog_title">Filtro</string>
     <string name="filter_dialog_message">Inserire le lettere che possono essere rimpiazzate dai jolly. Per esempio, data l\'espressione P??TA e il filtro composto dalle lettere EOR si ottengono le parole come POETA e PORTA ma non la parola PISTA.</string>
     <string name="wildcards_fragment_no_filter">Nessun Filtro</string>
