@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(id == R.id.action_rate_app) {
             String appPackage = getPackageName();
             try {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackage));
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("appmarket://details?id=" + appPackage));
                 intent.setPackage("com.android.vending");
                 startActivity(intent);
             } catch (android.content.ActivityNotFoundException ex) {
@@ -300,6 +300,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         config.setYesButtonText(R.string.rate_app_yes_button);
         config.setNoButtonText(R.string.rate_app_no_button);
         config.setCancelButtonText(R.string.rate_app_cancel_button);
+        config.setUrl("appmarket://details?id=" + getPackageName());
         RateThisApp.init(config);
         //Monitor launch times and interval from installation
         RateThisApp.onCreate(this);
