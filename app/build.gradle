@@ -44,7 +44,6 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     //For RecyclerView Fast Scroll Styling https://github.com/timusus/RecyclerView-FastScroll
     implementation 'com.simplecityapps:recyclerview-fastscroll:2.0.0'
-    //Rate This App https://github.com/kobakei/Android-RateThisApp
-    implementation 'io.github.kobakei:ratethisapp:1.2.0'
+
 
 }

@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.google.android.material.navigation.NavigationView;
-import com.kobakei.ratethisapp.RateThisApp;
 
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -19,7 +18,6 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.PreferenceManager;
 
 import emilsoft.completewordfinder.fragment.AnagramFragment;
@@ -35,13 +33,9 @@ import emilsoft.completewordfinder.utils.ThemeHelper;
 import emilsoft.completewordfinder.viewmodel.TrieViewModel;
 import emilsoft.completewordfinder.viewmodel.TrieViewModelFactory;
 
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
-
-import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
         TrieViewModel.MaxWordLengthListener, SharedPreferences.OnSharedPreferenceChangeListener {
@@ -122,8 +116,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mModel = new ViewModelProvider(this,
                 new TrieViewModelFactory(this.getApplication(), dict)).get(TrieViewModel.class);
         mModel.addMaxWordLengthListener(this);
-
-        rateThisApp();
     }
 
     @Override
@@ -168,7 +160,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackage));
                 startActivity(intent);
             }
-            RateThisApp.stopRateDialog(this);
         }
 
         if (id == R.id.action_help) {
@@ -292,18 +283,4 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             ThemeHelper.applyTheme(sharedPreferences.getString(key, ThemeHelper.DEFAULT_MODE));
     }
 
-    public void rateThisApp() {
-        RateThisApp.Config config = new RateThisApp.Config(CRITERIA_INSTALL_DAYS, CRITERIA_LAUNCH_TIMES);
-        //Other translations are already available in the RateThisApp's jar
-        config.setTitle(R.string.rate_app_title);
-        config.setMessage(R.string.rate_app_message);
-        config.setYesButtonText(R.string.rate_app_yes_button);
-        config.setNoButtonText(R.string.rate_app_no_button);
-        config.setCancelButtonText(R.string.rate_app_cancel_button);
-        RateThisApp.init(config);
-        //Monitor launch times and interval from installation
-        RateThisApp.onCreate(this);
-        //If the condition is satisfied, "Rate this app" dialog will be shown
-        RateThisApp.showRateDialogIfNeeded(this);
-    }
 }
