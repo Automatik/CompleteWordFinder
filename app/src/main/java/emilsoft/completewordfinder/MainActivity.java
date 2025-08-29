@@ -50,8 +50,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static final String IS_WORD_ORDER_ASCENDING = "isWordOrderAscending";
 
     public static final boolean WORD_ORDER_DEFAULT = false; //descending
-    public static final int CRITERIA_INSTALL_DAYS = 7;
-    public static final int CRITERIA_LAUNCH_TIMES = 7;
 
     private Dictionary dict; //Dictionary in use
     private SharedPreferences sharedPreferences;
