@@ -17,7 +17,6 @@ import emilsoft.completewordfinder.BuildConfig;
 import emilsoft.completewordfinder.MainActivity;
 import emilsoft.completewordfinder.utils.Dictionaries;
 
-@SuppressWarnings("JavadocReference")
 public class DoubleArrayTrie implements Serializable {
 
     public static final int TRIE_VERSION = 2;
