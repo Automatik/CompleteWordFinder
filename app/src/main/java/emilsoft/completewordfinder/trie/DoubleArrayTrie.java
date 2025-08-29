@@ -64,20 +64,20 @@ public class DoubleArrayTrie implements Serializable {
      * letter of the alphabet. So the value of endmarkerOffset is set
      * equal to alphabetSize + 1.
      */
-    private int endmarkerOffset;
+    private final int endmarkerOffset;
 
-    private IntegerList base;
+    private final IntegerList base;
 
-    private IntegerList check;
+    private final IntegerList check;
 
-    private ArrayList<String> tail; // if i < tail.size() and tail[i] == null, then it's an accepting word
+    private final ArrayList<String> tail; // if i < tail.size() and tail[i] == null, then it's an accepting word
 
     /**
      * Auxiliary storage for speeding up the process of searching for free positions
      */
     private transient TreeSet<Integer> freePositions;
 
-    private String dictionaryName;
+    private final String dictionaryName;
 
     public DoubleArrayTrie() {
         this(ENGLISH_ALPHABET_SIZE);
@@ -606,13 +606,13 @@ public class DoubleArrayTrie implements Serializable {
     }
 
     private void permute(Queue<Character> letters, String current, int node, List<String> words) {
-        if(!current.equals("")){
+        if(!current.isEmpty()){
             if(getBase(node) < EMPTY_VALUE) {
                 String word = composeWord(current, getBase(node));
                 String str = word.substring(current.length());
 //                String certain = Arrays.stream(array).map(Object::toString).collect(Collectors.joining());
                 Queue<Character> certain = new ArrayDeque<>(letters);
-                if(str.equals("") || containsOnly(str, certain))
+                if(str.isEmpty() || containsOnly(str, certain))
                     words.add(word);
                 return;
             } else {
@@ -741,11 +741,11 @@ public class DoubleArrayTrie implements Serializable {
      */
     private static boolean containsOnly(String str, String certain) {
         //This will match an empty string always. To change this, replace the * to +
-        return !certain.equals("") && str.matches("[" + certain + "]*");
+        return !certain.isEmpty() && str.matches("[" + certain + "]*");
     }
 
     private static boolean containsOnly(String str, Queue<Character> certain) {
-        if(certain.size() == 0)
+        if(certain.isEmpty())
             return false;
         boolean contained = true;
         char[] array = str.toCharArray();
