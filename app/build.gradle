@@ -6,8 +6,8 @@ android {
         applicationId "emilsoft.completewordfinder"
         minSdkVersion 23
         targetSdkVersion 37
-        versionCode 7
-        versionName "1.0.6"
+        versionCode 8
+        versionName "1.0.7"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         //resConfigs "en" //use this if support only english
         resConfigs 'en', 'it', 'fr', 'sv'
